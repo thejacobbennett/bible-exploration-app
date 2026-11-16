@@ -406,6 +406,10 @@ class Component extends DCLogic {
   componentDidMount() {
     var self = this;
     this.loadText('bsb');
+    // Remember a phone visitor's choice of desktop view.
+    var saved = false;
+    try { saved = window.localStorage.getItem('bibleExplorer.desktopView') === '1'; } catch (err) {}
+    if (saved && this.isPhoneScreen()) this.setDesktopView(true);
     this._narrow = window.innerWidth < 720;
     window.addEventListener('resize', function () {
       var n = window.innerWidth < 720;
@@ -425,6 +429,21 @@ class Component extends DCLogic {
       .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(function (d) { self._texts[tr] = d; self._pending[tr] = false; self.forceUpdate(); })
       .catch(function () { self._pending[tr] = false; self._failed[tr] = true; self.forceUpdate(); });
+  }
+
+  isPhoneScreen() {
+    var sw = (window.screen && window.screen.width) || window.innerWidth;
+    return sw < 720;
+  }
+
+  // Desktop view on a phone: lay the page out at desktop width and let the browser zoom it to fit.
+  setDesktopView(on) {
+    var meta = document.querySelector('meta[name="viewport"]');
+    if (!meta) { meta = document.createElement('meta'); meta.setAttribute('name', 'viewport'); document.head.appendChild(meta); }
+    meta.setAttribute('content', on ? 'width=1280' : 'width=device-width, initial-scale=1');
+    try { window.localStorage.setItem('bibleExplorer.desktopView', on ? '1' : '0'); } catch (err) {}
+    this.setState({ desktopView: on });
+    window.scrollTo(0, 0);
   }
 
   scrollToId(id) {
@@ -645,7 +664,12 @@ class Component extends DCLogic {
     var eraMap = buildMap(ERA_MAPS[eraN], narrow ? 4 / 3 : 16 / 9, narrow ? '4 / 3' : '16 / 9', !!st.mapWide, st.pin, st.mapZoom || 0, go, 'eraPan', 'era' + eraN, st.eraPan, st.dragging, 'eraListClosed', !st.eraListClosed);
     var bookMap = buildMap(BOOK_MAPS[B.id], 4 / 3, '4 / 3', !!st.mapWide, st.pin, st.mapZoom || 0, go, 'bookPan', 'book' + B.id, st.bookPan, st.dragging, 'bookListClosed', !st.bookListClosed);
 
+    var phoneScreen = this.isPhoneScreen();
     return {
+      showDesktopBtn: phoneScreen && !st.desktopView,
+      showPhoneBtn: phoneScreen && !!st.desktopView,
+      toDesktop: function () { self.setDesktopView(true); },
+      toPhone: function () { self.setDesktopView(false); },
       goGap: function () { go({ tab: 'story', era: 9 }); window.scrollTo(0, 0); },
       eraMap: eraMap, bookMap: bookMap,
       tabs: tabs, q: q, trBtns: trBtns, bookOpts: bookOpts, rd: rd, s: s,
@@ -665,7 +689,10 @@ class Component extends DCLogic {
 function view(V) {
   return html`<div style="min-height: 100vh; background: #F5EFE3; color: #231E19; font-family: Inter, system-ui, sans-serif; font-size: 15px; line-height: 1.5">
 
-<header style="border-bottom: 1px solid #E2D8C6; background: #FBF7EF">
+<header style="position: relative; border-bottom: 1px solid #E2D8C6; background: #FBF7EF">
+${(V.showDesktopBtn) ? html`
+<button type="button" onClick=${V.toDesktop} aria-label="Switch to desktop view" style="position: absolute; top: 14px; right: 16px; z-index: 5; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 52px; min-height: 48px; padding: 6px 8px; border-radius: 12px; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.12)"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4" width="19" height="12.5" rx="1.5"></rect><path d="M8.5 20.5h7"></path><path d="M12 16.5v4"></path></svg><span style="font-size: 11px; font-weight: 700; white-space: nowrap">Desktop View</span></button>
+` : null}
 <div style="max-width: 1360px; margin: 0 auto; padding: 16px 32px; display: flex; flex-wrap: wrap; align-items: center; gap: 14px 32px">
 <div style="display: flex; align-items: center; gap: 12px">
 <svg aria-hidden="true" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#7A3B1E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5c3-1.5 6.5-1.5 10 1 3.5-2.5 7-2.5 10-1v14c-3-1.5-6.5-1.5-10 1-3.5-2.5-7-2.5-10-1z"></path><path d="M12 6v14"></path></svg>
@@ -1201,6 +1228,9 @@ ${(V.sel.noThemes) ? html`
 </div>
 </aside>
 </main>
+${(V.showPhoneBtn) ? html`
+<button type="button" onClick=${V.toPhone} aria-label="Switch back to phone view" style="position: fixed; right: 28px; bottom: 28px; z-index: 50; display: flex; align-items: center; gap: 16px; padding: 22px 36px; border-radius: 999px; border: none; background: #231E19; color: #FBF7EF; font-size: 40px; font-weight: 700; cursor: pointer; box-shadow: 0 8px 28px rgba(0,0,0,0.35)"><svg aria-hidden="true" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6.5" y="2.5" width="11" height="19" rx="2"></rect><path d="M11 18.5h2"></path></svg>Phone View</button>
+` : null}
 </div>`;
 }
 
