@@ -1,6 +1,6 @@
 // Bible Explorer: generated from the design mockup. Edit freely.
-import { h, render } from './vendor/preact.module.js';
-import htm from './vendor/htm.module.js';
+import { h, render } from './preact.module.js';
+import htm from './htm.module.js';
 const html = htm.bind(h);
 
 let queued = false;
@@ -118,7 +118,7 @@ var THEMES = [
   { id: 'messiah', name: 'The promised one', short: 'The Messiah', ot: 'The “seed of the woman” (Gen 3:15), the son of David, Isaiah’s servant, Micah’s ruler from Bethlehem, Daniel’s son of man.', nt: 'Jesus as Christ (Messiah). The genealogies in Matthew 1 and Luke 3 link him back to David and Abraham.', books: ['gen','2sa','psa','isa','mic','zec','dan','mat','mrk','luk','jhn','heb'] }
 ];
 
-var TEXT_URLS = { bsb: 'data/bsb.json', kjv: 'data/kjv.json' };
+var TEXT_URLS = { bsb: 'bsb.json', kjv: 'kjv.json' };
 var TR_NAMES = { bsb: 'Berean Standard Bible', kjv: 'King James Version' };
 var SUGGESTIONS = ['shepherd', 'living water', 'covenant', 'mercy', 'kingdom of God', 'fear not'];
 var MAX_RESULTS = 100;
@@ -129,7 +129,7 @@ var PLACES = {
   ur: ['Ur', 30.96, 46.10, 'r'], haran: ['Haran', 36.87, 39.03, 'r'], babylon: ['Babylon', 32.54, 44.42, 'r'],
   nineveh: ['Nineveh', 36.36, 43.15, 'r'], susa: ['Susa', 32.19, 48.26, 'l'], chebar: ['Chebar canal', 32.13, 45.23, 'b'],
   egypt: ['Goshen, Egypt', 30.80, 31.80, 'l'], alexandria: ['Alexandria', 31.20, 29.92, 'l'],
-  redsea: ['Red Sea crossing (traditional)', 29.95, 32.55, 'l'], sinai: ['Mount Sinai', 28.54, 33.97, 'r'],
+  redsea: ['Red Sea crossing', 29.95, 32.55, 'l'], sinai: ['Mount Sinai', 28.54, 33.97, 'r'],
   kadesh: ['Kadesh Barnea', 30.69, 34.49, 'l'], edom: ['Edom', 30.73, 35.61, 'r'], uz: ['Land of Uz (uncertain)', 30.6, 36.6, 'r'],
   moab: ['Moab', 31.40, 35.75, 'r'], nebo: ['Mount Nebo', 31.77, 35.73, 'r'], jordan: ['Jordan River', 31.84, 35.55, 'r'],
   jericho: ['Jericho', 31.87, 35.44, 'r'], jerusalem: ['Jerusalem', 31.78, 35.23, 'l'], bethlehem: ['Bethlehem', 31.70, 35.20, 'b'],
@@ -185,7 +185,7 @@ var BOOK_MAPS = {
     ['bethel', 'Abram’s altar; Jacob’s ladder dream'], ['hebron', 'Abraham settles; the family tomb'], ['beersheba', 'Home of Isaac and Jacob'],
     ['egypt', 'Joseph rises; Jacob’s family settles in Goshen']],
     r: [['Abraham to Jacob', ['ur', 'haran', 'shechem', 'bethel', 'hebron', 'beersheba', 'egypt']]] },
-  exo: { p: [['egypt', 'Slavery, plagues and the Passover'], ['redsea', 'Israel crosses the sea'], ['sinai', 'The Ten Commandments and the covenant']], line: 'The Exodus' },
+  exo: { p: [['egypt', 'Slavery, plagues and the Passover'], ['redsea', 'Israel crosses the sea (traditional site)'], ['sinai', 'The Ten Commandments and the covenant']], line: 'The Exodus' },
   lev: { p: [['sinai', 'All of Leviticus is given at Sinai']] },
   num: { p: [['sinai', 'First census; Israel sets out'], ['kadesh', 'Spies report; Israel refuses to enter'], ['edom', 'Edom refuses passage'], ['moab', 'Second census; Balaam’s blessings']], line: '40 years in the wilderness' },
   deu: { p: [['moab', 'Moses’ farewell speeches'], ['nebo', 'Moses sees the land and dies']] },
@@ -258,7 +258,7 @@ var BOOK_MAPS = {
 var ERA_MAPS = {
   1: { p: [['eden', 'Garden of Eden (traditionally near the rivers)'], ['ararat', 'The ark comes to rest (traditional site)'], ['babylon', 'Tower of Babel']] },
   2: { p: BOOK_MAPS.gen.p.slice(3), line: 'Abraham to Jacob' },
-  3: { p: [['egypt', 'Slavery and the Passover'], ['redsea', 'Crossing the sea'], ['sinai', 'Covenant and law'], ['kadesh', 'Israel refuses to enter'], ['edom', 'Detour around Edom'], ['moab', 'Plains of Moab'], ['nebo', 'Moses dies in sight of the land']], line: 'The Exodus (traditional route)' },
+  3: { p: [['egypt', 'Slavery and the Passover'], ['redsea', 'Crossing the sea (traditional site)'], ['sinai', 'Covenant and law'], ['kadesh', 'Israel refuses to enter'], ['edom', 'Detour around Edom'], ['moab', 'Plains of Moab'], ['nebo', 'Moses dies in sight of the land']], line: 'The Exodus (traditional route)' },
   4: { p: [['jericho', 'The walls fall'], ['shiloh', 'The tabernacle'], ['shechem', 'Covenant renewed'], ['tabor', 'Deborah’s victory'], ['gaza', 'Samson'], ['dan', 'Northernmost city'], ['bethlehem', 'Ruth and Boaz'], ['moab', 'Ruth’s homeland']] },
   5: { p: [['shiloh', 'Samuel’s youth'], ['bethlehem', 'David’s hometown'], ['gath', 'Goliath’s city'], ['gilboa', 'Saul dies'], ['hebron', 'David’s first capital'], ['jerusalem', 'Capital and Temple']] },
   6: { p: [['samaria', 'Northern capital'], ['jerusalem', 'Southern capital'], ['dan', 'Northern shrine'], ['bethel', 'Northern shrine'], ['carmel', 'Elijah’s contest'], ['damascus', 'Aram, a frequent enemy'], ['nineveh', 'Assyria takes Israel (722 BC)'], ['babylon', 'Babylon takes Judah (586 BC)']],
@@ -284,8 +284,10 @@ function buildMap(def, aspect, aspectCss, wide, pin, zoom, go, mapKey, mapId, pa
   pts.forEach(function (p) { x0 = Math.min(x0, p.ux); x1 = Math.max(x1, p.ux); y0 = Math.min(y0, p.uy); y1 = Math.max(y1, p.uy); });
   if (wide) { x0 = (12 - MAP_LON0) * MAP_CX; x1 = (49.5 - MAP_LON0) * MAP_CX; y0 = MAP_LAT1 - 43; y1 = MAP_LAT1 - 27.5; }
   else {
-    var pad = Math.max(0.35, 0.16 * Math.max(x1 - x0, y1 - y0));
-    x0 -= pad; x1 += pad; y0 -= pad; y1 += pad;
+    var span = Math.max(x1 - x0, y1 - y0);
+    var pad = Math.max(0.35, 0.16 * span);
+    var padX = Math.max(0.7, 0.3 * span); // extra room at the sides for place labels
+    x0 -= padX; x1 += padX; y0 -= pad; y1 += pad;
     var mw = 2.4, mh = 1.6, cxm = (x0 + x1) / 2, cym = (y0 + y1) / 2;
     if (x1 - x0 < mw) { x0 = cxm - mw / 2; x1 = cxm + mw / 2; }
     if (y1 - y0 < mh) { y0 = cym - mh / 2; y1 = cym + mh / 2; }
@@ -329,6 +331,13 @@ function buildMap(def, aspect, aspectCss, wide, pin, zoom, go, mapKey, mapId, pa
     }),
     pins: pts.map(function (p) {
       var P = PLACES[p.id], on = p.id === active, side = P[3];
+      // Flip labels that would run off the visible edge of the map.
+      var fx = (0.5 - cx * k) + (p.ux / MAP_FW) * (MAP_FW * k);
+      var reach = Math.min(0.5, 0.25 + P[0].length * 0.015);
+      if (side === 'l' && fx < reach) side = 'r';
+      else if (side === 'r' && fx > 1 - reach) side = 'l';
+      else if (side === 'b' && fx < 0.2) side = 'r';
+      else if (side === 'b' && fx > 0.8) side = 'l';
       return {
         x: pct(p.ux / MAP_FW * 100), y: pct(p.uy / MAP_FH * 100), num: p.num, name: P[0],
         aria: p.num + '. ' + P[0] + ': ' + p.note,
@@ -390,7 +399,15 @@ DIVS.forEach(function (d) {
 });
 
 class Component extends DCLogic {
-  componentDidMount() { this.loadText('bsb'); }
+  componentDidMount() {
+    var self = this;
+    this.loadText('bsb');
+    this._narrow = window.innerWidth < 720;
+    window.addEventListener('resize', function () {
+      var n = window.innerWidth < 720;
+      if (n !== self._narrow) { self._narrow = n; self.forceUpdate(); }
+    });
+  }
 
   loadText(tr) {
     var self = this;
@@ -409,7 +426,7 @@ class Component extends DCLogic {
   scrollToId(id) {
     setTimeout(function () {
       var el = document.getElementById(id);
-      if (el && el.scrollIntoView) el.scrollIntoView({ block: id === 'reader-top' ? 'start' : 'center', behavior: 'smooth' });
+      if (el && el.scrollIntoView) el.scrollIntoView({ block: (id === 'reader-top' || id === 'book-card') ? 'start' : 'center', behavior: 'smooth' });
     }, 150);
   }
 
@@ -447,8 +464,13 @@ class Component extends DCLogic {
     });
 
     var ring = function (b) { return b.id === bookId ? '3px solid ' + INK : '3px solid transparent'; };
+    // On phones the book card sits below the content, so bring it into view when a book is picked.
+    var pickBook = function (id) {
+      go({ book: id, chap: 1, hl: 0 });
+      if (window.innerWidth < 900) self.scrollToId('book-card');
+    };
     var chip = function (b) {
-      return { name: b.name, bg: DIVM[b.div].color, ring: ring(b), pick: function () { go({ book: b.id, chap: 1, hl: 0 }); } };
+      return { name: b.name, bg: DIVM[b.div].color, ring: ring(b), pick: function () { pickBook(b.id); } };
     };
 
     // Overview
@@ -468,7 +490,7 @@ class Component extends DCLogic {
           abbr: b.abbr, name: b.name, ch: b.ch, bg: d.color, ring: ring(b), pressed: b.id === bookId,
           aria: b.name + ', ' + b.ch + ' chapters',
           pct: Math.max(4, Math.round(Math.sqrt(b.ch / 150) * 100)),
-          pick: function () { go({ book: b.id, chap: 1, hl: 0 }); }
+          pick: function () { pickBook(b.id); }
         };
       });
       var meta = (d.tag ? d.tag + ' · ' : '') + d.count + (d.count === 1 ? ' book' : ' books') + ' · ' + d.ch + ' chapters';
@@ -497,7 +519,7 @@ class Component extends DCLogic {
     });
     var strip = BOOKS.map(function (b) {
       var inT = T.books.indexOf(b.id) >= 0;
-      return { name: b.name + (inT ? ' — part of this thread' : ''), bg: inT ? DIVM[b.div].color : '#E3DACA', pick: function () { go({ book: b.id, chap: 1, hl: 0 }); } };
+      return { name: b.name + (inT ? ' — part of this thread' : ''), bg: inT ? DIVM[b.div].color : '#E3DACA', pick: function () { pickBook(b.id); } };
     });
     var theme = { name: T.name, ot: T.ot, nt: T.nt, books: BOOKS.filter(function (b) { return T.books.indexOf(b.id) >= 0; }).map(chip) };
 
@@ -614,7 +636,8 @@ class Component extends DCLogic {
     };
 
     // Maps
-    var eraMap = buildMap(ERA_MAPS[eraN], 16 / 9, '16 / 9', !!st.mapWide, st.pin, st.mapZoom || 0, go, 'eraPan', 'era' + eraN, st.eraPan, st.dragging);
+    var narrow = !!this._narrow;
+    var eraMap = buildMap(ERA_MAPS[eraN], narrow ? 4 / 3 : 16 / 9, narrow ? '4 / 3' : '16 / 9', !!st.mapWide, st.pin, st.mapZoom || 0, go, 'eraPan', 'era' + eraN, st.eraPan, st.dragging);
     var bookMap = buildMap(BOOK_MAPS[B.id], 4 / 3, '4 / 3', !!st.mapWide, st.pin, st.mapZoom || 0, go, 'bookPan', 'book' + B.id, st.bookPan, st.dragging);
 
     return {
@@ -669,7 +692,7 @@ ${(V.isOverview) ? html`
 <p style="margin: 0; font-size: 18px; color: #4A3F35; max-width: 720px">The Protestant Bible gathers 66 books written over more than a thousand years: 39 in the Old Testament, about God and the nation of Israel, and 27 in the New Testament, about Jesus and his followers.</p>
 </div>
 
-<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px">
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px">
 <div style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 14px; padding: 18px"><div style="font-family: Fraunces, Georgia, serif; font-size: 40px; font-weight: 700; line-height: 1">66</div><div style="color: #6B5F52; font-size: 14px; margin-top: 6px">books</div></div>
 <div style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 14px; padding: 18px"><div style="font-family: Fraunces, Georgia, serif; font-size: 40px; font-weight: 700; line-height: 1; color: #8A3E22">39</div><div style="color: #6B5F52; font-size: 14px; margin-top: 6px">Old Testament</div></div>
 <div style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 14px; padding: 18px"><div style="font-family: Fraunces, Georgia, serif; font-size: 40px; font-weight: 700; line-height: 1; color: #1F5A7A">27</div><div style="color: #6B5F52; font-size: 14px; margin-top: 6px">New Testament</div></div>
@@ -686,7 +709,7 @@ ${(V.segments || []).map((s, $index) => html`
 <div title=${s.label} style="flex: ${s.ch} 1 0px; background: ${s.bg}"></div>
 `)}
 </div>
-<div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px">
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px">
 ${(V.legend || []).map((l, $index) => html`
 <button type="button" onClick=${l.pick} style="display: flex; gap: 8px; align-items: flex-start; text-align: left; background: transparent; border: none; padding: 6px; border-radius: 8px; cursor: pointer; color: #231E19; min-height: 44px">
 <span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 3px; margin-top: 4px; flex: none; background: ${l.bg}"></span>
@@ -698,7 +721,7 @@ ${(V.legend || []).map((l, $index) => html`
 
 <div style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 14px">
 <h2 style="margin: 0; font-family: Fraunces, Georgia, serif; font-size: 24px">How the parts fit together</h2>
-<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px">
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px">
 <div style="border-radius: 12px; padding: 16px; background: #F7EDE8"><div style="font-weight: 700; color: #8A3E22">Law</div><div style="font-size: 14px; color: #4A3F35">God makes promises to Israel and asks for exclusive loyalty.</div></div>
 <div style="border-radius: 12px; padding: 16px; background: #F5EEE0"><div style="font-weight: 700; color: #7A5512">History</div><div style="font-size: 14px; color: #4A3F35">How that relationship plays out, and it doesn't go well.</div></div>
 <div style="border-radius: 12px; padding: 16px; background: #EFF1E3"><div style="font-weight: 700; color: #56661C">Poetry</div><div style="font-size: 14px; color: #4A3F35">Worship and wisdom for ancient Israel.</div></div>
@@ -716,7 +739,7 @@ ${(V.legend || []).map((l, $index) => html`
 
 <div style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 14px">
 <h2 style="margin: 0; font-family: Fraunces, Georgia, serif; font-size: 24px">Other Bibles, same story</h2>
-<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px">
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px">
 <div style="border: 2px solid #231E19; border-radius: 12px; padding: 16px"><div style="font-family: Fraunces, Georgia, serif; font-size: 32px; font-weight: 700">66</div><div style="font-weight: 600">Protestant</div><div style="font-size: 13px; color: #6B5F52">The arrangement this app follows.</div></div>
 <div style="border: 1px solid #D9CDB8; border-radius: 12px; padding: 16px"><div style="font-family: Fraunces, Georgia, serif; font-size: 32px; font-weight: 700">24</div><div style="font-weight: 600">Jewish Tanakh</div><div style="font-size: 13px; color: #6B5F52">Same books as the Old Testament, counted and ordered as Torah, Prophets and Writings.</div></div>
 <div style="border: 1px solid #D9CDB8; border-radius: 12px; padding: 16px"><div style="font-family: Fraunces, Georgia, serif; font-size: 32px; font-weight: 700">73</div><div style="font-weight: 600">Catholic</div><div style="font-size: 13px; color: #6B5F52">Adds Tobit, Judith, 1–2 Maccabees, Wisdom, Sirach and Baruch.</div></div>
@@ -824,9 +847,17 @@ ${(V.era.noBooks) ? html`
 <div style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 12px">
 <h2 style="margin: 0; font-family: Fraunces, Georgia, serif; font-size: 24px">Map: ${V.era.name}</h2>
 <div style="display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: flex-end">
+<div role="group" aria-label="Map zoom" style="display: flex; border-radius: 999px; border: 1px solid #D9CDB8; background: #FFFDF8; box-shadow: 0 1px 3px rgba(0,0,0,0.15); overflow: hidden">
+<button type="button" onClick=${V.eraMap.zoomOut} disabled=${V.eraMap.noOut} aria-label="Zoom out" style="cursor: pointer; width: 40px; height: 40px; border: none; background: transparent; color: ${V.eraMap.outColor}; display: flex; align-items: center; justify-content: center; padding: 0"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
+<span aria-hidden="true" style="width: 1px; background: #D9CDB8"></span>
+<button type="button" onClick=${V.eraMap.zoomIn} disabled=${V.eraMap.noIn} aria-label="Zoom in" style="cursor: pointer; width: 40px; height: 40px; border: none; background: transparent; color: ${V.eraMap.inColor}; display: flex; align-items: center; justify-content: center; padding: 0"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
+</div>
+<button type="button" onClick=${V.eraMap.toggle} style="cursor: pointer; min-height: 40px; padding: 6px 14px; border-radius: 999px; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; font-size: 13px; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.15)">${V.eraMap.toggleLabel}</button>
+</div>
 <div onPointerDown=${V.eraMap.down} onPointerMove=${V.eraMap.move} onPointerUp=${V.eraMap.up} onPointerCancel=${V.eraMap.up} style="position: relative; width: 100%; aspect-ratio: ${V.eraMap.aspect}; overflow: hidden; border-radius: 12px; background: #C7DADB; border: 1px solid #D9CDB8; touch-action: none; user-select: none; cursor: ${V.eraMap.cursor}">
 <div style="position: absolute; left: ${V.eraMap.left}%; top: ${V.eraMap.top}%; width: ${V.eraMap.width}%; height: ${V.eraMap.height}%; transition: ${V.eraMap.transition}">
-<img src="assets/basemap.svg" alt="" draggable="false" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: block; pointer-events: none" />
+<img src="basemap.svg" alt="" draggable="false" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: block; pointer-events: none" />
 <svg aria-hidden="true" viewBox="0 0 7372.37 5200" preserveAspectRatio="none" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible">
 ${(V.eraMap.routes || []).map((r, $index) => html`
 <polyline points=${r.points} fill="none" stroke=${r.color} stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.85" vector-effect="non-scaling-stroke"></polyline>
@@ -844,14 +875,6 @@ ${(p.showLabel) ? html`
 </div>
 `)}
 </div>
-<div style="position: absolute; right: 10px; top: 10px; display: flex; gap: 6px; align-items: center">
-<div role="group" aria-label="Map zoom" style="display: flex; border-radius: 999px; border: 1px solid #D9CDB8; background: #FFFDF8; box-shadow: 0 1px 3px rgba(0,0,0,0.15); overflow: hidden">
-<button type="button" onClick=${V.eraMap.zoomOut} disabled=${V.eraMap.noOut} aria-label="Zoom out" style="cursor: pointer; width: 40px; height: 40px; border: none; background: transparent; color: ${V.eraMap.outColor}; display: flex; align-items: center; justify-content: center; padding: 0"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
-<span aria-hidden="true" style="width: 1px; background: #D9CDB8"></span>
-<button type="button" onClick=${V.eraMap.zoomIn} disabled=${V.eraMap.noIn} aria-label="Zoom in" style="cursor: pointer; width: 40px; height: 40px; border: none; background: transparent; color: ${V.eraMap.inColor}; display: flex; align-items: center; justify-content: center; padding: 0"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
-</div>
-<button type="button" onClick=${V.eraMap.toggle} style="cursor: pointer; min-height: 40px; padding: 6px 14px; border-radius: 999px; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; font-size: 13px; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.15)">${V.eraMap.toggleLabel}</button>
-</div>
 </div>
 ${(V.eraMap.hasLegend) ? html`
 <div style="display: flex; flex-wrap: wrap; gap: 6px 16px">
@@ -867,7 +890,7 @@ ${(V.eraMap.list || []).map((it, $index) => html`
 </ol>
 </div>
 </div>
-<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px">
 <div style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 14px; padding: 16px"><div style="font-family: Fraunces, Georgia, serif; font-size: 26px; font-weight: 700; color: #8A2E4A">722 BC</div><div style="font-size: 14px; color: #4A3F35">The northern kingdom, Israel, falls to Assyria.</div></div>
 <div style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 14px; padding: 16px"><div style="font-family: Fraunces, Georgia, serif; font-size: 26px; font-weight: 700; color: #8A2E4A">586 BC</div><div style="font-size: 14px; color: #4A3F35">Judah and Jerusalem fall to Babylon, and the Temple is destroyed.</div></div>
 </div>
@@ -881,7 +904,7 @@ ${(V.isThemes) ? html`
 <h1 style="margin: 4px 0 8px; font-family: Fraunces, Georgia, serif; font-size: 36px; line-height: 1.1">Threads from Genesis to Revelation</h1>
 <p style="margin: 0; color: #4A3F35; max-width: 720px">Pick a thread to light up every book it runs through.</p>
 </div>
-<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px">
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px">
 ${(V.themeBtns || []).map((t, $index) => html`
 <button type="button" onClick=${t.pick} aria-pressed=${t.pressed} style="cursor: pointer; text-align: left; border-radius: 12px; padding: 14px 16px; min-height: 72px; background: ${t.bg}; color: ${t.fg}; border: 1px solid ${t.border}">
 <span style="display: block; font-weight: 700">${t.name}</span>
@@ -1043,9 +1066,9 @@ ${(V.s.hist || []).map((c, $index) => html`
 ` : null}
 <div style="display: flex; flex-direction: column">
 ${(V.s.results || []).map((r, $index) => html`
-<button type="button" onClick=${r.pick} style="cursor: pointer; text-align: left; background: transparent; border: none; border-top: 1px solid #EDE4D3; padding: 14px 6px; display: flex; gap: 14px; align-items: baseline; color: #231E19">
+<button type="button" onClick=${r.pick} style="cursor: pointer; text-align: left; background: transparent; border: none; border-top: 1px solid #EDE4D3; padding: 14px 6px; display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: baseline; color: #231E19">
 <span style="flex: 0 0 130px; font-weight: 700; font-size: 14px; color: ${r.color}">${r.ref}</span>
-<span style="flex: 1 1 auto; font-family: Georgia, 'Times New Roman', serif; font-size: 16px; line-height: 1.6">${r.pre}<mark style="background: #F6E2A8; color: #231E19; border-radius: 3px; padding: 0 2px">${r.mid}</mark>${r.post}</span>
+<span style="flex: 1 1 240px; font-family: Georgia, 'Times New Roman', serif; font-size: 16px; line-height: 1.6">${r.pre}<mark style="background: #F6E2A8; color: #231E19; border-radius: 3px; padding: 0 2px">${r.mid}</mark>${r.post}</span>
 </button>
 `)}
 </div>
@@ -1056,7 +1079,7 @@ ${(V.s.results || []).map((r, $index) => html`
 
 </div>
 
-<aside aria-label="Book details" style="flex: 1 1 340px; min-width: 0">
+<aside id="book-card" aria-label="Book details" style="flex: 1 1 340px; min-width: 0; scroll-margin-top: 12px">
 <div style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 18px; overflow: hidden">
 <div style="padding: 22px 24px; color: #FFFFFF; background: ${V.sel.color}">
 <div style="font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600">${V.sel.kicker}</div>
@@ -1081,9 +1104,17 @@ ${(V.sel.eras || []).map((c, $index) => html`
 <div>
 <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52; margin-bottom: 8px">Map</div>
 <div style="display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: flex-end">
+<div role="group" aria-label="Map zoom" style="display: flex; border-radius: 999px; border: 1px solid #D9CDB8; background: #FFFDF8; box-shadow: 0 1px 3px rgba(0,0,0,0.15); overflow: hidden">
+<button type="button" onClick=${V.bookMap.zoomOut} disabled=${V.bookMap.noOut} aria-label="Zoom out" style="cursor: pointer; width: 40px; height: 40px; border: none; background: transparent; color: ${V.bookMap.outColor}; display: flex; align-items: center; justify-content: center; padding: 0"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
+<span aria-hidden="true" style="width: 1px; background: #D9CDB8"></span>
+<button type="button" onClick=${V.bookMap.zoomIn} disabled=${V.bookMap.noIn} aria-label="Zoom in" style="cursor: pointer; width: 40px; height: 40px; border: none; background: transparent; color: ${V.bookMap.inColor}; display: flex; align-items: center; justify-content: center; padding: 0"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
+</div>
+<button type="button" onClick=${V.bookMap.toggle} style="cursor: pointer; min-height: 40px; padding: 6px 14px; border-radius: 999px; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; font-size: 13px; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.15)">${V.bookMap.toggleLabel}</button>
+</div>
 <div onPointerDown=${V.bookMap.down} onPointerMove=${V.bookMap.move} onPointerUp=${V.bookMap.up} onPointerCancel=${V.bookMap.up} style="position: relative; width: 100%; aspect-ratio: ${V.bookMap.aspect}; overflow: hidden; border-radius: 12px; background: #C7DADB; border: 1px solid #D9CDB8; touch-action: none; user-select: none; cursor: ${V.bookMap.cursor}">
 <div style="position: absolute; left: ${V.bookMap.left}%; top: ${V.bookMap.top}%; width: ${V.bookMap.width}%; height: ${V.bookMap.height}%; transition: ${V.bookMap.transition}">
-<img src="assets/basemap.svg" alt="" draggable="false" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: block; pointer-events: none" />
+<img src="basemap.svg" alt="" draggable="false" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: block; pointer-events: none" />
 <svg aria-hidden="true" viewBox="0 0 7372.37 5200" preserveAspectRatio="none" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible">
 ${(V.bookMap.routes || []).map((r, $index) => html`
 <polyline points=${r.points} fill="none" stroke=${r.color} stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.85" vector-effect="non-scaling-stroke"></polyline>
@@ -1100,14 +1131,6 @@ ${(p.showLabel) ? html`
 ` : null}
 </div>
 `)}
-</div>
-<div style="position: absolute; right: 10px; top: 10px; display: flex; gap: 6px; align-items: center">
-<div role="group" aria-label="Map zoom" style="display: flex; border-radius: 999px; border: 1px solid #D9CDB8; background: #FFFDF8; box-shadow: 0 1px 3px rgba(0,0,0,0.15); overflow: hidden">
-<button type="button" onClick=${V.bookMap.zoomOut} disabled=${V.bookMap.noOut} aria-label="Zoom out" style="cursor: pointer; width: 40px; height: 40px; border: none; background: transparent; color: ${V.bookMap.outColor}; display: flex; align-items: center; justify-content: center; padding: 0"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
-<span aria-hidden="true" style="width: 1px; background: #D9CDB8"></span>
-<button type="button" onClick=${V.bookMap.zoomIn} disabled=${V.bookMap.noIn} aria-label="Zoom in" style="cursor: pointer; width: 40px; height: 40px; border: none; background: transparent; color: ${V.bookMap.inColor}; display: flex; align-items: center; justify-content: center; padding: 0"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
-</div>
-<button type="button" onClick=${V.bookMap.toggle} style="cursor: pointer; min-height: 40px; padding: 6px 14px; border-radius: 999px; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; font-size: 13px; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.15)">${V.bookMap.toggleLabel}</button>
 </div>
 </div>
 ${(V.bookMap.hasLegend) ? html`
