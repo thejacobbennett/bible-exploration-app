@@ -276,7 +276,7 @@ var DRAG = {};
 function mapProj(id) { var P = PLACES[id]; return { ux: (P[2] - MAP_LON0) * MAP_CX, uy: MAP_LAT1 - P[1] }; }
 function pct(v) { return Math.round(v * 1000) / 1000; }
 
-function buildMap(def, aspect, aspectCss, wide, pin, zoom, go, mapKey, mapId, pan, dragging) {
+function buildMap(def, aspect, aspectCss, wide, pin, zoom, go, mapKey, mapId, pan, dragging, listKey, listOpen) {
   var A = aspect;
   var pts = def.p.map(function (e, i) { var q = mapProj(e[0]); return { id: e[0], note: e[1], num: i + 1, ux: q.ux, uy: q.uy }; });
   var routes = def.r ? def.r : (def.line ? [[def.line, def.p.map(function (e) { return e[0]; })]] : []);
@@ -353,6 +353,10 @@ function buildMap(def, aspect, aspectCss, wide, pin, zoom, go, mapKey, mapId, pa
       var on = p.id === active;
       return { num: p.num, name: PLACES[p.id][0], note: p.note, pressed: on, bg: on ? '#F6E2A8' : 'transparent', dot: on ? '#231E19' : '#7A3B1E', pick: toggle(p.id) };
     }),
+    listOpen: listOpen,
+    chevron: listOpen ? 0 : -90,
+    listLabel: (listOpen ? 'Hide ' : 'Show ') + (pts.length === 1 ? 'the place' : 'all ' + pts.length + ' places in order'),
+    toggleList: function () { var o = {}; o[listKey] = listOpen; go(o); }, // listKey stores "closed"
     toggleLabel: wide ? 'Zoom to the story' : 'Show whole region',
     toggle: function () { go({ mapWide: !wide, mapZoom: 0, eraPan: null, bookPan: null }); },
     cursor: isDragging ? 'grabbing' : 'grab',
@@ -541,6 +545,7 @@ class Component extends DCLogic {
       lengthLabel: (B.ch / 1189 * 100).toFixed(1) + '% of the Bible',
       prevName: prev ? prev.name : 'Start', nextName: next ? next.name : 'End',
       noPrev: !prev, noNext: !next,
+      prevOpacity: prev ? 1 : 0.45, nextOpacity: next ? 1 : 0.45,
       goPrev: function () { if (prev) go({ book: prev.id, chap: 1, hl: 0 }); },
       goNext: function () { if (next) go({ book: next.id, chap: 1, hl: 0 }); },
       read: function () { openChap(B.id, 1, 0); }
@@ -637,10 +642,11 @@ class Component extends DCLogic {
 
     // Maps
     var narrow = !!this._narrow;
-    var eraMap = buildMap(ERA_MAPS[eraN], narrow ? 4 / 3 : 16 / 9, narrow ? '4 / 3' : '16 / 9', !!st.mapWide, st.pin, st.mapZoom || 0, go, 'eraPan', 'era' + eraN, st.eraPan, st.dragging);
-    var bookMap = buildMap(BOOK_MAPS[B.id], 4 / 3, '4 / 3', !!st.mapWide, st.pin, st.mapZoom || 0, go, 'bookPan', 'book' + B.id, st.bookPan, st.dragging);
+    var eraMap = buildMap(ERA_MAPS[eraN], narrow ? 4 / 3 : 16 / 9, narrow ? '4 / 3' : '16 / 9', !!st.mapWide, st.pin, st.mapZoom || 0, go, 'eraPan', 'era' + eraN, st.eraPan, st.dragging, 'eraListClosed', !st.eraListClosed);
+    var bookMap = buildMap(BOOK_MAPS[B.id], 4 / 3, '4 / 3', !!st.mapWide, st.pin, st.mapZoom || 0, go, 'bookPan', 'book' + B.id, st.bookPan, st.dragging, 'bookListClosed', !st.bookListClosed);
 
     return {
+      goGap: function () { go({ tab: 'story', era: 9 }); window.scrollTo(0, 0); },
       eraMap: eraMap, bookMap: bookMap,
       tabs: tabs, q: q, trBtns: trBtns, bookOpts: bookOpts, rd: rd, s: s,
       onSearch: function (e) { go({ q: e.target.value, tab: 'search' }); },
@@ -731,9 +737,23 @@ ${(V.legend || []).map((l, $index) => html`
 <div style="border-radius: 12px; padding: 16px; background: #E8ECF5"><div style="font-weight: 700; color: #2E4A8A">Letters</div><div style="font-size: 14px; color: #4A3F35">What to do with Jesus' life and teachings.</div></div>
 <div style="border-radius: 12px; padding: 16px; background: #EEE9F5"><div style="font-weight: 700; color: #5B3A8A">Revelation</div><div style="font-size: 14px; color: #4A3F35">The happy ending: all things made new.</div></div>
 </div>
-<div style="display: flex; gap: 12px; align-items: center; border-top: 1px dashed #D9CDB8; padding-top: 14px">
-<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7A3B1E" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
-<div style="font-size: 14px; color: #4A3F35"><strong>About 400 years</strong> separate Malachi (c. 430 BC) and the birth of Jesus. Persia, Greece, the Maccabees and Rome all rule Judea in between.</div>
+</div>
+
+<div style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 14px">
+<div>
+<div style="font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #7A3B1E">Between the testaments</div>
+<h2 style="margin: 4px 0 8px; font-family: Fraunces, Georgia, serif; font-size: 24px">Why the New Testament world looks so different</h2>
+<p style="margin: 0; color: #4A3F35; max-width: 760px">The Old Testament ends around 430 BC (Malachi), with the Jews back home in a small Persian province, rebuilding. The New Testament opens about 400 years later in a different world: Rome is in charge, Herod is king, people speak Greek, and groups like the Pharisees and Sadducees appear. No Protestant book covers those years, but three empires and one revolt shaped them:</p>
+</div>
+<ol style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px">
+<li style="border-radius: 12px; padding: 14px; background: #F5EEE0"><div style="font-size: 12px; font-weight: 700; color: #7A5512">539–332 BC</div><div style="font-weight: 700; margin: 2px 0 4px">Persian rule</div><div style="font-size: 14px; color: #4A3F35">Persia lets the exiles go home. The Temple is rebuilt. This is where the Old Testament story stops.</div></li>
+<li style="border-radius: 12px; padding: 14px; background: #E8ECF5"><div style="font-size: 12px; font-weight: 700; color: #2E4A8A">332–167 BC</div><div style="font-weight: 700; margin: 2px 0 4px">Greek rule</div><div style="font-size: 14px; color: #4A3F35">Alexander the Great conquers the region, and Greek becomes the common language. The Hebrew Scriptures are translated into Greek (the Septuagint), the version the New Testament writers often quote.</div></li>
+<li style="border-radius: 12px; padding: 14px; background: #F5E8EC"><div style="font-size: 12px; font-weight: 700; color: #8A2E4A">167–63 BC</div><div style="font-weight: 700; margin: 2px 0 4px">The Maccabean revolt</div><div style="font-size: 14px; color: #4A3F35">A Greek king bans Jewish worship and defiles the Temple. The Maccabee family leads a revolt, rededicates the Temple (the origin of Hanukkah), and Judea is independent for about a century.</div></li>
+<li style="border-radius: 12px; padding: 14px; background: #E6EFF4"><div style="font-size: 12px; font-weight: 700; color: #1F5A7A">63 BC onward</div><div style="font-weight: 700; margin: 2px 0 4px">Roman rule</div><div style="font-size: 14px; color: #4A3F35">Rome takes Jerusalem and later makes Herod the Great king of Judea. He rebuilds the Temple on a grand scale, and this is the world Jesus is born into.</div></li>
+</ol>
+<div style="display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between">
+<div style="font-size: 13px; color: #6B5F52">Catholic and Orthodox Bibles include 1–2 Maccabees, which tell part of this story.</div>
+<button type="button" onClick=${V.goGap} style="cursor: pointer; min-height: 40px; padding: 6px 14px; border-radius: 999px; border: 1px solid #D9CDB8; background: #F5EFE3; color: #231E19; font-size: 14px; font-weight: 600">See it on the map →</button>
 </div>
 </div>
 
@@ -883,11 +903,14 @@ ${(V.eraMap.legend || []).map((g, $index) => html`
 `)}
 </div>
 ` : null}
+<button type="button" onClick=${V.eraMap.toggleList} aria-expanded=${V.eraMap.listOpen} style="cursor: pointer; align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 6px 12px 6px 10px; border-radius: 999px; border: 1px solid #D9CDB8; background: #F5EFE3; color: #231E19; font-size: 13px; font-weight: 600"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(${V.eraMap.chevron}deg); transition: transform 0.2s ease"><path d="M6 9l6 6 6-6"></path></svg>${V.eraMap.listLabel}</button>
+${(V.eraMap.listOpen) ? html`
 <ol style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 2px 12px">
 ${(V.eraMap.list || []).map((it, $index) => html`
 <li><button type="button" onClick=${it.pick} aria-pressed=${it.pressed} style="width: 100%; min-height: 40px; text-align: left; cursor: pointer; border: none; border-radius: 8px; padding: 6px 8px; display: flex; gap: 10px; align-items: baseline; font-size: 14px; color: #231E19; background: ${it.bg}"><span style="flex: none; width: 22px; height: 22px; border-radius: 50%; color: #FFFFFF; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; background: ${it.dot}">${it.num}</span><span><strong>${it.name}</strong> <span style="color: #4A3F35">${it.note}</span></span></button></li>
 `)}
 </ol>
+` : null}
 </div>
 </div>
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px">
@@ -1081,10 +1104,16 @@ ${(V.s.results || []).map((r, $index) => html`
 
 <aside id="book-card" aria-label="Book details" style="flex: 1 1 340px; min-width: 0; scroll-margin-top: 12px">
 <div style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 18px; overflow: hidden">
-<div style="padding: 22px 24px; color: #FFFFFF; background: ${V.sel.color}">
+<div style="padding: 14px 16px 22px; color: #FFFFFF; background: ${V.sel.color}">
+<nav aria-label="Previous and next book" style="display: flex; justify-content: space-between; gap: 8px; margin-bottom: 14px">
+<button type="button" onClick=${V.sel.goPrev} disabled=${V.sel.noPrev} aria-label="Previous book: ${V.sel.prevName}" style="cursor: pointer; min-height: 40px; padding: 6px 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.45); background: rgba(255,255,255,0.14); color: #FFFFFF; font-weight: 600; font-size: 14px; opacity: ${V.sel.prevOpacity}">← ${V.sel.prevName}</button>
+<button type="button" onClick=${V.sel.goNext} disabled=${V.sel.noNext} aria-label="Next book: ${V.sel.nextName}" style="cursor: pointer; min-height: 40px; padding: 6px 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.45); background: rgba(255,255,255,0.14); color: #FFFFFF; font-weight: 600; font-size: 14px; opacity: ${V.sel.nextOpacity}">${V.sel.nextName} →</button>
+</nav>
+<div style="padding: 0 8px">
 <div style="font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600">${V.sel.kicker}</div>
 <h2 style="margin: 6px 0 4px; font-family: Fraunces, Georgia, serif; font-size: 40px; line-height: 1.05">${V.sel.name}</h2>
 <div style="font-size: 14px">${V.sel.position}</div>
+</div>
 </div>
 <div style="padding: 22px 24px; display: flex; flex-direction: column; gap: 20px">
 <p style="margin: 0; font-size: 17px; line-height: 1.55">${V.sel.sum}</p>
@@ -1140,11 +1169,14 @@ ${(V.bookMap.legend || []).map((g, $index) => html`
 `)}
 </div>
 ` : null}
+<button type="button" onClick=${V.bookMap.toggleList} aria-expanded=${V.bookMap.listOpen} style="cursor: pointer; align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 6px 12px 6px 10px; border-radius: 999px; border: 1px solid #D9CDB8; background: #F5EFE3; color: #231E19; font-size: 13px; font-weight: 600"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(${V.bookMap.chevron}deg); transition: transform 0.2s ease"><path d="M6 9l6 6 6-6"></path></svg>${V.bookMap.listLabel}</button>
+${(V.bookMap.listOpen) ? html`
 <ol style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 2px 12px">
 ${(V.bookMap.list || []).map((it, $index) => html`
 <li><button type="button" onClick=${it.pick} aria-pressed=${it.pressed} style="width: 100%; min-height: 40px; text-align: left; cursor: pointer; border: none; border-radius: 8px; padding: 6px 8px; display: flex; gap: 10px; align-items: baseline; font-size: 14px; color: #231E19; background: ${it.bg}"><span style="flex: none; width: 22px; height: 22px; border-radius: 50%; color: #FFFFFF; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; background: ${it.dot}">${it.num}</span><span><strong>${it.name}</strong> <span style="color: #4A3F35">${it.note}</span></span></button></li>
 `)}
 </ol>
+` : null}
 </div>
 </div>
 <div>
@@ -1164,10 +1196,6 @@ ${(V.sel.noThemes) ? html`
 <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52; margin-bottom: 6px"><span>Length</span><span style="text-transform: none; letter-spacing: 0">${V.sel.lengthLabel}</span></div>
 <div aria-hidden="true" style="height: 8px; border-radius: 4px; background: #EAE1D0"><div style="height: 8px; border-radius: 4px; background: ${V.sel.color}; width: ${V.sel.pct}%"></div></div>
 <div style="font-size: 12px; color: #6B5F52; margin-top: 4px">Compared with Psalms, the longest book (150 chapters).</div>
-</div>
-<div style="display: flex; gap: 10px; border-top: 1px solid #E2D8C6; padding-top: 16px">
-<button type="button" onClick=${V.sel.goPrev} disabled=${V.sel.noPrev} style="flex: 1 1 0px; cursor: pointer; min-height: 44px; border-radius: 10px; border: 1px solid #D9CDB8; background: #FFFFFF; color: #231E19; font-weight: 600; font-size: 14px">← ${V.sel.prevName}</button>
-<button type="button" onClick=${V.sel.goNext} disabled=${V.sel.noNext} style="flex: 1 1 0px; cursor: pointer; min-height: 44px; border-radius: 10px; border: 1px solid #D9CDB8; background: #FFFFFF; color: #231E19; font-weight: 600; font-size: 14px">${V.sel.nextName} →</button>
 </div>
 </div>
 </div>
