@@ -1170,6 +1170,205 @@ var TRAD_NAME = {}; TRADS.forEach(function (t) { TRAD_NAME[t.id] = t; });
     sxtrad: { T: 'COBPN', S: 'LARM' }, affirm: { T: '', S: 'LARM' }
   });
 })();
+// ----- Practice: living the faith day to day, across traditions -----
+// Each practice: the shared biblical basis, then how each tradition typically lives it, with one concrete step.
+// ways[trad] = [how it is lived, a step to try this week, optional [source label, url]]
+var PR_SRC = {
+  ccc: ['Catechism of the Catholic Church: the precepts of the Church', 'https://www.vatican.va/archive/ENG0015/__P75.HTM'],
+  oca: ['Orthodox Church in America: fasting seasons', 'https://www.oca.org/liturgics/outlines/fasting-fast-free-seasons-of-the-church'],
+  luth: ['Luther’s Small Catechism: daily prayers', 'https://bookofconcord.org/small-catechism/appendix-i/'],
+  bcp: ['Book of Common Prayer: the Daily Office online', 'https://www.commonprayeronline.org/'],
+  heid: ['Heidelberg Catechism, Lord’s Day 38', 'https://www.heidelberg-catechism.com/lang/lords-days/38.html'],
+  rules: ['The General Rules of the Methodist Church', 'https://www.umc.org/en/content/the-general-rules-of-the-methodist-church'],
+  bfm: ['Baptist Faith and Message 2000', 'https://bfm.sbc.net/bfm2000/'],
+  ag: ['Assemblies of God Statement of Fundamental Truths', 'https://en.wikipedia.org/wiki/Assemblies_of_God_Statement_of_Fundamental_Truths'],
+  menno: ['Confession of Faith in a Mennonite Perspective', 'https://www.mennoniteusa.org/confession-of-faith/'],
+  didache: ['Didache (Britannica)', 'https://www.britannica.com/topic/Didache']
+};
+var PRACTICES = [
+  { id: 'pray', name: 'Daily prayer',
+    why: 'Jesus taught his followers a pattern of prayer and often withdrew to pray alone. The psalmists and Daniel prayed at set times of day, the first Christians kept the Jewish hours of prayer, and Paul urges believers to pray without ceasing.',
+    refs: [['mat', 6, 9, 'Matthew 6:9–13'], ['mrk', 1, 35, 'Mark 1:35'], ['psa', 55, 17, 'Psalm 55:17'], ['dan', 6, 10, 'Daniel 6:10'], ['act', 3, 1, 'Acts 3:1'], ['1th', 5, 17, '1 Thessalonians 5:17']],
+    shared: 'Every tradition prays the Lord’s Prayer, prays the Psalms in some form, and encourages both set times of prayer and spontaneous prayer through the day.',
+    ways: {
+      C: ['The Liturgy of the Hours (Morning and Evening Prayer) is the Church’s daily prayer, and laypeople are encouraged to join it. Many also pray the Rosary, the Angelus at morning, noon and evening, and an evening examination of the day.', 'Pray the Angelus at noon each day, or review the day each night: where God was present, where you fell short, what tomorrow needs.'],
+      O: ['Most Orthodox keep a morning and evening “prayer rule” from a prayer book, standing before an icon corner at home. Many also pray the Jesus Prayer, “Lord Jesus Christ, Son of God, have mercy on me, a sinner,” often with a prayer rope.', 'Set up a small icon corner and say the morning and evening prayers there; pray the Jesus Prayer slowly 33 times.'],
+      L: ['Luther’s Small Catechism gives a simple pattern: on rising and at bedtime, make the sign of the cross, say the Creed and the Lord’s Prayer, then a short morning or evening prayer, plus prayers at meals.', 'Use Luther’s Morning and Evening Prayers for one week, morning and night.', PR_SRC.luth],
+      A: ['The Daily Office, Morning and Evening Prayer from the Book of Common Prayer, with psalms and Bible readings, is the backbone of Anglican prayer; Noonday Prayer and Compline round out the day.', 'Pray Compline, the short service before sleep, every night this week.', PR_SRC.bcp],
+      R: ['Reformed piety stresses prayer in one’s own words shaped by Scripture and the Lord’s Prayer, and daily family worship: a Bible reading, prayer and often a sung psalm.', 'After dinner, read a psalm aloud with your household and pray for each person by name.'],
+      M: ['Wesley counted prayer, private, family and public, first among the “means of grace.” Methodists also renew the Covenant Prayer each year (“I am no longer my own, but thine”).', 'Pray Wesley’s Covenant Prayer each morning this week.'],
+      B: ['Many Baptists keep a daily “quiet time” of Bible reading and personal prayer, and gather for midweek prayer meetings. Prayer is usually spontaneous rather than from a book.', 'Use the ACTS pattern for ten minutes a day: adoration, confession, thanksgiving, supplication.'],
+      P: ['Prayer is expected to be expressive and expectant: praying aloud together, praying in tongues, laying hands on the sick and praying for healing.', 'Ask one person this week how you can pray for them, and pray with them on the spot.', PR_SRC.ag],
+      N: ['Anabaptist prayer tends to be simple and humble; many Amish pray silently before and after meals and use old prayer books. Praying for enemies, as Jesus commands, is stressed.', 'Pause in silent prayer before each meal, and pray daily for someone you find hard to love.']
+    } },
+  { id: 'word', name: 'Reading Scripture',
+    why: 'Scripture describes itself as God-breathed and useful for teaching and training in righteousness. The faithful person meditates on God’s law day and night, and Israel was told to keep God’s words before their children at home and on the road.',
+    refs: [['2ti', 3, 16, '2 Timothy 3:16–17'], ['psa', 1, 2, 'Psalm 1:2'], ['psa', 119, 105, 'Psalm 119:105'], ['deu', 6, 6, 'Deuteronomy 6:6–7'], ['act', 17, 11, 'Acts 17:11']],
+    shared: 'All read Scripture aloud in worship and encourage personal reading. They differ in how Scripture relates to Tradition and church teaching (see Compare).',
+    ways: {
+      C: ['Catholics hear Scripture through the lectionary at Mass (a three-year Sunday cycle) and are encouraged to pray it through lectio divina: read, meditate, pray, contemplate.', 'Take this Sunday’s Gospel and do lectio divina with it for ten minutes on three days.'],
+      O: ['Scripture is read chiefly in the Church’s worship and understood with the Church Fathers. The Psalter is prayed through each week in monasteries, and each day has an assigned Epistle and Gospel.', 'Read the day’s appointed Epistle and Gospel from the Orthodox calendar each morning.'],
+      L: ['Lutherans read Scripture through the lens of Law (what God requires) and Gospel (what God gives in Christ), alongside the Catechism.', 'Read a chapter of a Gospel and mark where you hear Law and where you hear Gospel.'],
+      A: ['The Daily Office lectionary takes readers through most of the Bible each year, and the older prayer books pray all 150 psalms every month.', 'Follow the 30-day psalm cycle: the morning and evening psalms for each day of the month.', PR_SRC.bcp],
+      R: ['Reformed churches favor preaching straight through books of the Bible, personal study, and memorizing a catechism such as the Westminster Shorter Catechism.', 'Memorize Shorter Catechism Question 1 and the verses behind it (1 Corinthians 10:31; Psalm 73:25–26).'],
+      M: ['Wesley called himself “a man of one book” and listed “searching the Scriptures” as a means of grace. Methodists often study Scripture in small groups.', 'Join or start a small group that reads one book of the Bible together.', PR_SRC.rules],
+      B: ['Baptists stress personal Bible reading and memorization, Sunday school classes for every age, and reading plans that cover the whole Bible.', 'Start a read-through-the-Bible plan and keep it for a week.', PR_SRC.bfm],
+      P: ['Pentecostals read Scripture expecting the same Spirit at work in Acts to act today, and often share testimonies of how a passage spoke to them.', 'Read through the book of Acts this week, a few chapters a day.'],
+      N: ['Anabaptists read Scripture together and discern its meaning as a congregation, with the Sermon on the Mount at the center of discipleship.', 'Read Matthew 5–7 every day this week and choose one command to act on.', PR_SRC.menno]
+    } },
+  { id: 'worship', name: 'Sunday worship and the Lord’s Supper',
+    why: 'The first Christians devoted themselves to the apostles’ teaching, fellowship, the breaking of bread and prayer, and met on the first day of the week, the day of the resurrection. Jesus told them to share the bread and cup in remembrance of him.',
+    refs: [['act', 2, 42, 'Acts 2:42'], ['act', 20, 7, 'Acts 20:7'], ['1co', 11, 23, '1 Corinthians 11:23–26'], ['heb', 10, 24, 'Hebrews 10:24–25'], ['rev', 1, 10, 'Revelation 1:10']],
+    shared: 'All gather on Sunday for Scripture, prayer, singing and the Lord’s Supper. They differ on what the Supper is and how often it is shared.',
+    ways: {
+      C: ['Sunday Mass is an obligation (the first precept of the Church), and the Eucharist is called “the source and summit of the Christian life.” Catholics are to receive Communion at least once in the Easter season, and many also spend time in Eucharistic adoration.', 'Attend one weekday Mass, or spend an hour in adoration.', PR_SRC.ccc],
+      O: ['The Divine Liturgy on Sunday is the center of Orthodox life, usually prepared for by Saturday evening Vespers, prayers before Communion, a fast from the night before, and regular confession.', 'Go to Saturday evening Vespers before the Sunday Liturgy.'],
+      L: ['The Divine Service joins Word and Sacrament, and many congregations celebrate Communion every Sunday. The Small Catechism teaches that Christ’s body and blood are truly given “for you, for the forgiveness of sins.”', 'Before church, read the Small Catechism’s short section on the Sacrament of the Altar.'],
+      A: ['The Holy Eucharist is the main Sunday service in most parishes. Choral Evensong, sung Evening Prayer, is a cherished Anglican treasure.', 'Attend a service of Evensong, or Evening Prayer, this week.'],
+      R: ['Lord’s Day worship centers on the preached Word. The Lord’s Supper is a spiritual feeding on Christ, held weekly in some churches and monthly or quarterly in many, with self-examination beforehand.', 'On Saturday evening, examine yourself with 1 Corinthians 11:28 and pray for the next day’s preaching.', PR_SRC.heid],
+      M: ['Wesley urged “constant communion,” taking the Lord’s Supper as often as possible. Methodist worship is known for its hymns, many by Charles Wesley.', 'Learn one Charles Wesley hymn, such as “And Can It Be,” and sing or read it daily.'],
+      B: ['The Lord’s Supper is an ordinance, a memorial, usually held monthly or quarterly. Worship centers on preaching and congregational singing.', 'Invite someone to church with you and have lunch together afterward.', PR_SRC.bfm],
+      P: ['Worship is often extended and participatory, with raised hands, spontaneous prayer, and spiritual gifts exercised in the service, “for the strengthening of the church.”', 'Arrive early and pray for the service and the people around you.'],
+      N: ['Many Anabaptists join the Lord’s Supper with footwashing (John 13). Amish congregations hold Communion twice a year, after a council meeting where members make peace with one another.', 'Before your next Communion, make peace with someone you are at odds with (Matthew 5:23–24).']
+    } },
+  { id: 'confess', name: 'Confession and repentance',
+    why: 'If we confess our sins, God is faithful to forgive. James tells believers to confess their sins to one another and pray for one another. Psalm 51 models honest repentance, and Jesus gave a pattern for making things right with a brother or sister.',
+    refs: [['1jn', 1, 9, '1 John 1:9'], ['jas', 5, 16, 'James 5:16'], ['psa', 51, 1, 'Psalm 51'], ['jhn', 20, 22, 'John 20:22–23'], ['mat', 18, 15, 'Matthew 18:15–17']],
+    shared: 'All call for honest confession to God and reconciliation with others. They differ on confession to a priest and on absolution as a sacrament.',
+    ways: {
+      C: ['The sacrament of Reconciliation (confession to a priest, with absolution) is required at least once a year for serious sin and encouraged often. An examination of conscience comes first.', 'Do a nightly examination of conscience this week, then go to confession.', PR_SRC.ccc],
+      O: ['Confession is a holy mystery: the penitent confesses before an icon of Christ, with the priest as witness and guide. It is made regularly, especially in the fasting seasons, often with a spiritual father.', 'Write down what weighs on you and arrange to see a priest.'],
+      L: ['Lutherans confess together in every service and keep private confession and absolution, which the Small Catechism describes and Luther valued highly.', 'Ask your pastor about private confession, using the Small Catechism’s short form.'],
+      A: ['A general confession is part of every Office and Eucharist. Private confession, the Reconciliation of a Penitent, is available; the Anglican saying is “all may, none must, some should.”', 'Pray the prayer book’s general confession slowly, every evening.'],
+      R: ['Confession is made directly to God, publicly in the service’s prayer of confession and privately. Elders care for members through church discipline aimed at restoration.', 'Pray through Psalm 51 in your own words, one section a day.'],
+      M: ['Early Methodist “bands” met weekly to confess sins to one another and pray. Wesley’s question, “How is it with your soul?”, still shapes accountability groups.', 'Find one trusted friend and meet weekly to ask each other, “How is it with your soul?”'],
+      B: ['Confession is made to God through Christ alone, with no priestly absolution. Many Baptists have accountability partners and seek to make things right with those they have wronged.', 'Make one apology this week that you have been putting off.'],
+      P: ['Repentance is often public and heartfelt, at an altar call or in prayer ministry where others pray over the person.', 'Respond to an altar call or ask someone to pray with you about a specific struggle.'],
+      N: ['Anabaptists practice congregational discipline and restoration following Matthew 18, and reconciliation among members comes before the Lord’s Supper.', 'Go directly and privately to someone who has wronged you, aiming at peace.', PR_SRC.menno]
+    } },
+  { id: 'fast', name: 'Fasting',
+    why: 'Jesus assumed his followers would fast (“when you fast,” not “if”), and said they would fast once he was taken away. The church in Antioch fasted and prayed before sending out missionaries. Isaiah insists that the fast God chooses includes justice and care for the hungry.',
+    refs: [['mat', 6, 16, 'Matthew 6:16–18'], ['mat', 9, 15, 'Matthew 9:15'], ['act', 13, 2, 'Acts 13:2–3'], ['isa', 58, 6, 'Isaiah 58:6–7']],
+    shared: 'All see fasting as a way to humble oneself before God and make room for prayer. Catholic and Orthodox Christians keep fasts set by the Church; most Protestants fast voluntarily.',
+    ways: {
+      C: ['Catholics fast (one full meal, two smaller ones) on Ash Wednesday and Good Friday from ages 18 to 59, abstain from meat on Fridays in Lent from age 14, and keep Fridays through the year as days of penance. There is also a one-hour fast before Communion.', 'Keep this Friday meatless and give what you save to the poor.', PR_SRC.ccc],
+      O: ['The Orthodox fast on most Wednesdays and Fridays (remembering Christ’s betrayal and crucifixion) and in four seasons: Great Lent, the Nativity fast, the Apostles’ fast and the Dormition fast. Fasting means going without meat, dairy and, at stricter times, fish, wine and oil. A priest helps adapt the rule, and the Didache shows Wednesday and Friday fasts were kept by early Christians.', 'Keep Wednesday and Friday as plant-based days this week, with extra prayer.', PR_SRC.oca],
+      L: ['Luther called fasting “fine outward training” but not what makes a person worthy of the Sacrament. Lutherans fast voluntarily, especially in Lent.', 'Skip one meal this week and spend that time in prayer.'],
+      A: ['The Book of Common Prayer names Ash Wednesday and Good Friday as fasts, and treats Fridays and Lent as times of self-denial.', 'Give up one comfort for this week and pray when you miss it.'],
+      R: ['Fasting is voluntary. Reformed churches have historically called days of fasting and prayer in times of crisis or before major decisions.', 'Fast before a decision you are facing, and pray about it at each missed meal.'],
+      M: ['Wesley fasted regularly on Wednesdays and Fridays and urged Methodists to fast as one of the ordinances of God.', 'Fast until mid-afternoon on Friday, as Wesley did.', PR_SRC.rules],
+      B: ['Fasting is voluntary, usually tied to a specific need for prayer or guidance.', 'Choose one day to fast for one specific person or need.'],
+      P: ['Many Pentecostal and charismatic churches begin the year with a congregational fast, often 21 days, sometimes as a “Daniel fast” of vegetables and water.', 'Try a three-day Daniel fast (vegetables, fruit, water) with a friend.'],
+      N: ['Fasting is practiced simply. Some Amish communities keep Good Friday as a day of fasting and reflection.', 'Fast quietly one day and give the cost of your meals away.']
+    } },
+  { id: 'rest', name: 'The Lord’s Day and rest',
+    why: 'God rested on the seventh day and blessed it, and the Sabbath command was given for rest and worship. Jesus said the Sabbath was made for people. The church gathered on the first day of the week, the Lord’s Day, and Hebrews speaks of a Sabbath rest that remains for God’s people.',
+    refs: [['gen', 2, 2, 'Genesis 2:2–3'], ['exo', 20, 8, 'Exodus 20:8–11'], ['mrk', 2, 27, 'Mark 2:27'], ['heb', 4, 9, 'Hebrews 4:9–10'], ['act', 20, 7, 'Acts 20:7']],
+    shared: 'Nearly all Christians keep Sunday as the day of worship, honoring the resurrection. They differ on how strictly to rest from work.',
+    ways: {
+      C: ['Catholics are to attend Mass on Sunday and holy days and to avoid work or business that hinders worship, joy and rest.', 'Plan one restful Sunday activity with family or friends after Mass, with no shopping or errands.', PR_SRC.ccc],
+      O: ['Every Sunday is a “little Pascha,” a weekly Easter. By an ancient canon of the Council of Nicaea, the faithful do not kneel in church on Sundays.', 'Begin Sunday on Saturday evening with Vespers, and keep Sunday as a feast.'],
+      L: ['Luther explained the Sabbath command as not despising preaching and God’s Word, but holding it sacred and gladly hearing and learning it. The day itself is a matter of Christian freedom.', 'On Sunday afternoon, talk over the sermon with someone.'],
+      A: ['Sunday is kept as the feast of the resurrection with the Eucharist. Many Anglicans add Evensong or a quiet afternoon.', 'Set aside two screen-free hours on Sunday for rest and prayer.'],
+      R: ['The Westminster standards call for a holy rest all day, given to worship, with exceptions for works of necessity and mercy. The Heidelberg Catechism adds resting from evil works every day, beginning the eternal Sabbath now.', 'Prepare on Saturday so Sunday is free for worship, rest and a visit to someone in need.', PR_SRC.heid],
+      M: ['Methodists keep Sunday for worship and fellowship. Early Methodists were known for strict Sunday observance.', 'Use Sunday for worship plus one act of mercy, such as visiting someone homebound.'],
+      B: ['The Baptist Faith and Message calls the Lord’s Day a Christian institution for regular observance, with worship and rest, and leaves activities to the believer’s conscience under Christ.', 'Choose one regular Sunday habit that refreshes you and others.', PR_SRC.bfm],
+      P: ['Sunday centers on extended worship. Many also attend evening or midweek services.', 'Rest from work-related email for the whole day.'],
+      N: ['Old Order Amish hold worship every other Sunday in members’ homes; “off Sundays” are for rest and visiting family and neighbors.', 'Use Sunday afternoon to visit a neighbor or relative.']
+    } },
+  { id: 'give', name: 'Giving and generosity',
+    why: 'Paul says God loves a cheerful giver. The early church shared possessions so that no one was in need. Jesus praised the widow’s small but costly gift and warned against storing up treasure on earth.',
+    refs: [['2co', 9, 6, '2 Corinthians 9:6–7'], ['act', 4, 32, 'Acts 4:32–35'], ['luk', 21, 1, 'Luke 21:1–4'], ['mat', 6, 19, 'Matthew 6:19–21'], ['mal', 3, 10, 'Malachi 3:10']],
+    shared: 'All teach that possessions are held in trust from God and that giving to the church and the poor is part of discipleship. They differ on whether the tithe (10%) is a rule or a guide.',
+    ways: {
+      C: ['One precept of the Church is to help provide for the Church’s needs according to one’s ability. Almsgiving, with prayer and fasting, is one of the three Lenten disciplines.', 'Set a fixed percentage for giving and give one gift to the poor directly this week.', PR_SRC.ccc],
+      O: ['Almsgiving goes with fasting and prayer, especially in Lent. Many parishes teach proportional giving (“stewardship”) rather than a strict tithe.', 'Give what you save by fasting this week to someone in need.'],
+      L: ['Giving is a fruit of the Gospel, not a condition of salvation. Lutherans encourage regular proportional giving to the congregation and to relief work.', 'Look at last month’s spending and set a giving percentage you will grow into.'],
+      A: ['Anglicans generally treat the tithe as a standard to aim for, given freely in thanks rather than by rule.', 'Give anonymously to one need you hear about this week.'],
+      R: ['Giving is part of thankful obedience. Deacons distribute aid to the poor in the congregation and beyond.', 'Ask your church’s deacons how you can help meet a current need.'],
+      M: ['Wesley’s rule for money: “Gain all you can, save all you can, give all you can.” Methodists are known for organized relief through their churches.', 'Find one expense to cut and give the difference away.'],
+      B: ['The tithe is widely taught as the starting point. The Baptist Faith and Message urges giving cheerfully, regularly, systematically, proportionately and liberally.', 'Set up regular, automatic giving to your church.', PR_SRC.bfm],
+      P: ['Tithes and offerings are central to worship, often given expectantly. Some churches teach a “prosperity” view of giving, which many other Pentecostals reject.', 'Give a first portion as soon as you are paid, before other spending.'],
+      N: ['Anabaptists practice mutual aid: congregations cover members’ medical bills, rebuild after disasters, and support relief agencies such as Mennonite Central Committee.', 'Help one family in your church or street with a practical need.']
+    } },
+  { id: 'mercy', name: 'Serving the poor and seeking justice',
+    why: 'Jesus said that what is done for the hungry, the stranger, the sick and the prisoner is done for him. Micah sums up God’s requirement as doing justice, loving mercy and walking humbly with God. James calls caring for orphans and widows pure religion.',
+    refs: [['mat', 25, 31, 'Matthew 25:31–46'], ['mic', 6, 8, 'Micah 6:8'], ['jas', 1, 27, 'James 1:27'], ['luk', 10, 25, 'Luke 10:25–37'], ['isa', 58, 6, 'Isaiah 58:6–7']],
+    shared: 'All teach works of mercy as essential to following Jesus. They differ on how much the church should address political and social structures.',
+    ways: {
+      C: ['The Catechism lists corporal works of mercy (feeding the hungry, sheltering the homeless, visiting the sick and imprisoned) and spiritual ones (counseling, comforting, forgiving). Catholic social teaching applies the faith to work, wages and the common good.', 'Choose one corporal work of mercy and do it this week.'],
+      O: ['Orthodox writers call care for the poor “the liturgy after the Liturgy.” St John Chrysostom taught that the Christ honored at the altar must be honored in the poor.', 'Visit someone sick or alone, or bring food to someone in need.'],
+      L: ['Serving the neighbor is how faith is lived out in one’s callings. Lutheran congregations support relief, refugee and social-service agencies.', 'Volunteer with a local food pantry or refugee ministry.'],
+      A: ['In the Episcopal Church’s baptismal covenant, Christians promise to seek and serve Christ in all persons and to strive for justice and peace among all people.', 'Pick one promise of the baptismal covenant and act on it this week.'],
+      R: ['Deacons lead the church’s ministry of mercy. Many Reformed thinkers also stress Christ’s lordship over every area of public life.', 'Serve with your church’s diaconal ministry for one shift.'],
+      M: ['Wesley’s second General Rule is “do good”: feed the hungry, clothe the naked, visit the sick and those in prison. Early Methodists ran schools, clinics and loan funds.', 'Visit someone in a hospital, nursing home or prison.', PR_SRC.rules],
+      B: ['Baptists pair local benevolence with missions. Southern Baptist Disaster Relief is one of the largest volunteer disaster-response groups in the United States.', 'Train for or give to a disaster-relief team.'],
+      P: ['Pentecostal churches often run compassion ministries (food, recovery, prison outreach) alongside prayer for healing and deliverance.', 'Serve a meal at a shelter, and offer to pray with someone there.'],
+      N: ['Peacemaking, nonresistance and simple living are central. Anabaptists are known for relief, development and restorative justice work.', 'Find a conflict near you and ask how you could help make peace.', PR_SRC.menno]
+    } },
+  { id: 'together', name: 'Fellowship and hospitality',
+    why: 'The first believers shared meals in their homes with glad hearts. Scripture urges hospitality to strangers, since some have entertained angels unawares, and tells believers to carry one another’s burdens.',
+    refs: [['act', 2, 44, 'Acts 2:44–47'], ['rom', 12, 13, 'Romans 12:13'], ['heb', 13, 2, 'Hebrews 13:2'], ['1pe', 4, 9, '1 Peter 4:9'], ['gal', 6, 2, 'Galatians 6:2']],
+    shared: 'All value the local congregation as a family, with shared meals, care for one another and welcome for newcomers.',
+    ways: {
+      C: ['Parish life, godparents, lay movements and small faith-sharing groups carry Catholic community beyond Sunday.', 'Invite a newer parishioner for a meal.'],
+      O: ['Parish feast days, name days (the day of one’s patron saint), blessing homes with holy water around Theophany, and the coffee hour after Liturgy knit the community together.', 'Find out a friend’s name day or patron saint and celebrate it with them.'],
+      L: ['Fellowship grows from the shared Supper and Word. Lutheran congregations often have strong traditions of shared meals and choirs.', 'Bring a meal to someone who is sick or has a new baby.'],
+      A: ['The parish is a geographic community serving everyone who lives nearby, not only members.', 'Introduce yourself to a neighbor and ask how you can pray for them.'],
+      R: ['Reformed churches stress covenant community: members commit to one another, and elders give pastoral care.', 'Invite someone from church who sits alone to lunch after the service.'],
+      M: ['Wesley organized Methodists into class meetings to “watch over one another in love.”', 'Join or start a weekly small group with real check-ins.', PR_SRC.rules],
+      B: ['Small groups, Sunday school classes and church meals (potlucks) are the hubs of Baptist fellowship. Members govern the congregation together.', 'Host a simple meal and invite someone who is new.'],
+      P: ['House groups and prayer meetings, where members pray for one another and share testimonies, are central.', 'Share one recent answer to prayer with a friend.'],
+      N: ['Community is part of faith itself: barn raisings, mutual aid, and worship and meals in members’ homes.', 'Do one practical job for a neighbor without being asked.']
+    } },
+  { id: 'home', name: 'Faith at home',
+    why: 'Israel was told to talk about God’s words at home, on the road, at bedtime and on rising. Parents are told to raise children in the Lord’s discipline and instruction, and Joshua declared, “As for me and my house, we will serve the Lord.”',
+    refs: [['deu', 6, 6, 'Deuteronomy 6:6–9'], ['eph', 6, 4, 'Ephesians 6:4'], ['jos', 24, 15, 'Joshua 24:15'], ['2ti', 1, 5, '2 Timothy 1:5']],
+    shared: 'All see the home as a place of prayer and teaching, from grace at meals and bedtime prayers to passing the faith to the next generation.',
+    ways: {
+      C: ['The Catechism calls the family the “domestic church.” Families say grace, pray the Rosary together and parents bless their children.', 'Make the sign of the cross on your children’s foreheads (or bless a loved one) at bedtime.'],
+      O: ['The home has an icon corner with a lamp, the priest blesses the house each year around Theophany, and family members celebrate their name days.', 'Light a candle or lamp at the icon corner for family prayers.'],
+      L: ['Luther wrote the Small Catechism for the head of each household to teach the family, and included table prayers and morning and evening prayers.', 'Learn one part of the Small Catechism with your household this week.', PR_SRC.luth],
+      A: ['Many families pray short forms of the Daily Office at home and keep the church year with Advent wreaths and Lenten disciplines.', 'Use a short “Daily Devotions for Individuals and Families” form from the prayer book.', PR_SRC.bcp],
+      R: ['Family worship (Bible reading, prayer, singing) and teaching children a catechism are long Reformed habits.', 'Teach a child or friend one catechism question and its answer.'],
+      M: ['Methodists encourage family prayer and hymn-singing at home.', 'Sing one hymn together at home this week.'],
+      B: ['Family devotions, memorizing verses and Vacation Bible School shape Baptist homes.', 'Memorize one verse together as a household.'],
+      P: ['Families pray together expectantly for one another’s needs, including healing.', 'Pray for each family member’s day at breakfast.'],
+      N: ['Faith shapes the whole household: simple living, modest dress in Old Order groups, and limits on technology agreed by the community.', 'Agree as a household on one way to simplify, such as a screen-free evening.']
+    } },
+  { id: 'work', name: 'Work and calling',
+    why: 'Humanity was placed in the garden to work it and keep it. Paul tells believers to work heartily, as for the Lord, to lead quiet lives and work with their hands, and to work honestly so they have something to share with those in need.',
+    refs: [['gen', 2, 15, 'Genesis 2:15'], ['col', 3, 23, 'Colossians 3:23–24'], ['1th', 4, 11, '1 Thessalonians 4:11–12'], ['eph', 4, 28, 'Ephesians 4:28'], ['1co', 7, 17, '1 Corinthians 7:17']],
+    shared: 'All teach that ordinary work done honestly and in love can serve God and neighbor.',
+    ways: {
+      C: ['Catholic teaching affirms the dignity of work and of workers (for example John Paul II’s Laborem exercens, 1981). Many begin the day with a Morning Offering, giving all the day’s work to God.', 'Pray a Morning Offering before you start work each day.'],
+      O: ['The Orthodox see daily life, work included, as part of theosis, being drawn into God’s life, with brief prayers woven through the day.', 'Say the Jesus Prayer silently during routine tasks.'],
+      L: ['Luther’s teaching on vocation holds that every honest station (parent, farmer, maid, magistrate) is a calling through which God serves the neighbor.', 'List your callings (work, family, community) and ask whom God serves through each.'],
+      A: ['Anglicans, following the prayer book, pray for daily work and for all in their various vocations.', 'Pray each morning for the people your work will affect that day.'],
+      R: ['Calvin and later Reformed thinkers taught that every lawful calling is holy service to God. Abraham Kuyper said there is no square inch of life over which Christ does not say “Mine!”', 'Name one way your work could better serve the common good, and take one step toward it.'],
+      M: ['Wesley urged hard, honest work (“gain all you can”) without harming others, linked to generous giving.', 'Check one work practice against “do no harm” and fix it if needed.'],
+      B: ['Baptists stress integrity at work and the workplace as a place to show and share faith.', 'Do one task this week with extra care, as for the Lord.'],
+      P: ['Pentecostals pray for God’s guidance and power at work and expect the Spirit to equip believers for every task.', 'Pray over your workplace or workspace at the start of the week.'],
+      N: ['Anabaptists value simple, honest labor and often refuse to swear oaths, letting their “yes” be yes (Matthew 5:34–37).', 'Keep every promise you make this week, however small.']
+    } },
+  { id: 'witness', name: 'Sharing the faith',
+    why: 'Jesus sent his disciples to make disciples of all nations. Peter tells believers to always be ready to give a reason for their hope, with gentleness and respect, and Paul asks that their speech be gracious.',
+    refs: [['mat', 28, 19, 'Matthew 28:19–20'], ['1pe', 3, 15, '1 Peter 3:15'], ['act', 1, 8, 'Acts 1:8'], ['col', 4, 5, 'Colossians 4:5–6']],
+    shared: 'All believe the good news is meant to be shared in word and deed. They differ in style and emphasis.',
+    ways: {
+      C: ['Recent popes have called for a “new evangelization,” and Pope Francis’s The Joy of the Gospel (2013) urges every Catholic to be a missionary disciple, starting with the witness of one’s life.', 'Tell one person how your faith has helped you this year.'],
+      O: ['Orthodox witness is often quiet and personal. St Seraphim of Sarov said, “Acquire the spirit of peace, and thousands around you will be saved.” Inviting people to “come and see” the Liturgy is common.', 'Invite a friend to “come and see” a service with you.'],
+      L: ['Lutherans stress that God creates faith through the Word and sacraments, and that believers witness through their daily callings.', 'Offer to read Scripture or pray with someone who is struggling.'],
+      A: ['Witness is often through the parish’s presence in its community and through welcoming newcomers to worship.', 'Invite a friend to a service such as Christmas, Easter or Evensong.'],
+      R: ['Reformed Christians emphasize clearly explaining the gospel, confident that God draws people to himself.', 'Prepare a two-minute explanation of the gospel in your own words.'],
+      M: ['Wesley preached in the open air and set up societies to care for new converts. Methodist evangelism joins personal witness with social action.', 'Pair a practical kindness with an honest word about why you do it.'],
+      B: ['Personal evangelism and missions are central: sharing one’s testimony, supporting missionaries and church planting.', 'Write out your testimony (before Christ, meeting Christ, since) in under a page.', PR_SRC.bfm],
+      P: ['Pentecostals expect evangelism to come with the Spirit’s power, through testimony, prayer for healing and bold invitation.', 'Ask God for one opening this week to pray with someone who does not yet believe.', PR_SRC.ag],
+      N: ['Anabaptists see a peaceable, simple and generous way of life as the church’s witness, alongside words.', 'Do one visible act of peacemaking or generosity in your community.']
+    } }
+];
+
+
 function labelTierOk(t, w) {
   if (t === 'world') return w <= 300;
   if (t === 'far') return w <= 970;
@@ -1194,6 +1393,7 @@ var LABEL_STYLE = {
 
 // ----- Chapter-by-chapter people, places and events (Theographic Bible Metadata, CC BY-SA 4.0) -----
 var CH_URL = 'chapters.json';
+var HN_URL = 'henry.json';
 
 // Reading order that places the extra (deuterocanonical) books where Catholic and Orthodox Bibles put them.
 var READ_ORDER_X = ['gen','exo','lev','num','deu','jos','jdg','rut','1sa','2sa','1ki','2ki','1ch','2ch','man','1es','ezr','neh','tob','jdt','est','esa','1ma','2ma',
@@ -1255,14 +1455,51 @@ var CANON_CARDS = [
 ];
 
 class Component extends DCLogic {
+  // Focus mode: show one section full screen. Purely DOM-level, so it works for any block marked data-focus.
+  focusToggle(e) {
+    var b = e && e.currentTarget; var el = b && b.closest ? b.closest('[data-focus]') : null;
+    if (!el) return;
+    if (el.classList.contains('be-focused')) this.focusExit(); else this.focusEnter(el, b);
+  }
+  focusEnter(el, btn) {
+    if (this._focusEl) this.focusExit(true);
+    var fit = el.querySelector('[data-fit]');
+    if (fit && fit.offsetHeight) el.style.setProperty('--ar', String(fit.offsetWidth / fit.offsetHeight));
+    el.classList.add('be-focused');
+    document.documentElement.classList.add('be-focus-open');
+    this._focusEl = el;
+    el.scrollTop = 0;
+    if (btn) { btn.setAttribute('aria-label', 'Exit focus mode'); btn.title = 'Exit focus mode (Esc)'; try { btn.focus(); } catch (err) {} }
+    var d = document.documentElement;
+    if (!document.fullscreenElement && d.requestFullscreen) {
+      var self = this; self._fsByUs = true;
+      try { d.requestFullscreen().catch(function () { self._fsByUs = false; }); } catch (err) { self._fsByUs = false; }
+    }
+    this.forceUpdate();
+  }
+  focusExit(keepFs) {
+    var el = this._focusEl; this._focusEl = null;
+    if (el) {
+      el.classList.remove('be-focused');
+      var b = el.querySelector('.be-fbtn');
+      if (b) { b.setAttribute('aria-label', 'Focus mode: show this section full screen'); b.title = 'Focus mode (full screen)'; }
+    }
+    document.documentElement.classList.remove('be-focus-open');
+    if (!keepFs && this._fsByUs) {
+      this._fsByUs = false;
+      try { if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(function () {}); } catch (err) {}
+    }
+    if (el) { var self = this; setTimeout(function () { try { el.scrollIntoView({ block: 'nearest' }); } catch (err) {} self.forceUpdate(); }, 30); }
+  }
   componentDidMount() {
     var self = this;
     this.loadText('bsb');
     this.loadChapters();
+    this.loadHenry();
     if (!document.getElementById('be-speak-style')) {
       var css = document.createElement('style');
       css.id = 'be-speak-style';
-      css.textContent = '.be-speaking{background:#F6E2A8 !important;border-radius:6px;box-shadow:0 0 0 6px #F6E2A8;transition:background .2s ease}';
+      css.textContent = '[data-focus]{position:relative}.be-fbtn{position:absolute;top:8px;right:8px;z-index:6;width:34px;height:34px;border-radius:50%;border:1px solid #D9CDB8;background:#FFFDF8;color:#231E19;display:inline-flex;align-items:center;justify-content:center;padding:0;cursor:pointer;opacity:.8;box-shadow:0 1px 3px rgba(0,0,0,.12)}.be-fbtn:hover,.be-fbtn:focus-visible{opacity:1;background:#F5EFE3}.be-fi-out{display:none}.be-focused>.be-fbtn .be-fi-in{display:none}.be-focused>.be-fbtn .be-fi-out{display:block}.be-focused{position:fixed !important;top:0 !important;left:0 !important;right:0 !important;bottom:0 !important;z-index:45 !important;margin:0 !important;max-width:none !important;max-height:none !important;width:auto !important;height:auto !important;overflow:auto !important;background:#FBF7EF !important;border:none !important;border-radius:0 !important;box-shadow:none !important;padding:60px max(20px,calc((100vw - 1180px) / 2)) 48px !important;box-sizing:border-box !important;--fit-off:140px}.be-focused>.be-fbtn{position:fixed;top:12px;right:16px;width:44px;height:44px;opacity:1;z-index:46}.be-focused[data-focus=text]{padding:64px max(20px,calc((100vw - 760px) / 2)) 96px !important;font-size:21px !important}.be-focused[data-focus=map]{--fit-off:200px}.be-focused [data-fit]{width:min(100%, calc((100vh - var(--fit-off)) * var(--ar,1.333))) !important;max-width:none !important;margin-left:auto !important;margin-right:auto !important}html.be-focus-open,html.be-focus-open body{overflow:hidden !important}html.be-focus-open .be-dbtn{display:none !important}[data-focus=text]:not(.be-focused)>.be-fbtn{position:sticky;top:0;float:right;margin:-14px -18px 0 8px}.be-sbtn{position:absolute;top:8px;right:48px;z-index:6;width:34px;height:34px;border-radius:50%;border:1px solid #D9CDB8;background:#FFFDF8;color:#231E19;display:inline-flex;align-items:center;justify-content:center;padding:0;cursor:pointer;opacity:.8;box-shadow:0 1px 3px rgba(0,0,0,.12)}.be-sbtn:hover,.be-sbtn:focus-visible{opacity:1;background:#F5EFE3}.be-sbtn .be-si-stop{display:none}.be-reading>.be-sbtn{opacity:1;background:#231E19;color:#FBF7EF;border-color:#231E19}.be-reading>.be-sbtn .be-si-play{display:none}.be-reading>.be-sbtn .be-si-stop{display:block}.be-focused>.be-sbtn{position:fixed;top:12px;right:68px;width:44px;height:44px;opacity:1;z-index:46}[data-focus=text]:not(.be-focused)>.be-sbtn{position:sticky;top:0;float:right;margin:-14px 0 0 8px}.be-speaking{background:#F6E2A8 !important;border-radius:6px;box-shadow:0 0 0 6px #F6E2A8;transition:background .2s ease}';
       document.head.appendChild(css);
     }
     // Remember a phone visitor's choice of desktop view.
@@ -1272,9 +1509,12 @@ class Component extends DCLogic {
     this.readLink();
     if (this.ttsSupported()) {
       // Voices load asynchronously in some browsers; stop any reading left over from a previous page.
-      try { window.speechSynthesis.cancel(); window.speechSynthesis.onvoiceschanged = function () {}; } catch (err) {}
+      try { window.speechSynthesis.cancel(); window.speechSynthesis.onvoiceschanged = function () { self.forceUpdate(); }; } catch (err) {}
       window.addEventListener('pagehide', function () { try { window.speechSynthesis.cancel(); } catch (err) {} });
     }
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && self._focusEl) self.focusExit(); });
+    document.addEventListener('fullscreenchange', function () { if (!document.fullscreenElement && self._fsByUs) { self._fsByUs = false; if (self._focusEl) self.focusExit(); } });
+    document.addEventListener('click', function () { setTimeout(function () { if (self._focusEl && !self._focusEl.isConnected) self.focusExit(); }, 60); });
     this._narrow = window.innerWidth < 720;
     window.addEventListener('resize', function () {
       var n = window.innerWidth < 720;
@@ -1297,6 +1537,15 @@ class Component extends DCLogic {
   }
 
 
+  loadHenry() {
+    var self = this;
+    if (this._hnData || this._hnPending) return;
+    this._hnPending = true;
+    fetch(HN_URL)
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(function (d) { self._hnData = d; self._hnPending = false; self.forceUpdate(); })
+      .catch(function () { self._hnPending = false; self._hnFailed = true; self.forceUpdate(); });
+  }
   loadChapters() {
     var self = this;
     if (this._chData || this._chPending) return;
@@ -1312,39 +1561,95 @@ class Component extends DCLogic {
 
   // ----- Listen to any page: reads the headings and text of the current view -----
   // The readable blocks of the current view, each with the element it came from.
-  pageSpeakItems() {
-    var roots = [document.getElementById('page-main')];
+  // The readable blocks inside the given elements, in page order. Walks every visible text node,
+  // so text shown by toggles, tabs and filters is read just like static text.
+  pageSpeakItems(roots) {
     var st = this.state || {};
-    if ((st.tab || 'overview') === 'library') roots.push(document.getElementById('book-card'));
-    var out = [];
+    if (!roots) {
+      roots = [document.getElementById('page-main')];
+      var bc = document.getElementById('book-card');
+      if (bc) roots.push(bc);
+    }
+    var SKIP = 'svg, script, style, select, option, input, textarea, [aria-hidden="true"], [data-noread], .be-fbtn, .be-sbtn, .sr';
+    var words = function (t) { return t.split(/\s+/).filter(Boolean).length; };
+    var visible = function (el) {
+      if (el.checkVisibility) return el.checkVisibility({ visibilityProperty: true });
+      return !!(el.offsetParent || el.getClientRects().length);
+    };
+    var blockOf = function (el, root) {
+      var ctl = el.closest('button, [role="button"]');
+      if (ctl && root.contains(ctl)) return ctl;
+      while (el && el !== root) {
+        var d = getComputedStyle(el).display;
+        if (d.indexOf('inline') !== 0 && d !== 'contents') return el;
+        el = el.parentElement;
+      }
+      return root;
+    };
+    var out = [], seen = new Map();
     roots.forEach(function (root) {
-      if (!root) return;
-      var els = root.querySelectorAll('h1, h2, h3, p, li, [data-say]');
-      for (var i = 0; i < els.length; i++) {
-        var el = els[i];
-        if (el.closest('[aria-hidden="true"]')) continue;
-        var parent = el.parentElement && el.parentElement.closest('p, li, [data-say]');
-        if (parent && root.contains(parent)) continue;
-        var t = (el.innerText || '').replace(/\s+/g, ' ').trim();
-        if (t) out.push({ el: el, text: /[.!?:”"]$/.test(t) ? t : t + '.' });
+      if (!root || !root.isConnected) return;
+      var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+      var n;
+      while ((n = w.nextNode())) {
+        var txt = n.nodeValue.replace(/\s+/g, ' ');
+        if (!txt.trim()) continue;
+        var pe = n.parentElement;
+        if (!pe || pe.closest(SKIP) || !visible(pe)) continue;
+        var b = blockOf(pe, root);
+        var it = seen.get(b);
+        if (!it) { it = { el: b, text: '', last: null }; seen.set(b, it); out.push(it); }
+        if (it.last && it.last !== pe && it.text.trim()) {
+          // Separate pieces that sit in their own boxes (a title and its description, a line and its verse range).
+          var box = function (x) { return x !== b && getComputedStyle(x).display.indexOf('inline') !== 0; };
+          if ((box(pe) || box(it.last)) && !/[.!?:,;]\s*$/.test(it.text)) it.text = it.text.replace(/\s*$/, '. ');
+          else if (!/\s$/.test(it.text) && !/^\s/.test(txt)) it.text += ' ';
+        }
+        it.text += txt; it.last = pe;
       }
     });
-    return out;
+    return out.map(function (it) {
+      var t = it.text.replace(/\s+/g, ' ').trim().replace(/\bvv\. ?(?=\d)/g, 'verses ').replace(/\bv\. ?(?=\d)/g, 'verse ');
+      var ctl = it.el.matches('button, [role="button"]');
+      // Skip controls (toggles, filters, arrows, actions); keep buttons that carry content, such as names and summaries.
+      if (ctl && (it.el.hasAttribute('aria-pressed') || it.el.getAttribute('role') === 'tab' ||
+          /^[←→↑↓‹›«»▾▴+−-]|[←→↑↓‹›«»▾▴]$/.test(t) ||
+          /^(export|download|show|hide|expand|collapse|reset|clear|close|play|pause|stop|listen|read more|see all|zoom|back|next|previous|start)\b/i.test(t))) return null;
+      if (!t || !/[A-Za-z0-9]/.test(t)) return null;
+      return { el: it.el, text: /[.!?:”"’)]$/.test(t) ? t : t + '.' };
+    }).filter(Boolean);
   }
 
-  pageSpeak() {
-    if (this._ps && this._ps.on) { this.pageStop(); return; }
+  // Read one area aloud (the speaker button on each section). The chapter text uses the verse reader.
+  areaSpeak(e) {
+    var b = e && e.currentTarget; var el = b && b.closest ? b.closest('[data-focus]') : null;
+    if (!el) return;
+    if (el.getAttribute('data-focus') === 'text' && this._chapterPlay) {
+      var t = this._tts;
+      this.pageStop(true);
+      if (t && (t.status === 'playing' || t.status === 'paused')) this.ttsStop(false); else this._chapterPlay();
+      return;
+    }
+    if (this._ps && this._ps.on && this._psArea === el) { this.pageStop(); return; }
+    this.pageSpeak([el], el);
+  }
+
+  pageSpeak(roots, area) {
+    if (this._ps && this._ps.on && !roots) { this.pageStop(); return; }
+    if (this._ps && this._ps.on) this.pageStop(true);
     this.ttsStop(true);
     var parts = [];
-    this.pageSpeakItems().forEach(function (it) {
+    this.pageSpeakItems(roots).forEach(function (it) {
       var cur = '';
       it.text.split(/(?<=[.!?])\s+/).forEach(function (sent) {
         if ((cur + ' ' + sent).length > 220 && cur) { parts.push({ el: it.el, text: cur }); cur = sent; } else cur = cur ? cur + ' ' + sent : sent;
       });
       if (cur) parts.push({ el: it.el, text: cur });
     });
-    if (!parts.length) return;
+    if (!parts.length) { this.showToast('Nothing to read here.'); return; }
     this._psParts = parts;
+    this._psArea = area || null;
+    if (area) area.classList.add('be-reading');
     this.pageSpeakFrom(0);
   }
 
@@ -1356,7 +1661,7 @@ class Component extends DCLogic {
     this._psEl = p ? p.el : null;
     if (!this._psEl || !this._psEl.isConnected) return;
     this._psEl.classList.add('be-speaking');
-    try { this._psEl.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (err) {}
+    this.followEl(this._psEl);
   }
 
   pageSpeakFrom(start) {
@@ -1375,7 +1680,7 @@ class Component extends DCLogic {
       u.lang = voice ? voice.lang : 'en-US';
       if (voice) u.voice = voice;
       u.onstart = function () { if (self._ps && self._ps.gen === gen) { self._ps.idx = i; self.pageMark(i); self.forceUpdate(); } };
-      if (i === parts.length - 1) u.onend = function () { if (self._ps && self._ps.gen === gen) { self._ps.on = false; self.pageMark(-1); self.forceUpdate(); } };
+      if (i === parts.length - 1) u.onend = function () { if (self._ps && self._ps.gen === gen) { self._ps.on = false; self.pageMark(-1); if (self._psArea) { self._psArea.classList.remove('be-reading'); self._psArea = null; } self.forceUpdate(); } };
       synth.speak(u);
     });
     this.forceUpdate();
@@ -1403,6 +1708,7 @@ class Component extends DCLogic {
 
   pageStop(quiet) {
     if (this._psEl) { this._psEl.classList.remove('be-speaking'); this._psEl = null; }
+    if (this._psArea) { this._psArea.classList.remove('be-reading'); this._psArea = null; }
     var gen = ((this._ps && this._ps.gen) || 0) + 1;
     this._ps = { on: false, gen: gen };
     try { window.speechSynthesis.cancel(); } catch (err) {}
@@ -1428,7 +1734,7 @@ class Component extends DCLogic {
     var q;
     try { q = new URLSearchParams(window.location.search); } catch (err) { return; }
     var patch = {};
-    var tabs = ['overview', 'library', 'story', 'timeline', 'themes', 'compare', 'read', 'search'];
+    var tabs = ['overview', 'library', 'story', 'timeline', 'themes', 'compare', 'practice', 'read', 'search'];
     var tab = q.get('tab');
     if (tab && tabs.indexOf(tab) >= 0) patch.tab = tab;
     var book = q.get('book');
@@ -1458,20 +1764,63 @@ class Component extends DCLogic {
     return typeof window !== 'undefined' && 'speechSynthesis' in window && typeof window.SpeechSynthesisUtterance !== 'undefined';
   }
 
-  ttsVoice() {
+  // English voices on this device, most natural-sounding first.
+  ttsVoices() {
     var voices = [];
     try { voices = window.speechSynthesis.getVoices() || []; } catch (err) {}
     var en = voices.filter(function (v) { return /^en(-|_|$)/i.test(v.lang); });
-    if (!en.length) return null;
     var score = function (v) {
       var n = v.name, sc = 0;
-      if (/natural|neural|premium|enhanced/i.test(n)) sc += 4;
-      if (/google us english|samantha|daniel|aria|jenny|guy|ava|allison|serena|karen|moira/i.test(n)) sc += 3;
+      if (/\(natural\)|natural|neural/i.test(n)) sc += 8;           // Edge / Windows online neural voices
+      if (/premium/i.test(n)) sc += 7;                               // Apple premium voices
+      if (/enhanced|siri/i.test(n)) sc += 6;                         // Apple enhanced and Siri voices
+      if (/^google /i.test(n)) sc += 5;                              // Chrome's online Google voices
+      if (/ava|zoe|evan|nathan|samantha|daniel|aria|jenny|guy|allison|serena|karen|moira|tom|susan/i.test(n)) sc += 2;
+      if (/compact|espeak|robot|novelty|bad news|bells|boing|bubbles|cellos|whisper|zarvox|trinoids|organ|jester|superstar|wobble|albert|fred|junior|ralph|kathy|bahh/i.test(n)) sc -= 10;
       if (/^en-us/i.test(v.lang)) sc += 1;
-      if (v.localService) sc += 1;
       return sc;
     };
-    return en.slice().sort(function (a, b) { return score(b) - score(a); })[0];
+    return en.slice().sort(function (a, b) { return score(b) - score(a) || a.name.localeCompare(b.name); });
+  }
+  ttsVoice() {
+    var list = this.ttsVoices();
+    if (!list.length) return null;
+    var want = null;
+    try { want = window.localStorage.getItem('bibleExplorer.voice'); } catch (err) {}
+    return list.filter(function (v) { return v.voiceURI === want; })[0] || list[0];
+  }
+
+  // Keep the block being read comfortably on screen: inside any scrolling box it sits in, and in the page,
+  // clear of the sticky header and the player bar at the bottom.
+  followEl(el) {
+    if (!el || !el.isConnected) return;
+    var smooth = !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    var a = el.parentElement;
+    while (a && a !== document.body && a !== document.documentElement) {
+      var cs = getComputedStyle(a);
+      if (/(auto|scroll)/.test(cs.overflowY) && a.scrollHeight > a.clientHeight + 2) {
+        var r = el.getBoundingClientRect(), cr = a.getBoundingClientRect();
+        var bar = cs.position === 'fixed' ? this.playerHeight() : 0;
+        var top = cr.top + 24, bottom = cr.bottom - bar - 24;
+        if (r.top < top || r.bottom > bottom) {
+          var d = r.top - cr.top - Math.max(24, (cr.height - bar - r.height) * 0.35);
+          a.scrollTo({ top: a.scrollTop + d, behavior: smooth ? 'smooth' : 'auto' });
+        }
+        if (cs.position === 'fixed') return;
+      }
+      a = a.parentElement;
+    }
+    var rr = el.getBoundingClientRect(), vh = window.innerHeight;
+    var hb = this.playerHeight();
+    var bandTop = 90, bandBottom = vh - hb - 40;
+    if (rr.top < bandTop || rr.bottom > bandBottom) {
+      var target = window.scrollY + rr.top - Math.max(bandTop, (vh - hb) * 0.3);
+      window.scrollTo({ top: Math.max(0, target), behavior: smooth ? 'smooth' : 'auto' });
+    }
+  }
+  playerHeight() {
+    var pb = document.querySelector('[data-player]');
+    return pb ? pb.getBoundingClientRect().height + 24 : 0;
   }
 
   ttsStart(verses, fromVerse, title, key) {
@@ -1499,8 +1848,7 @@ class Component extends DCLogic {
         if (!self._tts || self._tts.gen !== gen) return;
         self._tts.verse = n;
         self.forceUpdate();
-        var el = document.getElementById('v-' + n);
-        if (el && el.scrollIntoView) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        self.followEl(document.getElementById('v-' + n));
       };
       if (n === verses.length) {
         u.onend = function () {
@@ -1572,7 +1920,7 @@ class Component extends DCLogic {
       return { label: t.toUpperCase(), title: TR_NAMES[t], pressed: on, bg: on ? INK : 'transparent', fg: on ? PAPER : '#4A3F35', pick: function () { go({ tr: t }); self.loadText(t); } };
     });
 
-    var tabs = [['overview','Overview'],['library','Library'],['story','Storyline'],['timeline','Timeline'],['themes','Themes'],['compare','Compare'],['read','Read'],['search','Search']].map(function (t) {
+    var tabs = [['overview','Overview'],['library','Library'],['story','Storyline'],['timeline','Timeline'],['themes','Themes'],['compare','Compare'],['practice','Practice'],['read','Read'],['search','Search']].map(function (t) {
       var on = tab === t[0];
       return { label: t[1], pressed: on, bg: on ? INK : 'transparent', fg: on ? PAPER : '#4A3F35', pick: function () { go({ tab: t[0] }); window.scrollTo(0, 0); } };
     });
@@ -1714,8 +2062,8 @@ class Component extends DCLogic {
       kicker: isX ? 'Deuterocanonical / Apocrypha' : (D.t === 'OT' ? 'Old Testament' : 'New Testament') + ' · ' + D.name,
       position: isX ? (B.ch + (B.ch === 1 ? ' chapter' : ' chapters')) : 'Book ' + (B.idx + 1) + ' of 66 · ' + B.ch + (B.ch === 1 ? ' chapter' : ' chapters'),
       isExtra: isX, extraNote: extraNote,
-      canRead: !isX || B.hasText, readLabel: isX ? 'Read ' + B.name + ' (King James Apocrypha)' : 'Read ' + B.name,
-      showThemes: !isX, showLength: !isX, showMap: tab !== 'read',
+      canRead: (!isX || B.hasText) && tab !== 'read', readLabel: isX ? 'Read ' + B.name + ' (King James Apocrypha)' : 'Read ' + B.name,
+      showThemes: !isX, showLength: !isX, showMap: true,
       eras: B.eras.map(function (n) { return { label: ERAS[n - 1].name, pick: function () { go({ tab: 'story', era: n }); } }; }),
       themes: bThemes, hasThemes: bThemes.length > 0, noThemes: bThemes.length === 0,
       pct: Math.max(1, Math.round(B.ch / 150 * 100)),
@@ -1796,9 +2144,19 @@ class Component extends DCLogic {
         else self.forceUpdate();
       }
     };
+    this._chapterPlay = tts.playPause;
     var noText = isX && !B.hasText;
+    var txtOpen = st.txtOpen != null ? !!st.txtOpen : !(this._narrow || this.isPhoneScreen());
     var rd = {
       color: D.color,
+      txtOpen: txtOpen, txtMax: txtOpen ? 'none' : '228px', txtOv: txtOpen ? 'visible' : 'auto', txtChev: txtOpen ? 180 : 0,
+      txtPad: this._narrow ? '20px 20px' : '32px 40px',
+      txtLabel: txtOpen ? 'Collapse text' : 'Expand full chapter',
+      txtHint: txtOpen ? 'Shrink the text to a few lines to bring the chapter notes and map closer.' : 'Scroll inside the text to keep reading. Chapter notes and the map are just below.',
+      txtToggle: function () {
+        go({ txtOpen: !txtOpen });
+        if (txtOpen) setTimeout(function () { var a = document.getElementById('read-text'); if (a && a.getBoundingClientRect().top < 0) a.scrollIntoView({ block: 'start' }); }, 40);
+      },
       title: B.name + ' ' + C, trName: isX ? TR_NAMES.apoc : TR_NAMES[tr], bookId: B.id, chapVal: String(C), chapOpts: chapOpts,
       bookName: B.name, isExtra: isX, extraNote: extraNote, showTr: !isX, noText: noText,
       footnote: isX ? 'Chapter and verse numbers follow the King James Apocrypha.' : 'Words in [brackets] are supplied by the translators.',
@@ -1824,24 +2182,35 @@ class Component extends DCLogic {
       return { label: p[0], title: 'Mentioned in ' + p[1] + (p[1] === 1 ? ' verse' : ' verses') + ' of this chapter. Search the Bible for ' + nm + '.', pick: function () { go({ tab: 'search', q: nm }); window.scrollTo(0, 0); } };
     }) : [];
     var cpPlaces = chRow ? chRow[2] : [];
-    var chWhole = !!st.chMapBook || !cpPlaces.length;
+    var hnRow = (!isX && this._hnData && this._hnData[B.id]) ? (this._hnData[B.id][C - 1] || []) : [];
+    var hnLoading = !isX && !this._hnData && !this._hnFailed;
+    var cpOutline = hnRow.map(function (o) {
+      var first = parseInt(o[1], 10);
+      return { text: o[0], ref: o[1] ? (/[–,]/.test(o[1]) ? 'vv. ' : 'v. ') + o[1] : '', hasRef: !!o[1],
+        pick: function () { if (first) hlVerse(first); } };
+    });
+    var chWhole = !cpPlaces.length;
     var chDef = chWhole ? BOOK_MAPS[B.id] : { p: cpPlaces.map(function (x) { return [x[0], (x[1].length > 1 ? 'verses ' : 'verse ') + x[1].join(', ')]; }) };
     var chMap = buildMap(chDef, 4 / 3, '4 / 3', !!st.mapWide, st.pin, st.mapZoom || 0, go, 'chPan', 'ch' + B.id + C + (chWhole ? 'b' : ''), st.chPan, st.dragging, 'chListClosed', !st.chListClosed);
     var chLoading = !isX && !chD && !this._chFailed;
+    var cpScope = st.cpScope === 'book' ? 'book' : 'ch';
     var cp = {
       title: B.name + ' ' + C, isExtra: isX, extraNote: extraNote, color: D.color,
-      loading: chLoading, hasEvents: cpEv.length > 0, events: cpEv,
-      noEvents: !chLoading && cpEv.length === 0,
-      fallback: isX ? B.sum : ('No named events are tagged in this chapter. The book in brief: ' + B.sum),
+      loading: chLoading && hnLoading, hasEvents: cpEv.length > 0, events: cpEv,
+      hasOutline: cpOutline.length > 0, outline: cpOutline, outlineSrc: 'https://github.com/lyteword/mhenry-concise',
+      eventsHead: 'Named events',
+      noEvents: !chLoading && !hnLoading && cpEv.length === 0 && cpOutline.length === 0,
+      fallback: isX ? B.sum : ('No chapter outline is available here. The book in brief: ' + B.sum),
       hasPeople: cpPeople.length > 0, people: cpPeople, noPeople: !chLoading && cpPeople.length === 0, peopleFallback: 'Across the book: ' + B.people,
       themes: bThemes, hasThemes: bThemes.length > 0, noThemes: bThemes.length === 0,
-      mapBtns: [['ch', 'This chapter'], ['book', 'Whole book']].map(function (m) {
-        var on = m[0] === 'book' ? chWhole : !chWhole;
-        var dis = m[0] === 'ch' && !cpPlaces.length;
-        return { label: m[1], pressed: on, disabled: dis, bg: on ? INK : 'transparent', fg: on ? PAPER : dis ? '#B8AC98' : '#4A3F35',
-          pick: function () { if (!dis) go({ chMapBook: m[0] === 'book', pin: null, chPan: null, mapZoom: 0, mapWide: false }); } };
+      showCh: tab === 'read' && cpScope === 'ch', showBook: tab !== 'read' || cpScope === 'book',
+      scopeHint: cpScope === 'ch' ? 'Notes, figures and map for ' + B.name + ' ' + C + '.' : 'The whole book of ' + B.name + ', as on the Library page.',
+      scopeBtns: [['ch', 'This chapter'], ['book', 'Whole book']].map(function (m) {
+        var on = m[0] === cpScope;
+        return { label: m[1], pressed: on, bg: on ? INK : 'transparent', fg: on ? PAPER : '#4A3F35',
+          pick: function () { go({ cpScope: m[0], pin: null, chPan: null, bookPan: null, mapZoom: 0, mapWide: false }); } };
       }),
-      mapNote: chWhole ? (cpPlaces.length ? 'Every mapped place in ' + B.name + '.' : (isX ? 'Places in ' + B.name + '.' : 'No places are named in this chapter, so the map shows the whole book.'))
+      mapNote: chWhole ? (cpPlaces.length ? '' : (isX ? 'No chapter-level places for this book, so the map shows the whole book.' : 'No places are named in this chapter, so the map shows the whole book.'))
         : (cpPlaces.length === 1 ? 'The place named in this chapter.' : 'The ' + cpPlaces.length + ' places named in this chapter, numbered in the order they first appear.'),
       showAttrib: !isX,
       prevLabel: rd.prevLabel, nextLabel: rd.nextLabel, noPrev: rd.noPrev, noNext: rd.noNext, goPrev: rd.goPrev, goNext: rd.goNext
@@ -2037,6 +2406,45 @@ class Component extends DCLogic {
       read: function () { if (selE.r) openChap(selE.r[0], selE.r[1], 0); },
       close: function () { go({ tlSel: -1 }); }
     } : null;
+    // Event list grouped by period: the main events of each period, with the rest a tap away.
+    var tlGrpSt = st.tlGrp || {};
+    var inRange = [];
+    TIMELINE.forEach(function (e, i) { if (!tlOff[e.c] && (e.y2 || e.y) >= t0 && e.y <= t1) inRange.push({ e: e, i: i }); });
+    inRange.sort(function (a, b) { return a.e.y - b.e.y || a.e.k - b.e.k; });
+    var groupDefs = bandDefs.map(function (b, gi) { return { id: 'g' + gi, a: b[0], b: b[1], name: b[2] }; });
+    var tlGroups = [];
+    groupDefs.forEach(function (g, gi) {
+      var evs = inRange.filter(function (o) { return o.e.y >= g.a && (o.e.y < g.b || (gi === groupDefs.length - 1)); });
+      if (!evs.length) return;
+      var mainSet = evs.filter(function (o) { return o.e.k === 1; });
+      if (mainSet.length < 2) {
+        var extra = evs.filter(function (o) { return o.e.k === 2; }).slice(0, 2 - mainSet.length);
+        mainSet = evs.filter(function (o) { return o.e.k === 1 || extra.indexOf(o) >= 0; });
+      }
+      if (!mainSet.length) mainSet = evs.slice(0, 2);
+      var mode = tlGrpSt[g.id] || (st.tlAll ? 'all' : 'main');
+      var shown = mode === 'closed' ? [] : mode === 'all' ? evs : mainSet;
+      if (tlSel >= 0 && mode === 'main' && shown.every(function (o) { return o.i !== tlSel; })) {
+        var selO = evs.filter(function (o) { return o.i === tlSel; })[0];
+        if (selO) shown = evs.filter(function (o) { return o === selO || mainSet.indexOf(o) >= 0; });
+      }
+      var more = evs.length - shown.length;
+      var setMode = function (m) { return function () { var o = Object.assign({}, tlGrpSt); o[g.id] = m; go({ tlGrp: o }); }; };
+      tlGroups.push({
+        name: g.name, dates: tlYear(Math.max(g.a, -4004)) + ' – ' + (g.b >= 2025 ? 'today' : tlYear(g.b)),
+        count: evs.length + (evs.length === 1 ? ' event' : ' events'),
+        open: mode !== 'closed', chev: mode === 'closed' ? -90 : 0,
+        toggle: setMode(mode === 'closed' ? 'main' : 'closed'),
+        items: shown.map(function (o) {
+          var on = o.i === tlSel;
+          return { date: dateLabel(o.e), label: o.e.t, color: TL_CATS[o.e.c][1], tip: srcTip(o.e), pressed: on,
+            bg: on ? '#F6E2A8' : 'transparent', weight: o.e.k === 1 ? 700 : 500, pick: tlPick(o.i) };
+        }),
+        hasMore: mode !== 'closed' && more > 0, moreLabel: 'Show ' + more + ' more in ' + g.name,
+        showMore: setMode('all'),
+        hasLess: mode === 'all' && mainSet.length < evs.length, showLess: setMode('main')
+      });
+    });
     var hiddenCount = TIMELINE.filter(function (e) { return !tlOff[e.c] && e.k > tierMax && (e.y2 || e.y) >= t0 && e.y <= t1; }).length;
 
     var RP = function (y) { return (y - TL_LO) / tlSpan0 * 100; };
@@ -2099,6 +2507,11 @@ class Component extends DCLogic {
       }),
       rs: rs,
       marks: marks, bars: bars, ticks: ticks, bands: bands,
+      groups: tlGroups,
+      listCount: inRange.length + (inRange.length === 1 ? ' event' : ' events') + ' in this range, by period',
+      allOpen: !!st.tlAll && !Object.keys(tlGrpSt).length,
+      expandLabel: (st.tlAll && !Object.keys(tlGrpSt).length) ? 'Main events only' : 'Show every event',
+      expandAll: function () { var on = !!st.tlAll && !Object.keys(tlGrpSt).length; go({ tlAll: !on, tlGrp: {} }); },
       list: vis.map(function (o) {
         var on = o.i === tlSel;
         return { date: dateLabel(o.e), label: o.e.t, color: TL_CATS[o.e.c][1], tip: srcTip(o.e), pressed: on, bg: on ? '#F6E2A8' : 'transparent', pick: tlPick(o.i) };
@@ -2144,18 +2557,27 @@ class Component extends DCLogic {
         if (tab === 'read') { if (self._tts && self._tts.status !== 'idle' && self._tts.status !== 'done') self.ttsStop(false); else tts.playPause(); return; }
         self.pageSpeak();
       },
-      back: function () { if (tab === 'read') self.ttsSkip(-1); else self.pageSkip(-1); },
-      fwd: function () { if (tab === 'read') self.ttsSkip(1); else self.pageSkip(1); },
+      back: function () { if (readOn && !psOn) self.ttsSkip(-1); else self.pageSkip(-1); },
+      fwd: function () { if (readOn && !psOn) self.ttsSkip(1); else self.pageSkip(1); },
       unit: tab === 'read' ? 'verse' : 'section'
     };
     // Player bar: a scrubber to jump to any part of what is being read
     var psState = this._ps || {};
-    var isReadP = tab === 'read';
+    var isReadP = readOn && !psOn;
     var pMin = isReadP ? 1 : 0;
     var pMax = isReadP ? Math.max(1, rawVerses.length) : Math.max(0, (psState.total || 1) - 1);
     var pPos = isReadP ? (tt.verse || 1) : (psState.idx || 0);
     if (st.seekV != null) pPos = st.seekV;
     var pPaused = isReadP ? tt.status === 'paused' : !!psState.paused;
+    var curVoice = this.ttsVoice();
+    var commitSeek = function () {
+      var v = self._seekPending;
+      if (v == null) return;
+      self._seekPending = null;
+      if (isReadP) { var t2 = self._tts; if (t2 && t2.verses) self.ttsStart(t2.verses, Math.max(1, v), t2.title, t2.key); }
+      else self.pageSpeakFrom(v);
+      self.setState({ seekV: null });
+    };
     var player = {
       show: listen.on, min: String(pMin), max: String(pMax), val: String(pPos),
       fill: pMax > pMin ? Math.round((pPos - pMin) / (pMax - pMin) * 100) : 0,
@@ -2165,24 +2587,40 @@ class Component extends DCLogic {
       pause: function () { if (isReadP) tts.playPause(); else self.pagePause(); },
       stop: function () { if (isReadP) self.ttsStop(false); else self.pageStop(); },
       back: listen.back, fwd: listen.fwd,
+      // Dragging previews the spot (highlight and scroll); reading jumps there when the finger or mouse lets go.
       onSeek: function (e) {
         var v = parseInt(e.target.value, 10) || 0;
+        self._seekPending = v;
         go({ seekV: v });
-        if (isReadP) { var ve = document.getElementById('v-' + Math.max(1, v)); if (ve && ve.scrollIntoView) ve.scrollIntoView({ block: 'center' }); }
+        if (isReadP) { var ve = document.getElementById('v-' + Math.max(1, v)); self.followEl(ve); }
         else self.pageMark(v);
         clearTimeout(self._seekT);
-        self._seekT = setTimeout(function () {
-          if (isReadP) { var t2 = self._tts; if (t2 && t2.verses) self.ttsStart(t2.verses, Math.max(1, v), t2.title, t2.key); }
-          else self.pageSpeakFrom(v);
-          self.setState({ seekV: null });
-        }, 280);
+        if (!self._seekDown) self._seekT = setTimeout(commitSeek, 450);
+      },
+      seekDown: function () { self._seekDown = true; clearTimeout(self._seekT); },
+      seekUp: function (e) {
+        self._seekDown = false;
+        var v = parseInt(e.target.value, 10);
+        if (!isNaN(v)) self._seekPending = v;
+        clearTimeout(self._seekT);
+        commitSeek();
+      },
+      voices: this.ttsVoices().map(function (v) {
+        return { id: v.voiceURI, label: v.name.replace(/^Microsoft /, '').replace(/ - English \(.*\)$/, '') + ' · ' + v.lang.replace('_', '-'), sel: curVoice && v.voiceURI === curVoice.voiceURI };
+      }),
+      hasVoices: this.ttsVoices().length > 1,
+      onVoice: function (e) {
+        try { window.localStorage.setItem('bibleExplorer.voice', e.target.value); } catch (err) {}
+        if (isReadP) { var t3 = self._tts; if (t3 && t3.verses) self.ttsStart(t3.verses, t3.verse || 1, t3.title, t3.key); }
+        else if (self._ps && self._ps.on) self.pageSpeakFrom(self._ps.idx || 0);
+        else self.forceUpdate();
       }
     };
     var partSel = PARTS.filter(function (p) { return p.id === st.part; })[0] || null;
     var parts = PARTS.map(function (p) {
       var on = p === partSel;
       return { name: p.name, short: p.short, color: p.color, bg: p.bg, pressed: on, border: on ? p.color : 'transparent', chev: on ? 180 : 0,
-        pick: function () { go({ part: on ? null : p.id }); } };
+        pick: function () { go({ part: on ? null : p.id }); if (!on) setTimeout(function () { var d = document.getElementById('part-detail'); if (d && d.getBoundingClientRect().bottom > window.innerHeight) d.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 80); } };
     });
     var part = partSel ? {
       show: true, name: partSel.name, color: partSel.color, bg: partSel.bg, more: paras(partSel.more),
@@ -2192,6 +2630,59 @@ class Component extends DCLogic {
       refs: partSel.refs.map(function (r) { return { label: r[2], pick: function () { openChap(r[0], r[1], 0); } }; }),
       close: function () { go({ part: null }); }
     } : { show: false };
+
+    // Practice: living the faith, by practice or by tradition
+    var prMode = st.prMode === 'trad' ? 'trad' : 'practice';
+    var prSel = PRACTICES.filter(function (q) { return q.id === st.prId; })[0] || PRACTICES[0];
+    var prTradId = TRAD_NAME[st.prTrad] ? st.prTrad : 'C';
+    var prHide = st.prHide || {};
+    var prSrc = function (w) { return w && w[2] ? [{ label: w[2][0], url: w[2][1] }] : []; };
+    var pr = {
+      modes: [['practice', 'By practice'], ['trad', 'By tradition']].map(function (m) {
+        var on = m[0] === prMode;
+        return { label: m[1], pressed: on, bg: on ? INK : 'transparent', fg: on ? PAPER : '#4A3F35', pick: function () { go({ prMode: m[0] }); } };
+      }),
+      isPractice: prMode === 'practice', isTrad: prMode === 'trad',
+      practices: PRACTICES.map(function (q) {
+        var on = q === prSel;
+        return { label: q.name, pressed: on, bg: on ? INK : '#FFFDF8', fg: on ? PAPER : INK, pick: function () { go({ prId: q.id }); } };
+      }),
+      tradChips: TRADS.map(function (t) {
+        var off = !!prHide[t.id];
+        return { label: t.name, pressed: !off, bg: off ? '#FFFDF8' : t.color, fg: off ? t.color : '#FFFFFF', border: t.color,
+          pick: function () { var o = Object.assign({}, prHide); o[t.id] = !off; go({ prHide: o }); } };
+      }),
+      tradPick: TRADS.map(function (t) {
+        var on = t.id === prTradId;
+        return { label: t.name, pressed: on, bg: on ? t.color : '#FFFDF8', fg: on ? '#FFFFFF' : t.color, border: t.color, pick: function () { go({ prTrad: t.id }); } };
+      }),
+      sel: {
+        name: prSel.name, why: prSel.why, shared: prSel.shared,
+        refs: prSel.refs.map(function (r) { return { label: r[3], pick: function () { openChap(r[0], r[1], r[2]); window.scrollTo(0, 0); } }; })
+      },
+      cards: TRADS.filter(function (t) { return !prHide[t.id]; }).map(function (t) {
+        var w = prSel.ways[t.id];
+        return { name: t.name, color: t.color, how: w[0], tryIt: w[1], src: prSrc(w), hasSrc: !!w[2],
+          more: function () { go({ prMode: 'trad', prTrad: t.id }); window.scrollTo(0, 0); } };
+      }),
+      tradName: TRAD_NAME[prTradId].name, tradColor: TRAD_NAME[prTradId].color, tradDesc: TRAD_NAME[prTradId].desc,
+      rule: PRACTICES.map(function (q) {
+        var w = q.ways[prTradId];
+        return { name: q.name, how: w[0], tryIt: w[1], src: prSrc(w), hasSrc: !!w[2],
+          open: function () { go({ prMode: 'practice', prId: q.id }); window.scrollTo(0, 0); } };
+      }),
+      compare: function () { go({ tab: 'compare', cmpMode: 'trad' }); window.scrollTo(0, 0); },
+      exportAll: function () {
+        var rows = [['Practice', 'Biblical basis', 'Scripture', 'Common ground', 'Tradition', 'How it is lived', 'Try this week', 'Source']];
+        PRACTICES.forEach(function (q) {
+          TRADS.forEach(function (t) {
+            var w = q.ways[t.id];
+            rows.push([q.name, q.why, q.refs.map(function (r) { return r[3]; }).join('; '), q.shared, t.name, w[0], w[1], w[2] ? w[2][0] + ' ' + w[2][1] : '']);
+          });
+        });
+        self.exportCSV('living-the-faith-by-tradition', rows);
+      }
+    };
 
     // Compare traditions and frameworks
     var cmpMode = st.cmpMode === 'fw' ? 'fw' : 'trad';
@@ -2317,6 +2808,7 @@ class Component extends DCLogic {
           typical: typical, hasTypical: typical.length > 0,
           meta1: x.origin ? 'Origins: ' + x.origin : 'Held by: ' + x.who, meta2: x.docs ? 'Key documents: ' + x.docs : '',
           hasMeta2: !!x.docs, hasProCon: !!x.pro, pro: x.pro || '', con: x.con || '',
+          canLive: cmpMode === 'trad', live: function () { go({ tab: 'practice', prMode: 'trad', prTrad: x.id }); window.scrollTo(0, 0); },
           src: x.src.map(function (q) { return { label: q[0], url: q[1] }; }) };
       }),
       famName: cmpFam.name
@@ -2370,6 +2862,9 @@ class Component extends DCLogic {
       } else copy();
     };
     return {
+      focusToggle: function (e) { self.focusToggle(e); },
+      areaSpeak: function (e) { self.areaSpeak(e); },
+      canSpeak: self.ttsSupported(),
       exportLibrary: function () {
         var rows = [['Order', 'Book', 'Testament', 'Group', 'Chapters', 'Key figures', 'Summary', 'In which Bibles']];
         BOOKS.forEach(function (b, i) { var d = DIVM[b.div]; rows.push([i + 1, b.name, d.t === 'OT' ? 'Old Testament' : 'New Testament', d.name, b.ch, b.people, b.sum, 'All Christian Bibles']); });
@@ -2393,7 +2888,7 @@ class Component extends DCLogic {
       isRead: tab === 'read', isSearch: tab === 'search',
       segments: segments, legend: legend,
       filters: filters, divisions: divisions,
-      eras: eras, era: era, arc: arc, arcSel: arcSel, future: future, tl: tl, isTimeline: tab === 'timeline', cp: cp, chMap: chMap, listen: listen, player: player, cmp: cmp, isCompare: tab === 'compare', parts: parts, part: part, showAside: tab !== 'compare' && tab !== 'timeline',
+      eras: eras, era: era, arc: arc, arcSel: arcSel, future: future, tl: tl, isTimeline: tab === 'timeline', cp: cp, chMap: chMap, listen: listen, player: player, cmp: cmp, isCompare: tab === 'compare', parts: parts, part: part, showAside: tab !== 'compare' && tab !== 'timeline' && tab !== 'practice', pr: pr, isPractice: tab === 'practice',
       themeBtns: themeBtns, strip: strip, theme: theme,
       sel: sel
     };
@@ -2405,7 +2900,7 @@ function view(V) {
 
 <header style="position: relative; border-bottom: 1px solid #E2D8C6; background: #FBF7EF">
 ${(V.showDesktopBtn) ? html`
-<button type="button" onClick=${V.toDesktop} aria-label="Switch to desktop view" style="position: absolute; top: 14px; right: 16px; z-index: 5; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 52px; min-height: 48px; padding: 6px 8px; border-radius: 12px; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.12)"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4" width="19" height="12.5" rx="1.5"></rect><path d="M8.5 20.5h7"></path><path d="M12 16.5v4"></path></svg><span style="font-size: 11px; font-weight: 700; white-space: nowrap">Desktop View</span></button>
+<button type="button" class="be-dbtn" onClick=${V.toDesktop} aria-label="Switch to desktop view" style="position: fixed; top: calc(12px + env(safe-area-inset-top, 0px)); right: calc(12px + env(safe-area-inset-right, 0px)); z-index: 50; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 52px; min-height: 48px; padding: 6px 8px; border-radius: 12px; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.18)"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4" width="19" height="12.5" rx="1.5"></rect><path d="M8.5 20.5h7"></path><path d="M12 16.5v4"></path></svg><span style="font-size: 11px; font-weight: 700; white-space: nowrap">Desktop View</span></button>
 ` : null}
 <div style="max-width: 1360px; margin: 0 auto; padding: 16px 32px; display: flex; flex-wrap: wrap; align-items: center; gap: 14px 32px">
 <div style="display: flex; align-items: center; gap: 12px">
@@ -2457,7 +2952,7 @@ ${(V.isOverview) ? html`
 <div style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 14px; padding: 18px"><div style="font-family: Fraunces, Georgia, serif; font-size: 40px; font-weight: 700; line-height: 1">1,189</div><div style="color: #6B5F52; font-size: 14px; margin-top: 6px">chapters</div></div>
 </div>
 
-<div style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 14px">
+<div data-focus="card" style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 14px"><button type="button" class="be-fbtn" onClick=${V.focusToggle} aria-label="Focus mode: show this section full screen" title="Focus mode (full screen)"><svg class="be-fi-in" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg><svg class="be-fi-out" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"></path><path d="M15 4v5h5"></path><path d="M9 20v-5H4"></path><path d="M15 20v-5h5"></path></svg></button><button type="button" class="be-sbtn" onClick=${V.areaSpeak} aria-label="Read this section aloud (press again to stop)" title="Read this section aloud"><svg class="be-si-play" aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg><svg class="be-si-stop" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"></rect></svg></button>
 <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: baseline">
 <h2 style="margin: 0; font-family: Fraunces, Georgia, serif; font-size: 24px">How the length is split</h2>
 <div style="font-size: 14px; color: #6B5F52">The Old Testament holds about three-quarters of the Bible: 929 of 1,189 chapters.</div>
@@ -2477,19 +2972,17 @@ ${(V.legend || []).map((l, $index) => html`
 </div>
 </div>
 
-<div style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 14px">
+<div data-focus="card" style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 14px"><button type="button" class="be-fbtn" onClick=${V.focusToggle} aria-label="Focus mode: show this section full screen" title="Focus mode (full screen)"><svg class="be-fi-in" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg><svg class="be-fi-out" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"></path><path d="M15 4v5h5"></path><path d="M9 20v-5H4"></path><path d="M15 20v-5h5"></path></svg></button><button type="button" class="be-sbtn" onClick=${V.areaSpeak} aria-label="Read this section aloud (press again to stop)" title="Read this section aloud"><svg class="be-si-play" aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg><svg class="be-si-stop" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"></rect></svg></button>
 <h2 style="margin: 0; font-family: Fraunces, Georgia, serif; font-size: 24px">How the parts fit together</h2>
 <p style="margin: 0; font-size: 14px; color: #4A3F35">Tap a part to read more about it.</p>
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px">
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; grid-auto-flow: dense">
 ${(V.parts || []).map((p, $index) => html`
 <button type="button" onClick=${p.pick} aria-expanded=${p.pressed} style="cursor: pointer; text-align: left; border-radius: 12px; padding: 16px; background: ${p.bg}; border: 2px solid ${p.border}; display: flex; flex-direction: column; gap: 4px; color: #231E19">
 <span style="display: flex; justify-content: space-between; align-items: center; gap: 6px; font-weight: 700; color: ${p.color}">${p.name}<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(${p.chev}deg); transition: transform 0.2s ease"><path d="M6 9l6 6 6-6"></path></svg></span>
 <span style="font-size: 14px; color: #4A3F35">${p.short}</span>
 </button>
-`)}
-</div>
-${(V.part.show) ? html`
-<div style="border-radius: 14px; padding: 18px 20px; background: ${V.part.bg}; border-left: 5px solid ${V.part.color}; display: flex; flex-direction: column; gap: 12px">
+${(p.pressed) ? html`
+<div id="part-detail" style="grid-column: 1 / -1; scroll-margin-top: 12px; border-radius: 14px; padding: 18px 20px; background: ${V.part.bg}; border-left: 5px solid ${V.part.color}; display: flex; flex-direction: column; gap: 12px">
 <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px"><h3 style="margin: 0; font-family: Fraunces, Georgia, serif; font-size: 22px; color: ${V.part.color}">${V.part.name}</h3><button type="button" onClick=${V.part.close} style="cursor: pointer; border: none; background: transparent; color: #4A3F35; font-size: 13px; font-weight: 600; min-height: 36px">Show less</button></div>
 ${(V.part.more || []).map((para, $index) => html`
 <p style="margin: 0; font-size: 16px; line-height: 1.65; color: #31291F; max-width: 780px">${para}</p>
@@ -2506,9 +2999,11 @@ ${(V.part.refs || []).map((c, $index) => html`
 </div>
 </div>
 ` : null}
+`)}
+</div>
 </div>
 
-<div style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 14px">
+<div data-focus="card" style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 14px"><button type="button" class="be-fbtn" onClick=${V.focusToggle} aria-label="Focus mode: show this section full screen" title="Focus mode (full screen)"><svg class="be-fi-in" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg><svg class="be-fi-out" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"></path><path d="M15 4v5h5"></path><path d="M9 20v-5H4"></path><path d="M15 20v-5h5"></path></svg></button><button type="button" class="be-sbtn" onClick=${V.areaSpeak} aria-label="Read this section aloud (press again to stop)" title="Read this section aloud"><svg class="be-si-play" aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg><svg class="be-si-stop" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"></rect></svg></button>
 <div>
 <div style="font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #7A3B1E">Between the testaments</div>
 <h2 style="margin: 4px 0 8px; font-family: Fraunces, Georgia, serif; font-size: 24px">Why the New Testament world looks so different</h2>
@@ -2526,7 +3021,7 @@ ${(V.part.refs || []).map((c, $index) => html`
 </div>
 </div>
 
-<div style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 14px">
+<div data-focus="card" style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 14px"><button type="button" class="be-fbtn" onClick=${V.focusToggle} aria-label="Focus mode: show this section full screen" title="Focus mode (full screen)"><svg class="be-fi-in" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg><svg class="be-fi-out" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"></path><path d="M15 4v5h5"></path><path d="M9 20v-5H4"></path><path d="M15 20v-5h5"></path></svg></button><button type="button" class="be-sbtn" onClick=${V.areaSpeak} aria-label="Read this section aloud (press again to stop)" title="Read this section aloud"><svg class="be-si-play" aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg><svg class="be-si-stop" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"></rect></svg></button>
 <div>
 <h2 style="margin: 0 0 4px; font-family: Fraunces, Georgia, serif; font-size: 24px">How other traditions arrange Scripture</h2>
 <p style="margin: 0; font-size: 14px; color: #4A3F35">Tap a tradition to see how it organizes its books. Dashed outlines mark books that are not in the Protestant Bible.</p>
@@ -2614,6 +3109,7 @@ ${(V.isStory) ? html`
 <h1 style="margin: 4px 0 8px; font-family: Fraunces, Georgia, serif; font-size: 36px; line-height: 1.1">One story in nine movements and eleven eras</h1>
 <p style="margin: 0; color: #4A3F35; max-width: 760px">The top row is the Bible’s big story, from creation to new creation. The brackets show which historical eras each movement covers. Pick either one to see who lived then and which books tell the story. Dates are approximate, and some are debated, especially the Exodus.</p>
 </div>
+<div data-focus="wide" style="display: flex; flex-direction: column; gap: 18px"><button type="button" class="be-fbtn" onClick=${V.focusToggle} aria-label="Focus mode: show this section full screen" title="Focus mode (full screen)"><svg class="be-fi-in" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg><svg class="be-fi-out" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"></path><path d="M15 4v5h5"></path><path d="M9 20v-5H4"></path><path d="M15 20v-5h5"></path></svg></button><button type="button" class="be-sbtn" onClick=${V.areaSpeak} aria-label="Read this section aloud (press again to stop)" title="Read this section aloud"><svg class="be-si-play" aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg><svg class="be-si-stop" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"></rect></svg></button>
 <div style="overflow-x: auto; padding: 4px 2px 10px">
 <div style="display: grid; grid-template-columns: repeat(24, 79px); column-gap: 10px; min-width: max-content">
 <div style="grid-row: 1; grid-column: 1 / -1; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52; margin-bottom: 6px">The big story · tap a movement to see how it lines up with the eras</div>
@@ -2637,7 +3133,8 @@ ${(V.eras || []).map((e, $index) => html`
 </button>
 </div>
 </div>
-<div style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; border-left: 6px solid ${V.arcSel.color}; padding: 20px 24px; display: flex; flex-direction: column; gap: 14px">
+</div>
+<div data-focus="card" style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; border-left: 6px solid ${V.arcSel.color}; padding: 20px 24px; display: flex; flex-direction: column; gap: 14px"><button type="button" class="be-fbtn" onClick=${V.focusToggle} aria-label="Focus mode: show this section full screen" title="Focus mode (full screen)"><svg class="be-fi-in" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg><svg class="be-fi-out" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"></path><path d="M15 4v5h5"></path><path d="M9 20v-5H4"></path><path d="M15 20v-5h5"></path></svg></button><button type="button" class="be-sbtn" onClick=${V.areaSpeak} aria-label="Read this section aloud (press again to stop)" title="Read this section aloud"><svg class="be-si-play" aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg><svg class="be-si-stop" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"></rect></svg></button>
 <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: baseline">
 <div style="font-size: 13px; color: #6B5F52; font-weight: 600">The big story · movement ${V.arcSel.n} of 9 · ${V.arcSel.span}</div>
 <div style="display: flex; gap: 6px">
@@ -2668,7 +3165,7 @@ ${(V.arcSel.showTimeline) ? html`
 <button type="button" onClick=${V.arcSel.goTimeline} style="align-self: flex-start; cursor: pointer; border: none; border-radius: 999px; padding: 8px 16px; min-height: 40px; font-size: 14px; font-weight: 700; background: #231E19; color: #FBF7EF">Follow the church to today on the Timeline →</button>
 ` : null}
 </div>
-<div style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+<div data-focus="card" style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 16px"><button type="button" class="be-fbtn" onClick=${V.focusToggle} aria-label="Focus mode: show this section full screen" title="Focus mode (full screen)"><svg class="be-fi-in" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg><svg class="be-fi-out" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"></path><path d="M15 4v5h5"></path><path d="M9 20v-5H4"></path><path d="M15 20v-5h5"></path></svg></button><button type="button" class="be-sbtn" onClick=${V.areaSpeak} aria-label="Read this section aloud (press again to stop)" title="Read this section aloud"><svg class="be-si-play" aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg><svg class="be-si-stop" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"></rect></svg></button>
 <div>
 <div style="font-size: 13px; color: #6B5F52; font-weight: 600">Era ${V.era.n} of 11 · ${V.era.dates}</div>
 <h2 style="margin: 4px 0 8px; font-family: Fraunces, Georgia, serif; font-size: 32px; line-height: 1.15">${V.era.name}</h2>
@@ -2704,7 +3201,7 @@ ${(V.era.noBooks) ? html`
 </div>
 </div>
 </div>
-<div style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 12px">
+<div data-focus="map" style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 12px"><button type="button" class="be-fbtn" onClick=${V.focusToggle} aria-label="Focus mode: show this section full screen" title="Focus mode (full screen)"><svg class="be-fi-in" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg><svg class="be-fi-out" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"></path><path d="M15 4v5h5"></path><path d="M9 20v-5H4"></path><path d="M15 20v-5h5"></path></svg></button><button type="button" class="be-sbtn" onClick=${V.areaSpeak} aria-label="Read this section aloud (press again to stop)" title="Read this section aloud"><svg class="be-si-play" aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg><svg class="be-si-stop" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"></rect></svg></button>
 <h2 style="margin: 0; font-family: Fraunces, Georgia, serif; font-size: 24px">Map: ${V.era.name}</h2>
 <div style="display: flex; flex-direction: column; gap: 10px">
 <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: flex-end">
@@ -2715,7 +3212,7 @@ ${(V.era.noBooks) ? html`
 </div>
 <button type="button" onClick=${V.eraMap.toggle} style="cursor: pointer; min-height: 40px; padding: 6px 14px; border-radius: 999px; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; font-size: 13px; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.15)">${V.eraMap.toggleLabel}</button>
 </div>
-<div onPointerDown=${V.eraMap.down} onPointerMove=${V.eraMap.move} onPointerUp=${V.eraMap.up} onPointerCancel=${V.eraMap.up} style="position: relative; width: 100%; aspect-ratio: ${V.eraMap.aspect}; overflow: hidden; border-radius: 12px; background: #C7DADB; border: 1px solid #D9CDB8; touch-action: none; user-select: none; cursor: ${V.eraMap.cursor}">
+<div onPointerDown=${V.eraMap.down} onPointerMove=${V.eraMap.move} onPointerUp=${V.eraMap.up} onPointerCancel=${V.eraMap.up} data-fit="1" data-noread="1" style="position: relative; width: 100%; aspect-ratio: ${V.eraMap.aspect}; overflow: hidden; border-radius: 12px; background: #C7DADB; border: 1px solid #D9CDB8; touch-action: none; user-select: none; cursor: ${V.eraMap.cursor}">
 <div style="position: absolute; left: ${V.eraMap.left}%; top: ${V.eraMap.top}%; width: ${V.eraMap.width}%; height: ${V.eraMap.height}%; transition: ${V.eraMap.transition}">
 <img src="basemap.svg" alt="" draggable="false" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: block; pointer-events: none" />
 <svg aria-hidden="true" viewBox="0 0 7372.37 5200" preserveAspectRatio="none" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible">
@@ -2775,7 +3272,7 @@ ${(V.themeBtns || []).map((t, $index) => html`
 </button>
 `)}
 </div>
-<div style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 18px">
+<div data-focus="card" style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 18px"><button type="button" class="be-fbtn" onClick=${V.focusToggle} aria-label="Focus mode: show this section full screen" title="Focus mode (full screen)"><svg class="be-fi-in" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg><svg class="be-fi-out" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"></path><path d="M15 4v5h5"></path><path d="M9 20v-5H4"></path><path d="M15 20v-5h5"></path></svg></button><button type="button" class="be-sbtn" onClick=${V.areaSpeak} aria-label="Read this section aloud (press again to stop)" title="Read this section aloud"><svg class="be-si-play" aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg><svg class="be-si-stop" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"></rect></svg></button>
 <h2 style="margin: 0; font-family: Fraunces, Georgia, serif; font-size: 30px">${V.theme.name}</h2>
 <div style="display: flex; flex-wrap: wrap; gap: 14px; align-items: stretch">
 <div style="flex: 1 1 260px; background: #F7EDE8; border-radius: 12px; padding: 16px">
@@ -2826,6 +3323,7 @@ ${(V.isTimeline) ? html`
 <h1 style="margin: 4px 0 8px; font-family: Fraunces, Georgia, serif; font-size: 36px; line-height: 1.1">From creation to today</h1>
 <p style="margin: 0; color: #4A3F35; max-width: 760px">Zoom in on any period to see more events. Dates before about 1000 BC are traditional and approximate, and creation itself is undated in Genesis. Hover over an event, or tap it, to see its source, with links to read further.</p>
 </div>
+<div data-focus="wide" style="display: flex; flex-direction: column; gap: 18px"><button type="button" class="be-fbtn" onClick=${V.focusToggle} aria-label="Focus mode: show this section full screen" title="Focus mode (full screen)"><svg class="be-fi-in" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg><svg class="be-fi-out" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"></path><path d="M15 4v5h5"></path><path d="M9 20v-5H4"></path><path d="M15 20v-5h5"></path></svg></button><button type="button" class="be-sbtn" onClick=${V.areaSpeak} aria-label="Read this section aloud (press again to stop)" title="Read this section aloud"><svg class="be-si-play" aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg><svg class="be-si-stop" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"></rect></svg></button>
 <div style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: 16px 18px; display: flex; flex-direction: column; gap: 14px">
 <div role="group" aria-label="Jump to a period" style="display: flex; flex-wrap: wrap; gap: 6px">
 ${(V.tl.presets || []).map((p, $index) => html`
@@ -2878,19 +3376,29 @@ ${(V.tl.rs.dots || []).map((d, $index) => html`
 </div>
 <div style="display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center"><div style="font-size: 13px; color: #6B5F52; flex: 1 1 300px">${V.tl.count} · ${V.tl.detailNote} You can also drag the timeline itself sideways.</div><button type="button" onClick=${V.tl.exportView} style="cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; border-radius: 999px; padding: 6px 14px; min-height: 38px; font-size: 13px; font-weight: 700"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"></path><path d="M7.5 10.5L12 15l4.5-4.5"></path><path d="M5 19h14"></path></svg>Export events in view</button><button type="button" onClick=${V.tl.exportAll} style="cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; border-radius: 999px; padding: 6px 14px; min-height: 38px; font-size: 13px; font-weight: 700"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"></path><path d="M7.5 10.5L12 15l4.5-4.5"></path><path d="M5 19h14"></path></svg>Export all events</button></div>
 <div style="display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-start">
-<div style="flex: 1 1 300px; min-width: 0; background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: 10px; max-height: 460px; overflow-y: auto">
-<ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px">
-${(V.tl.list || []).map((it, $index) => html`
-<li><button type="button" onClick=${it.pick} aria-pressed=${it.pressed} title=${it.tip} style="width: 100%; text-align: left; cursor: pointer; border: none; border-radius: 8px; padding: 8px 10px; min-height: 40px; display: flex; gap: 10px; align-items: baseline; background: ${it.bg}; color: #231E19"><span aria-hidden="true" style="flex: none; width: 10px; height: 10px; border-radius: 50%; background: ${it.color}; transform: translateY(1px)"></span><span style="flex: none; width: 112px; font-size: 12px; font-weight: 700; color: #6B5F52">${it.date}</span><span style="font-size: 14px; font-weight: 600">${it.label}</span></button></li>
+<div style="flex: 1 1 300px; min-width: 0; background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: 10px 10px 12px; max-height: 560px; overflow-y: auto">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 4px 6px 8px"><div style="flex: 1 1 160px; font-size: 13px; color: #6B5F52">${V.tl.listCount}</div><button type="button" onClick=${V.tl.expandAll} aria-pressed=${V.tl.allOpen} style="cursor: pointer; border: 1px solid #D9CDB8; background: #F5EFE3; color: #231E19; border-radius: 999px; padding: 6px 12px; min-height: 36px; font-size: 13px; font-weight: 700">${V.tl.expandLabel}</button></div>
+${(V.tl.groups || []).map((g, $index) => html`
+<section style="border-top: 1px solid #EAE1D0; padding: 4px 0">
+<button type="button" onClick=${g.toggle} aria-expanded=${g.open} style="width: 100%; cursor: pointer; border: none; background: transparent; display: flex; align-items: center; gap: 8px; padding: 8px 6px; min-height: 44px; text-align: left; color: #231E19"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex: none; transform: rotate(${g.chev}deg); transition: transform 0.15s ease"><path d="M6 9l6 6 6-6"></path></svg><span style="flex: 1 1 auto; font-family: Fraunces, Georgia, serif; font-size: 16px; font-weight: 700">${g.name}</span><span style="flex: none; font-size: 12px; color: #6B5F52">${g.dates} · ${g.count}</span></button>
+${(g.open) ? html`
+<ol style="list-style: none; margin: 0; padding: 0 0 0 14px; display: flex; flex-direction: column; gap: 2px; border-left: 2px solid #EAE1D0; margin-left: 13px">
+${(g.items || []).map((it, $index) => html`
+<li><button type="button" onClick=${it.pick} aria-pressed=${it.pressed} title=${it.tip} style="width: 100%; text-align: left; cursor: pointer; border: none; border-radius: 8px; padding: 7px 8px; min-height: 40px; display: flex; gap: 10px; align-items: baseline; background: ${it.bg}; color: #231E19"><span aria-hidden="true" style="flex: none; width: 10px; height: 10px; border-radius: 50%; background: ${it.color}; transform: translateY(1px)"></span><span style="flex: none; width: 104px; font-size: 12px; font-weight: 700; color: #6B5F52">${it.date}</span><span style="font-size: 14px; font-weight: ${it.weight}">${it.label}</span></button></li>
 `)}
 </ol>
+${(g.hasMore) ? html`<button type="button" onClick=${g.showMore} style="margin: 4px 0 2px 27px; cursor: pointer; border: 1px dashed #B9AA90; background: transparent; color: #4A3F35; border-radius: 999px; padding: 6px 12px; min-height: 36px; font-size: 13px; font-weight: 700">+ ${g.moreLabel}</button>` : null}
+${(g.hasLess) ? html`<button type="button" onClick=${g.showLess} style="margin: 4px 0 2px 27px; cursor: pointer; border: none; background: transparent; color: #6B5F52; text-decoration: underline; padding: 6px 4px; min-height: 36px; font-size: 13px">Main events only</button>` : null}
+` : null}
+</section>
+`)}
 </div>
 <div style="flex: 1 1 320px; min-width: 0">
 ${(V.tl.noDetail) ? html`
 <div style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: 22px; color: #4A3F35">Pick an event on the timeline or in the list to read about it, see where the information comes from, and follow links to read further.</div>
 ` : null}
 ${(V.tl.hasDetail) ? html`
-<article style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; border-top: 6px solid ${V.tl.detail.color}; padding: 20px 22px; display: flex; flex-direction: column; gap: 12px">
+<article data-focus="card" style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; border-top: 6px solid ${V.tl.detail.color}; padding: 20px 22px; display: flex; flex-direction: column; gap: 12px"><button type="button" class="be-fbtn" onClick=${V.focusToggle} aria-label="Focus mode: show this section full screen" title="Focus mode (full screen)"><svg class="be-fi-in" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg><svg class="be-fi-out" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"></path><path d="M15 4v5h5"></path><path d="M9 20v-5H4"></path><path d="M15 20v-5h5"></path></svg></button><button type="button" class="be-sbtn" onClick=${V.areaSpeak} aria-label="Read this section aloud (press again to stop)" title="Read this section aloud"><svg class="be-si-play" aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg><svg class="be-si-stop" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"></rect></svg></button>
 <div style="display: flex; justify-content: space-between; gap: 8px; align-items: baseline"><span style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: ${V.tl.detail.color}">${V.tl.detail.cat}</span><button type="button" onClick=${V.tl.detail.close} aria-label="Close" style="cursor: pointer; border: none; background: transparent; font-size: 20px; line-height: 1; color: #6B5F52; width: 32px; height: 32px">×</button></div>
 <h2 style="margin: 0; font-family: Fraunces, Georgia, serif; font-size: 26px; line-height: 1.15">${V.tl.detail.title}</h2>
 <div style="font-size: 14px; font-weight: 700; color: #4A3F35">${V.tl.detail.date}</div>
@@ -2911,10 +3419,79 @@ ${(V.tl.detail.hasRead) ? html`
 ` : null}
 </div>
 </div>
+</div>
 <div style="font-size: 12px; color: #6B5F52">Summaries are written for this app; event facts are checked against Encyclopaedia Britannica and, for today’s figures, Pew Research Center.</div>
 </section>
 ` : null}
 
+${(V.isPractice) ? html`
+<section style="display: flex; flex-direction: column; gap: 18px">
+<div>
+<div style="font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #7A3B1E">Practice</div>
+<h1 style="margin: 4px 0 8px; font-family: Fraunces, Georgia, serif; font-size: 36px; line-height: 1.1">Living it out, day to day</h1>
+<p style="margin: 0 0 8px; color: #4A3F35; max-width: 800px">Beliefs shape a way of life. Here are twelve everyday practices, each with its basis in Scripture, the ground Christians share, and how each tradition typically lives it, drawing on Scripture and, for Catholic and Orthodox Christians, the Church’s Tradition. Each one ends with a small step to try this week.</p>
+<p style="margin: 0; font-size: 13px; color: #6B5F52; max-width: 800px">Every tradition teaches that these practices respond to God’s grace rather than earn it, though they explain that link differently (see Compare). Descriptions follow each tradition’s official teaching or common practice; individual churches vary.</p>
+</div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px">
+<div role="group" aria-label="View" style="display: flex; gap: 4px; background: #EAE1D0; padding: 4px; border-radius: 999px">
+${(V.pr.modes || []).map((m, $index) => html`<button type="button" onClick=${m.pick} aria-pressed=${m.pressed} style="border: none; cursor: pointer; padding: 8px 16px; min-height: 44px; border-radius: 999px; font-size: 14px; font-weight: 700; background: ${m.bg}; color: ${m.fg}">${m.label}</button>`)}
+</div>
+<button type="button" onClick=${V.pr.compare} style="cursor: pointer; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; border-radius: 999px; padding: 8px 14px; min-height: 40px; font-size: 13px; font-weight: 700">Compare beliefs →</button>
+<button type="button" onClick=${V.pr.exportAll} style="cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; border-radius: 999px; padding: 8px 14px; min-height: 40px; font-size: 13px; font-weight: 700"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M5 21h14"></path></svg>Export all as CSV</button>
+</div>
+${(V.pr.isPractice) ? html`
+<div>
+<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52; margin-bottom: 8px">Practice</div>
+<div role="group" aria-label="Practice" style="display: flex; flex-wrap: wrap; gap: 6px">
+${(V.pr.practices || []).map((q, $index) => html`<button type="button" onClick=${q.pick} aria-pressed=${q.pressed} style="cursor: pointer; border: 1px solid #D9CDB8; border-radius: 999px; padding: 6px 12px; min-height: 38px; font-size: 13px; font-weight: 600; background: ${q.bg}; color: ${q.fg}">${q.label}</button>`)}
+</div>
+</div>
+<article data-focus="card" style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 18px; padding: 22px 24px; display: flex; flex-direction: column; gap: 12px"><button type="button" class="be-fbtn" onClick=${V.focusToggle} aria-label="Focus mode: show this section full screen" title="Focus mode (full screen)"><svg class="be-fi-in" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg><svg class="be-fi-out" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"></path><path d="M15 4v5h5"></path><path d="M9 20v-5H4"></path><path d="M15 20v-5h5"></path></svg></button><button type="button" class="be-sbtn" onClick=${V.areaSpeak} aria-label="Read this section aloud (press again to stop)" title="Read this section aloud"><svg class="be-si-play" aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg><svg class="be-si-stop" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"></rect></svg></button>
+<h2 style="margin: 0; font-family: Fraunces, Georgia, serif; font-size: 28px; line-height: 1.15; padding-right: 80px">${V.pr.sel.name}</h2>
+<div><div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52; margin-bottom: 4px">Why Christians do this</div><p style="margin: 0; font-size: 16px; line-height: 1.6; color: #31291F; max-width: 820px">${V.pr.sel.why}</p></div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px">${(V.pr.sel.refs || []).map((r, $index) => html`<button type="button" onClick=${r.pick} title="Read this passage" style="cursor: pointer; border: 1px solid #D9CDB8; background: #F5EFE3; color: #7A3B1E; border-radius: 999px; padding: 6px 12px; min-height: 36px; font-size: 13px; font-weight: 700">${r.label}</button>`)}</div>
+<div style="background: #F5EFE3; border-radius: 12px; padding: 12px 14px"><div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52; margin-bottom: 4px">Common ground</div><p style="margin: 0; font-size: 15px; line-height: 1.55; color: #31291F">${V.pr.sel.shared}</p></div>
+</article>
+<div>
+<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52; margin-bottom: 8px">Traditions shown (tap to hide or show)</div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px">${(V.pr.tradChips || []).map((c, $index) => html`<button type="button" onClick=${c.pick} aria-pressed=${c.pressed} style="cursor: pointer; border: 2px solid ${c.border}; border-radius: 999px; padding: 5px 12px; min-height: 36px; font-size: 13px; font-weight: 700; background: ${c.bg}; color: ${c.fg}">${c.label}</button>`)}</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px">
+${(V.pr.cards || []).map((c, $index) => html`
+<article data-focus="card" style="background: #FFFDF8; border: 1px solid #E2D8C6; border-top: 6px solid ${c.color}; border-radius: 16px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px"><button type="button" class="be-fbtn" onClick=${V.focusToggle} aria-label="Focus mode: show this section full screen" title="Focus mode (full screen)"><svg class="be-fi-in" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg><svg class="be-fi-out" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"></path><path d="M15 4v5h5"></path><path d="M9 20v-5H4"></path><path d="M15 20v-5h5"></path></svg></button><button type="button" class="be-sbtn" onClick=${V.areaSpeak} aria-label="Read this section aloud (press again to stop)" title="Read this section aloud"><svg class="be-si-play" aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg><svg class="be-si-stop" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"></rect></svg></button>
+<h3 style="margin: 0; font-family: Fraunces, Georgia, serif; font-size: 19px; color: ${c.color}; padding-right: 80px">${c.name}</h3>
+<p style="margin: 0; font-size: 15px; line-height: 1.55; color: #31291F">${c.how}</p>
+<div style="border-left: 3px solid ${c.color}; padding: 4px 0 4px 10px; font-size: 14px; line-height: 1.5; color: #231E19"><strong>Try this week:</strong> ${c.tryIt}</div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; margin-top: auto; font-size: 13px">
+${(c.hasSrc) ? html`${(c.src || []).map((q, $index) => html`<a href=${q.url} target="_blank" rel="noopener noreferrer" title="Opens in a new tab" style="color: #2E4A8A; font-weight: 600">${q.label} ↗</a>`)}` : null}
+<button type="button" onClick=${c.more} style="cursor: pointer; border: none; background: transparent; color: #6B5F52; text-decoration: underline; padding: 4px 0; min-height: 32px; font-size: 13px">All practices in this tradition</button>
+</div>
+</article>
+`)}
+</div>
+` : null}
+${(V.pr.isTrad) ? html`
+<div>
+<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52; margin-bottom: 8px">Tradition</div>
+<div role="group" aria-label="Tradition" style="display: flex; flex-wrap: wrap; gap: 6px">${(V.pr.tradPick || []).map((c, $index) => html`<button type="button" onClick=${c.pick} aria-pressed=${c.pressed} style="cursor: pointer; border: 2px solid ${c.border}; border-radius: 999px; padding: 6px 14px; min-height: 40px; font-size: 13px; font-weight: 700; background: ${c.bg}; color: ${c.fg}">${c.label}</button>`)}</div>
+</div>
+<article data-focus="card" style="background: #FFFDF8; border: 1px solid #E2D8C6; border-top: 6px solid ${V.pr.tradColor}; border-radius: 18px; padding: 22px 24px; display: flex; flex-direction: column; gap: 14px"><button type="button" class="be-fbtn" onClick=${V.focusToggle} aria-label="Focus mode: show this section full screen" title="Focus mode (full screen)"><svg class="be-fi-in" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg><svg class="be-fi-out" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"></path><path d="M15 4v5h5"></path><path d="M9 20v-5H4"></path><path d="M15 20v-5h5"></path></svg></button><button type="button" class="be-sbtn" onClick=${V.areaSpeak} aria-label="Read this section aloud (press again to stop)" title="Read this section aloud"><svg class="be-si-play" aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg><svg class="be-si-stop" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"></rect></svg></button>
+<div><h2 style="margin: 0 0 6px; font-family: Fraunces, Georgia, serif; font-size: 28px; line-height: 1.15; color: ${V.pr.tradColor}; padding-right: 80px">A ${V.pr.tradName} way of life</h2><p style="margin: 0; font-size: 15px; line-height: 1.55; color: #4A3F35; max-width: 820px">${V.pr.tradDesc}</p></div>
+<ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0">
+${(V.pr.rule || []).map((r, $index) => html`
+<li style="border-top: 1px solid #EAE1D0; padding: 14px 0; display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px"><h3 style="margin: 0; font-family: Fraunces, Georgia, serif; font-size: 18px">${r.name}</h3><button type="button" onClick=${r.open} style="cursor: pointer; border: none; background: transparent; color: #6B5F52; text-decoration: underline; padding: 2px 0; min-height: 28px; font-size: 13px">Compare across traditions</button></div>
+<p style="margin: 0; font-size: 15px; line-height: 1.55; color: #31291F; max-width: 860px">${r.how}</p>
+<div style="border-left: 3px solid ${V.pr.tradColor}; padding: 2px 0 2px 10px; font-size: 14px; line-height: 1.5"><strong>Try this week:</strong> ${r.tryIt}</div>
+${(r.hasSrc) ? html`<div style="font-size: 13px">${(r.src || []).map((q, $index) => html`<a href=${q.url} target="_blank" rel="noopener noreferrer" title="Opens in a new tab" style="color: #2E4A8A; font-weight: 600">${q.label} ↗</a>`)}</div>` : null}
+</li>
+`)}
+</ol>
+</article>
+` : null}
+<div style="font-size: 12px; color: #6B5F52; max-width: 820px">Summaries are written for this app from each tradition’s catechisms, prayer books and confessions, linked where used. Practice varies by country, parish and family; for guidance, talk with a pastor or priest in your own tradition.</div>
+</section>
+` : null}
 ${(V.isCompare) ? html`
 <section style="display: flex; flex-direction: column; gap: 18px">
 <div>
@@ -2954,8 +3531,8 @@ ${(V.cmp.views || []).map((v, $index) => html`
 </div>
 ` : null}
 ${(V.cmp.showVennView) ? html`
-<div style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: 16px">
-<div style="position: relative; width: 100%; max-width: 640px; margin: 0 auto; aspect-ratio: 600 / 470">
+<div data-focus="fit" style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: 16px"><button type="button" class="be-fbtn" onClick=${V.focusToggle} aria-label="Focus mode: show this section full screen" title="Focus mode (full screen)"><svg class="be-fi-in" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg><svg class="be-fi-out" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"></path><path d="M15 4v5h5"></path><path d="M9 20v-5H4"></path><path d="M15 20v-5h5"></path></svg></button><button type="button" class="be-sbtn" onClick=${V.areaSpeak} aria-label="Read this section aloud (press again to stop)" title="Read this section aloud"><svg class="be-si-play" aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg><svg class="be-si-stop" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"></rect></svg></button>
+<div data-fit="1" style="position: relative; width: 100%; max-width: 640px; margin: 0 auto; aspect-ratio: 600 / 470">
 <svg aria-hidden="true" viewBox="0 0 600 470" style="position: absolute; inset: 0; width: 100%; height: 100%">
 ${(V.cmp.circles || []).map((c, $index) => html`
 <circle cx=${c.cx} cy=${c.cy} r=${c.r} fill=${c.color} fill-opacity="0.13" stroke=${c.color} stroke-width="2.5"></circle>
@@ -2989,7 +3566,7 @@ ${(sec.items || []).map((it, $index) => html`
 ` : null}
 ${(V.cmp.showTableView) ? html`
 <button type="button" onClick=${V.cmp.exportTable} style="align-self: flex-start; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; border-radius: 999px; padding: 6px 14px; min-height: 38px; font-size: 13px; font-weight: 700"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"></path><path d="M7.5 10.5L12 15l4.5-4.5"></path><path d="M5 19h14"></path></svg>Export table (CSV)</button>
-<div style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: 6px; overflow-x: auto">
+<div data-focus="card" style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: 6px; overflow-x: auto"><button type="button" class="be-fbtn" onClick=${V.focusToggle} aria-label="Focus mode: show this section full screen" title="Focus mode (full screen)"><svg class="be-fi-in" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg><svg class="be-fi-out" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"></path><path d="M15 4v5h5"></path><path d="M9 20v-5H4"></path><path d="M15 20v-5h5"></path></svg></button><button type="button" class="be-sbtn" onClick=${V.areaSpeak} aria-label="Read this section aloud (press again to stop)" title="Read this section aloud"><svg class="be-si-play" aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg><svg class="be-si-stop" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"></rect></svg></button>
 <table style="width: 100%; border-collapse: collapse; min-width: 560px; font-size: 14px">
 <thead><tr><th style="text-align: left; padding: 10px; width: 22%"></th>
 ${(V.cmp.tblHead || []).map((h, $index) => html`<th style="text-align: left; padding: 10px; color: ${h.color}; font-family: Fraunces, Georgia, serif; font-size: 16px; border-bottom: 3px solid ${h.color}">${h.name}</th>`)}
@@ -3007,7 +3584,7 @@ ${(r.cells || []).map((c, $index) => html`<td style="vertical-align: top; paddin
 ${(V.cmp.showTradsView) ? html`
 <div style="font-size: 14px; color: #31291F; max-width: 780px">Where each view in <strong>${V.cmp.famName}</strong> is found. This is a loose association: a <strong>filled dot</strong> marks the official or majority view of a tradition; a <strong>dashed ring</strong> means it is found in some churches or among many members. Individual congregations and believers vary.</div>
 <button type="button" onClick=${V.cmp.exportTrads} style="align-self: flex-start; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; border-radius: 999px; padding: 6px 14px; min-height: 38px; font-size: 13px; font-weight: 700">Export (CSV)</button>
-<div style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: 6px; overflow-x: auto">
+<div data-focus="card" style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: 6px; overflow-x: auto"><button type="button" class="be-fbtn" onClick=${V.focusToggle} aria-label="Focus mode: show this section full screen" title="Focus mode (full screen)"><svg class="be-fi-in" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg><svg class="be-fi-out" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"></path><path d="M15 4v5h5"></path><path d="M9 20v-5H4"></path><path d="M15 20v-5h5"></path></svg></button><button type="button" class="be-sbtn" onClick=${V.areaSpeak} aria-label="Read this section aloud (press again to stop)" title="Read this section aloud"><svg class="be-si-play" aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg><svg class="be-si-stop" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"></rect></svg></button>
 <table style="width: 100%; border-collapse: collapse; min-width: 760px; font-size: 13px">
 <thead><tr><th style="text-align: left; padding: 8px"></th>
 ${(V.cmp.trHead || []).map((h, $index) => html`<th style="padding: 8px 4px; color: ${h.color}; font-size: 12px; font-weight: 700; text-align: center; vertical-align: bottom; border-bottom: 3px solid ${h.color}">${h.name}</th>`)}
@@ -3037,6 +3614,7 @@ ${(c.noFound) ? html`<div style="font-size: 12px; color: #6B5F52">Not the offici
 ${(c.hasTypical) ? html`
 <div><div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52; margin-bottom: 6px">Typical frameworks (loosely)</div><ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 3px">${(c.typical || []).map((r, $index) => html`<li style="font-size: 13px; line-height: 1.4"><button type="button" onClick=${r.pick} title="Compare these frameworks" style="cursor: pointer; border: none; background: transparent; padding: 0; color: #2E4A8A; font-weight: 700; font-size: 13px; text-decoration: underline">${r.topic}</button>: ${r.main} <span style="color: #6B5F52">${r.some}</span></li>`)}</ul></div>
 ` : null}
+${(c.canLive) ? html`<button type="button" onClick=${c.live} style="align-self: flex-start; cursor: pointer; border: 1px solid ${c.color}; background: #FFFDF8; color: ${c.color}; border-radius: 999px; padding: 6px 14px; min-height: 38px; font-size: 13px; font-weight: 700">How ${c.name} Christians live it out →</button>` : null}
 <div style="font-size: 13px">Read more: ${(c.src || []).map((q, $index) => html`<a href=${q.url} target="_blank" rel="noopener noreferrer" title="Opens in a new tab" style="color: #2E4A8A; font-weight: 600; margin-right: 8px">${q.label} ↗</a>`)}</div>
 </article>
 `)}
@@ -3121,13 +3699,14 @@ ${(V.tts.active) ? html`
 <span aria-live="polite" style="font-size: 13px; color: #6B5F52; flex: 1 1 160px">${V.tts.status}</span>
 </div>
 ` : null}
-<article style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: 32px 40px; font-family: Georgia, 'Times New Roman', serif; font-size: 19px; line-height: 1.8; color: #231E19">
+<article id="read-text" data-focus="text" style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: ${V.rd.txtPad}; font-family: Georgia, 'Times New Roman', serif; font-size: 19px; line-height: 1.8; color: #231E19; max-height: ${V.rd.txtMax}; overflow-y: ${V.rd.txtOv}; overscroll-behavior: contain"><button type="button" class="be-fbtn" onClick=${V.focusToggle} aria-label="Focus mode: show this section full screen" title="Focus mode (full screen)"><svg class="be-fi-in" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg><svg class="be-fi-out" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"></path><path d="M15 4v5h5"></path><path d="M9 20v-5H4"></path><path d="M15 20v-5h5"></path></svg></button><button type="button" class="be-sbtn" onClick=${V.areaSpeak} aria-label="Read this section aloud (press again to stop)" title="Read this section aloud"><svg class="be-si-play" aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg><svg class="be-si-stop" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"></rect></svg></button>
 <div style="max-width: 720px">
 ${(V.rd.verses || []).map((v, $index) => html`
 <span id=${v.id} style="border-radius: 4px; padding: 2px 0; background: ${v.bg}"><sup style="font-family: Inter, system-ui, sans-serif; font-size: 11px; font-weight: 700; color: #7A3B1E; margin: 0 4px 0 6px">${v.n}</sup>${v.text} </span>
 `)}
 </div>
 </article>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-top: -6px"><button type="button" onClick=${V.rd.txtToggle} aria-expanded=${V.rd.txtOpen} aria-controls="read-text" style="cursor: pointer; display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 6px 14px 6px 10px; border-radius: 999px; border: 1px solid #D9CDB8; background: #F5EFE3; color: #231E19; font-size: 14px; font-weight: 700"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(${V.rd.txtChev}deg); transition: transform 0.2s ease"><path d="M6 9l6 6 6-6"></path></svg>${V.rd.txtLabel}</button><span style="font-size: 13px; color: #6B5F52">${V.rd.txtHint}</span></div>
 <div style="font-size: 12px; color: #6B5F52">${V.rd.trName} · public domain. ${V.rd.footnote}</div>
 ` : null}
 </section>
@@ -3179,7 +3758,7 @@ ${(V.s.loading) ? html`
 <div style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: 32px; text-align: center; color: #4A3F35">Loading the ${V.s.trName}…</div>
 ` : null}
 ${(V.s.ready) ? html`
-<div style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 16px">
+<div data-focus="card" style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 16px"><button type="button" class="be-fbtn" onClick=${V.focusToggle} aria-label="Focus mode: show this section full screen" title="Focus mode (full screen)"><svg class="be-fi-in" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg><svg class="be-fi-out" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"></path><path d="M15 4v5h5"></path><path d="M9 20v-5H4"></path><path d="M15 20v-5h5"></path></svg></button><button type="button" class="be-sbtn" onClick=${V.areaSpeak} aria-label="Read this section aloud (press again to stop)" title="Read this section aloud"><svg class="be-si-play" aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg><svg class="be-si-stop" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"></rect></svg></button>
 <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: baseline">
 <h2 style="margin: 0; font-family: Fraunces, Georgia, serif; font-size: 24px">${V.s.totalLabel} contain “${V.s.query}”</h2>
 <span style="font-size: 13px; color: #6B5F52">${V.s.note}</span>
@@ -3234,7 +3813,10 @@ ${(V.s.xresults || []).map((r, $index) => html`
 ${(V.showAside) ? html`
 <aside id="book-card" aria-label="Book details" style="flex: 1 1 340px; min-width: 0; scroll-margin-top: 12px">
 ${(V.isRead) ? html`
-<section aria-label="About this chapter" style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 18px; padding: 18px 20px; display: flex; flex-direction: column; gap: 18px; margin-bottom: 20px; border-top: 6px solid ${V.cp.color}">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-bottom: 12px"><div role="group" aria-label="Show notes for" style="display: flex; gap: 2px; background: #EAE1D0; padding: 3px; border-radius: 999px">${(V.cp.scopeBtns || []).map((t, $index) => html`<button type="button" onClick=${t.pick} aria-pressed=${t.pressed} style="border: none; cursor: pointer; padding: 8px 16px; min-height: 40px; border-radius: 999px; font-size: 14px; font-weight: 700; background: ${t.bg}; color: ${t.fg}">${t.label}</button>`)}</div><div style="flex: 1 1 160px; font-size: 13px; color: #6B5F52">${V.cp.scopeHint}</div></div>
+` : null}
+${(V.cp.showCh) ? html`
+<section data-focus="card" aria-label="About this chapter" style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 18px; padding: 18px 20px; display: flex; flex-direction: column; gap: 18px; margin-bottom: 20px; border-top: 6px solid ${V.cp.color}"><button type="button" class="be-fbtn" onClick=${V.focusToggle} aria-label="Focus mode: show this section full screen" title="Focus mode (full screen)"><svg class="be-fi-in" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg><svg class="be-fi-out" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"></path><path d="M15 4v5h5"></path><path d="M9 20v-5H4"></path><path d="M15 20v-5h5"></path></svg></button><button type="button" class="be-sbtn" onClick=${V.areaSpeak} aria-label="Read this section aloud (press again to stop)" title="Read this section aloud"><svg class="be-si-play" aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg><svg class="be-si-stop" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"></rect></svg></button>
 <div>
 <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #7A3B1E">Now reading</div>
 <h2 style="margin: 2px 0 10px; font-family: Fraunces, Georgia, serif; font-size: 30px; line-height: 1.1">${V.cp.title}</h2>
@@ -3247,9 +3829,18 @@ ${(V.cp.isExtra) ? html`
 <div style="border: 2px dashed #8C7A58; border-radius: 12px; padding: 10px 12px; background: #F5EFE3; font-size: 13px; color: #31291F"><strong>Extra-biblical.</strong> ${V.cp.extraNote}</div>
 ` : null}
 <div>
-<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52; margin-bottom: 6px">What happens in this chapter</div>
+<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52; margin-bottom: 6px">Chapter summary</div>
 ${(V.cp.loading) ? html`<div style="font-size: 14px; color: #6B5F52">Loading…</div>` : null}
+${(V.cp.hasOutline) ? html`
+<ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px">
+${(V.cp.outline || []).map((o, $index) => html`
+<li><button type="button" onClick=${o.pick} title="Jump to ${o.ref}" style="width: 100%; text-align: left; cursor: pointer; border: none; background: transparent; border-radius: 8px; padding: 6px 4px; min-height: 36px; display: flex; gap: 10px; align-items: baseline; color: #231E19; font-size: 15px; line-height: 1.45"><span aria-hidden="true" style="flex: none; width: 8px; height: 8px; border-radius: 50%; background: ${V.cp.color}; transform: translateY(-1px)"></span><span style="flex: 1 1 auto">${o.text}</span>${(o.hasRef) ? html`<span style="flex: none; font-size: 12px; color: #6B5F52; white-space: nowrap">${o.ref}</span>` : null}</button></li>
+`)}
+</ol>
+<div style="font-size: 12px; color: #6B5F52; margin-top: 6px; line-height: 1.45">Outline from Matthew Henry’s <a href=${V.cp.outlineSrc} target="_blank" rel="noopener" style="color: #7A3B1E">Concise Commentary</a> (1706), a classic Protestant commentary in the public domain.</div>
+` : null}
 ${(V.cp.hasEvents) ? html`
+<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52; margin: 10px 0 4px">${V.cp.eventsHead}</div>
 <ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px">
 ${(V.cp.events || []).map((ev, $index) => html`
 <li><button type="button" onClick=${ev.pick} title="Jump to ${ev.ref}" style="width: 100%; text-align: left; cursor: pointer; border: none; background: transparent; border-radius: 8px; padding: 6px 4px; min-height: 36px; display: flex; gap: 10px; align-items: baseline; color: #231E19; font-size: 15px"><span aria-hidden="true" style="flex: none; width: 8px; height: 8px; border-radius: 50%; background: ${V.cp.color}; transform: translateY(-2px)"></span><span style="flex: 1 1 auto; font-weight: 600">${ev.title}</span><span style="flex: none; font-size: 12px; color: #6B5F52">${ev.ref}</span></button></li>
@@ -3280,14 +3871,9 @@ ${(V.cp.themes || []).map((c, $index) => html`
 ` : null}
 ${(V.cp.noThemes) ? html`<div style="font-size: 14px; color: #6B5F52">Not tagged with a major theme yet.</div>` : null}
 </div>
-<div>
+<div data-focus="map"><button type="button" class="be-fbtn" onClick=${V.focusToggle} aria-label="Focus mode: show this section full screen" title="Focus mode (full screen)"><svg class="be-fi-in" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg><svg class="be-fi-out" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"></path><path d="M15 4v5h5"></path><path d="M9 20v-5H4"></path><path d="M15 20v-5h5"></path></svg></button><button type="button" class="be-sbtn" onClick=${V.areaSpeak} aria-label="Read this section aloud (press again to stop)" title="Read this section aloud"><svg class="be-si-play" aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg><svg class="be-si-stop" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"></rect></svg></button>
 <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px">
 <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52">Current passage location</div>
-<div role="group" aria-label="Map shows" style="display: flex; gap: 2px; background: #EAE1D0; padding: 3px; border-radius: 999px">
-${(V.cp.mapBtns || []).map((t, $index) => html`
-<button type="button" onClick=${t.pick} aria-pressed=${t.pressed} disabled=${t.disabled} style="border: none; cursor: pointer; padding: 6px 12px; min-height: 34px; border-radius: 999px; font-size: 12px; font-weight: 700; background: ${t.bg}; color: ${t.fg}">${t.label}</button>
-`)}
-</div>
 </div>
 <div style="font-size: 13px; color: #4A3F35; margin-bottom: 8px">${V.cp.mapNote}</div>
 <div style="display: flex; flex-direction: column; gap: 10px">
@@ -3299,7 +3885,7 @@ ${(V.cp.mapBtns || []).map((t, $index) => html`
 </div>
 <button type="button" onClick=${V.chMap.toggle} style="cursor: pointer; min-height: 40px; padding: 6px 14px; border-radius: 999px; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; font-size: 13px; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.15)">${V.chMap.toggleLabel}</button>
 </div>
-<div onPointerDown=${V.chMap.down} onPointerMove=${V.chMap.move} onPointerUp=${V.chMap.up} onPointerCancel=${V.chMap.up} style="position: relative; width: 100%; aspect-ratio: ${V.chMap.aspect}; overflow: hidden; border-radius: 12px; background: #C7DADB; border: 1px solid #D9CDB8; touch-action: none; user-select: none; cursor: ${V.chMap.cursor}">
+<div onPointerDown=${V.chMap.down} onPointerMove=${V.chMap.move} onPointerUp=${V.chMap.up} onPointerCancel=${V.chMap.up} data-fit="1" data-noread="1" style="position: relative; width: 100%; aspect-ratio: ${V.chMap.aspect}; overflow: hidden; border-radius: 12px; background: #C7DADB; border: 1px solid #D9CDB8; touch-action: none; user-select: none; cursor: ${V.chMap.cursor}">
 <div style="position: absolute; left: ${V.chMap.left}%; top: ${V.chMap.top}%; width: ${V.chMap.width}%; height: ${V.chMap.height}%; transition: ${V.chMap.transition}">
 <img src="basemap.svg" alt="" draggable="false" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: block; pointer-events: none" />
 <svg aria-hidden="true" viewBox="0 0 7372.37 5200" preserveAspectRatio="none" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible">
@@ -3342,6 +3928,7 @@ ${(V.cp.showAttrib) ? html`
 ` : null}
 </section>
 ` : null}
+${(V.cp.showBook) ? html`
 <div style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 18px; overflow: hidden">
 <div style="padding: 14px 16px 22px; color: #FFFFFF; background: ${V.sel.color}">
 <nav aria-label="Previous and next book" style="display: flex; justify-content: space-between; gap: 8px; margin-bottom: 14px">
@@ -3388,7 +3975,7 @@ ${(V.sel.eras || []).map((c, $index) => html`
 </div>
 </div>
 ${(V.sel.showMap) ? html`
-<div>
+<div data-focus="map"><button type="button" class="be-fbtn" onClick=${V.focusToggle} aria-label="Focus mode: show this section full screen" title="Focus mode (full screen)"><svg class="be-fi-in" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg><svg class="be-fi-out" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"></path><path d="M15 4v5h5"></path><path d="M9 20v-5H4"></path><path d="M15 20v-5h5"></path></svg></button><button type="button" class="be-sbtn" onClick=${V.areaSpeak} aria-label="Read this section aloud (press again to stop)" title="Read this section aloud"><svg class="be-si-play" aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg><svg class="be-si-stop" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"></rect></svg></button>
 <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52; margin-bottom: 8px">Map</div>
 <div style="display: flex; flex-direction: column; gap: 10px">
 <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: flex-end">
@@ -3399,7 +3986,7 @@ ${(V.sel.showMap) ? html`
 </div>
 <button type="button" onClick=${V.bookMap.toggle} style="cursor: pointer; min-height: 40px; padding: 6px 14px; border-radius: 999px; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; font-size: 13px; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.15)">${V.bookMap.toggleLabel}</button>
 </div>
-<div onPointerDown=${V.bookMap.down} onPointerMove=${V.bookMap.move} onPointerUp=${V.bookMap.up} onPointerCancel=${V.bookMap.up} style="position: relative; width: 100%; aspect-ratio: ${V.bookMap.aspect}; overflow: hidden; border-radius: 12px; background: #C7DADB; border: 1px solid #D9CDB8; touch-action: none; user-select: none; cursor: ${V.bookMap.cursor}">
+<div onPointerDown=${V.bookMap.down} onPointerMove=${V.bookMap.move} onPointerUp=${V.bookMap.up} onPointerCancel=${V.bookMap.up} data-fit="1" data-noread="1" style="position: relative; width: 100%; aspect-ratio: ${V.bookMap.aspect}; overflow: hidden; border-radius: 12px; background: #C7DADB; border: 1px solid #D9CDB8; touch-action: none; user-select: none; cursor: ${V.bookMap.cursor}">
 <div style="position: absolute; left: ${V.bookMap.left}%; top: ${V.bookMap.top}%; width: ${V.bookMap.width}%; height: ${V.bookMap.height}%; transition: ${V.bookMap.transition}">
 <img src="basemap.svg" alt="" draggable="false" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: block; pointer-events: none" />
 <svg aria-hidden="true" viewBox="0 0 7372.37 5200" preserveAspectRatio="none" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible">
@@ -3462,21 +4049,23 @@ ${(V.sel.showLength) ? html`
 ` : null}
 </div>
 </div>
+` : null}
 </aside>
 ` : null}
 </main>
-${(V.player.show) ? html`<div aria-hidden="true" style="height: 130px"></div>` : null}
+${(V.player.show) ? html`<div aria-hidden="true" style="height: 175px"></div>` : null}
 ${(V.player.show) ? html`
-<div role="region" aria-label="Reading aloud" style="position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 55; width: min(640px, calc(100vw - 24px)); box-sizing: border-box; background: #231E19; color: #FBF7EF; border-radius: 18px; padding: 12px 16px 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.35); display: flex; flex-direction: column; gap: 6px">
+<div role="region" data-player="1" aria-label="Reading aloud" style="position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 55; width: min(640px, calc(100vw - 24px)); box-sizing: border-box; background: #231E19; color: #FBF7EF; border-radius: 18px; padding: 12px 16px 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.35); display: flex; flex-direction: column; gap: 6px">
 <div style="display: flex; justify-content: space-between; gap: 10px; font-size: 13px"><span style="font-weight: 700">Listening · ${V.player.title}</span><span style="color: #D9CDB8">${V.player.posLabel}</span></div>
 <label for="player-seek" class="sr">Position</label>
-<input id="player-seek" type="range" min=${V.player.min} max=${V.player.max} step="1" value=${V.player.val} onInput=${V.player.onSeek} style="width: 100%; margin: 4px 0; accent-color: #F6E2A8; cursor: pointer" />
+<input id="player-seek" type="range" min=${V.player.min} max=${V.player.max} step="1" value=${V.player.val} onInput=${V.player.onSeek} onPointerDown=${V.player.seekDown} onPointerUp=${V.player.seekUp} onPointerCancel=${V.player.seekUp} onKeyUp=${V.player.seekUp} style="width: 100%; height: 28px; margin: 2px 0; accent-color: #F6E2A8; cursor: pointer; touch-action: none" />
 <div style="display: flex; justify-content: center; align-items: center; gap: 18px">
 <button type="button" onClick=${V.player.back} aria-label="Back" title="Back" style="flex: none; cursor: pointer; width: 44px; height: 44px; border-radius: 50%; border: none; background: transparent; color: #FBF7EF; display: inline-flex; align-items: center; justify-content: center; padding: 0"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M11 6v12L3 12z"></path><path d="M20 6v12l-8-6z"></path></svg></button>
 <button type="button" onClick=${V.player.pause} aria-label="Pause or resume" title="Pause or resume" style="flex: none; cursor: pointer; width: 50px; height: 50px; border-radius: 50%; border: none; background: #FBF7EF; color: #231E19; display: inline-flex; align-items: center; justify-content: center; padding: 0">${(V.player.playing) ? html`<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4.5" width="4" height="15" rx="1"></rect><rect x="14" y="4.5" width="4" height="15" rx="1"></rect></svg>` : null}${(V.player.paused) ? html`<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"></path></svg>` : null}</button>
 <button type="button" onClick=${V.player.fwd} aria-label="Skip ahead" title="Skip ahead" style="flex: none; cursor: pointer; width: 44px; height: 44px; border-radius: 50%; border: none; background: transparent; color: #FBF7EF; display: inline-flex; align-items: center; justify-content: center; padding: 0"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M13 6v12l8-6z"></path><path d="M4 6v12l8-6z"></path></svg></button>
 <button type="button" onClick=${V.player.stop} aria-label="Stop" title="Stop" style="flex: none; cursor: pointer; width: 44px; height: 44px; border-radius: 50%; border: none; background: transparent; color: #FBF7EF; display: inline-flex; align-items: center; justify-content: center; padding: 0"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"></rect></svg></button>
 </div>
+${(V.player.hasVoices) ? html`<div style="display: flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 12px; color: #D9CDB8"><label for="player-voice" style="flex: none">Voice</label><select id="player-voice" onChange=${V.player.onVoice} style="flex: 1 1 auto; min-width: 0; min-height: 32px; border-radius: 8px; border: 1px solid #4A3F35; background: #31291F; color: #FBF7EF; font-size: 13px; padding: 4px 8px">${(V.player.voices || []).map((vo, $index) => html`<option value=${vo.id} selected=${vo.sel}>${vo.label}</option>`)}</select></div>` : null}
 </div>
 ` : null}
 ${(V.toast.show) ? html`
