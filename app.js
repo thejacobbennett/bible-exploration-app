@@ -1724,6 +1724,7 @@ class Component extends DCLogic {
     var saved = false;
     try { saved = window.localStorage.getItem('bibleExplorer.desktopView') === '1'; } catch (err) {}
     if (saved && this.isPhoneScreen()) this.setDesktopView(true);
+    window.addEventListener('orientationchange', function () { if (self.state && self.state.desktopView) setTimeout(function () { self.setDesktopView(true); }, 250); });
     this.readLink();
     window.addEventListener('popstate', function (e) { self.histPop(e); });
     try { var hs0 = window.history.state; if (hs0 && hs0.be) this._histDepth = hs0.depth || 0; } catch (err) {}
@@ -2157,7 +2158,22 @@ class Component extends DCLogic {
   setDesktopView(on) {
     var meta = document.querySelector('meta[name="viewport"]');
     if (!meta) { meta = document.createElement('meta'); meta.setAttribute('name', 'viewport'); document.head.appendChild(meta); }
-    meta.setAttribute('content', on ? 'width=1280' : 'width=device-width, initial-scale=1');
+    // Scale the 1280px desktop layout to the phone's width. Pinning minimum and maximum scale for a moment makes
+    // mobile Safari apply the new zoom instead of keeping the old one (which shows only the top-left corner).
+    var DW = 1280;
+    var sw = (window.screen && window.screen.width) || window.innerWidth, sh = (window.screen && window.screen.height) || window.innerHeight;
+    var land = window.matchMedia ? window.matchMedia('(orientation: landscape)').matches : sw > sh;
+    var cw = land ? Math.max(sw, sh) : Math.min(sw, sh);
+    var k = Math.max(0.1, Math.min(1, Math.round((cw / DW) * 1000) / 1000));
+    meta.setAttribute('content', on
+      ? 'width=' + DW + ', initial-scale=' + k + ', minimum-scale=' + k + ', maximum-scale=' + k
+      : 'width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1');
+    clearTimeout(this._vpT);
+    this._vpT = setTimeout(function () {
+      meta.setAttribute('content', on
+        ? 'width=' + DW + ', initial-scale=' + k + ', minimum-scale=' + k + ', maximum-scale=5'
+        : 'width=device-width, initial-scale=1');
+    }, 400);
     try { window.localStorage.setItem('bibleExplorer.desktopView', on ? '1' : '0'); } catch (err) {}
     this.setState({ desktopView: on });
     window.scrollTo(0, 0);
