@@ -1982,6 +1982,7 @@ class Component extends DCLogic {
       window.history.replaceState(Object.assign({}, cur, { y: window.scrollY }), '');
       this._histDepth = (this._histDepth || 0) + 1;
       window.history.pushState({ be: 1, v: v, depth: this._histDepth, y: 0 }, '', this.histUrl(v));
+      if (this._histDepth === 1) { var me = this; setTimeout(function () { me.forceUpdate(); }, 0); }
     } catch (err) {}
   }
   histPop(e) {
@@ -3349,11 +3350,11 @@ ${(V.tabs || []).map((t, $index) => html`
 <button type="button" onClick=${t.pick} aria-pressed=${t.pressed} style="border: none; cursor: pointer; padding: 10px 18px; min-height: 44px; border-radius: 999px; font-size: 15px; font-weight: 600; background: ${t.bg}; color: ${t.fg}">${t.label}</button>
 `)}
 </nav>
-<div style="display: flex; align-items: center; gap: 8px; flex: 0 1 470px; min-width: 0">
-<div style="display: flex; align-items: center; gap: 8px; background: #FFFFFF; border: 1px solid #D9CDB8; border-radius: 999px; padding: 0 16px; min-height: 44px; flex: 1 1 auto; min-width: 0">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; flex: 0 1 560px; min-width: 0">
+<div style="display: flex; align-items: center; gap: 8px; background: #FFFFFF; border: 1px solid #D9CDB8; border-radius: 999px; padding: 0 14px; min-height: 44px; flex: 1 1 200px; min-width: 180px">
 <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B5F52" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
 <label for="book-search" class="sr">Search the Bible</label>
-<input id="book-search" type="search" placeholder="Search the Bible…" value=${V.q} onInput=${V.onSearch} style="border: none; background: transparent; font-size: 15px; width: 100%; color: #231E19; padding: 8px 0" />
+<input id="book-search" type="search" placeholder="Search the Bible…" value=${V.q} onInput=${V.onSearch} style="border: none; background: transparent; font-size: 14px; width: 100%; min-width: 0; text-overflow: ellipsis; color: #231E19; padding: 8px 0" />
 </div>
 ${(V.listen.show) ? html`
 ${(V.nav.canBack) ? html`<button type="button" onClick=${V.nav.back} aria-label="Back to the previous view" title="Back to the previous view" style="flex: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px 0 10px; border-radius: 999px; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; font-size: 14px; font-weight: 700"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>Back</button>` : null}
