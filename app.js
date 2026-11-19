@@ -2622,14 +2622,18 @@ class Component extends DCLogic {
       return { name: b.name, bg: DIVM[b.div].color, pick: function () { openChap(b.id, 1, 0); } };
     }) : [];
     if (isX && scope === 'book') scope = 'all';
-    var scopeList = [['all', 'Whole Bible'], ['OT', 'Old Testament'], ['NT', 'New Testament']];
+    var scopeList = [['all', 'Whole Bible'], ['OT', 'Old Testament'], ['NT', 'New Testament'], ['X', 'Catholic & Orthodox books']];
     if (!isX) scopeList.push(['book', 'In ' + B.name]);
     var scopes = scopeList.map(function (c) {
       var on = scope === c[0];
       return { label: c[1], pressed: on, bg: on ? INK : '#FFFDF8', fg: on ? PAPER : INK, border: on ? INK : '#D9CDB8', pick: function () { go({ scope: c[0] }); } };
     });
     var searching = qlow.length >= 3;
-    var withXS = !!st.searchX && (scope === 'all' || scope === 'OT');
+    // The Catholic and Orthodox books are searched by default with the whole Bible or Old Testament, or on their own.
+    var sx = st.searchX == null ? true : !!st.searchX;
+    var onlyX = scope === 'X';
+    var withXS = onlyX || (sx && (scope === 'all' || scope === 'OT'));
+    var XCAP = onlyX ? 300 : 60;
     if (withXS) this.loadText('apoc');
     var apocT = (this._texts || {}).apoc;
     var res = { hits: [], counts: [], total: 0, xhits: [], xtotal: 0 };
@@ -2640,7 +2644,7 @@ class Component extends DCLogic {
         for (var bi = 0; bi < BOOKS.length; bi++) {
           counts.push(0);
           var bk = BOOKS[bi], tt = DIVM[bk.div].t;
-          if ((scope === 'OT' && tt !== 'OT') || (scope === 'NT' && tt !== 'NT') || (scope === 'book' && bk.id !== B.id)) continue;
+          if (onlyX || (scope === 'OT' && tt !== 'OT') || (scope === 'NT' && tt !== 'NT') || (scope === 'book' && bk.id !== B.id)) continue;
           var chs = text[bi];
           for (var c2 = 0; c2 < chs.length; c2++) {
             var vs = chs[c2];
@@ -2661,7 +2665,7 @@ class Component extends DCLogic {
               vs2.forEach(function (v2, vi2) {
                 if (!v2 || v2 === '\u2026') return;
                 var at2 = v2.toLowerCase().indexOf(qlow);
-                if (at2 >= 0) { xtotal++; if (xhits.length < 60) xhits.push({ xb: xb.id, ci: c3, vi: vi2, at: at2 }); }
+                if (at2 >= 0) { xtotal++; if (xhits.length < XCAP) xhits.push({ xb: xb.id, ci: c3, vi: vi2, at: at2 }); }
               });
             });
           });
@@ -2697,14 +2701,14 @@ class Component extends DCLogic {
         pick: function () { openChap(b.id, c, h.vi + 1); }
       };
     });
-    var scopeNote = scope === 'all' ? 'whole Bible' : scope === 'OT' ? 'Old Testament' : scope === 'NT' ? 'New Testament' : B.name;
+    var scopeNote = scope === 'all' ? 'whole Bible' : scope === 'OT' ? 'Old Testament' : scope === 'NT' ? 'New Testament' : onlyX ? 'Catholic and Orthodox books (KJV Apocrypha text)' : B.name;
     var s = {
       query: qq, trName: TR_NAMES[tr], scopes: scopes,
       bookMatches: bookMatches, hasBooks: bookMatches.length > 0,
       hint: !searching, loading: searching && !text && !failed, ready: searching && !!text,
-      total: res.total, totalLabel: res.total.toLocaleString() + (res.total === 1 ? ' verse' : ' verses'),
+      total: res.total, totalLabel: onlyX ? res.xtotal.toLocaleString() + (res.xtotal === 1 ? ' verse' : ' verses') : res.total.toLocaleString() + (res.total === 1 ? ' verse' : ' verses') + (withXS && res.xtotal ? ' (plus ' + res.xtotal.toLocaleString() + ' in the Catholic and Orthodox books)' : ''),
       has: res.total > 0,
-      note: TR_NAMES[tr] + ' · ' + scopeNote + (res.total > MAX_RESULTS ? ' · showing the first ' + MAX_RESULTS : ''),
+      note: (onlyX ? '' : TR_NAMES[tr] + ' · ') + scopeNote + (res.total > MAX_RESULTS ? ' · showing the first ' + MAX_RESULTS : ''),
       hist: hist, results: results,
       exportRes: function () {
         var rows = [['Reference', 'Book group', 'Verse text (' + TR_NAMES[tr] + ')']];
@@ -2714,8 +2718,8 @@ class Component extends DCLogic {
       },
       xresults: xresults, hasX: withXS && res.xtotal > 0, xLoading: withXS && searching && !apocT,
       xNone: withXS && searching && !!apocT && res.xtotal === 0,
-      xLabel: res.xtotal.toLocaleString() + (res.xtotal === 1 ? ' verse' : ' verses') + ' in extra-biblical books' + (res.xtotal > 60 ? ' (showing the first 60)' : ''),
-      withX: !!st.searchX, xDisabled: !(scope === 'all' || scope === 'OT'),
+      xLabel: res.xtotal.toLocaleString() + (res.xtotal === 1 ? ' verse' : ' verses') + ' in extra-biblical books' + (res.xtotal > XCAP ? ' (showing the first ' + XCAP + ')' : ''),
+      withX: withXS, xDisabled: !(scope === 'all' || scope === 'OT'), onlyX: onlyX, notOnlyX: !onlyX,
       onWithX: function (e) { go({ searchX: !!e.target.checked }); },
       suggestions: SUGGESTIONS.map(function (w) { return { label: w, pick: function () { go({ q: w }); } }; })
     };
