@@ -3299,7 +3299,7 @@ class Component extends DCLogic {
       canonBtns: canonBtns, canon: canon,
       share: share, tts: tts,
       toast: this._toast || { text: '', show: false },
-      showDesktopBtn: phoneScreen && !st.desktopView,
+      showDesktopBtn: phoneScreen && !st.desktopView, brandPad: phoneScreen && !st.desktopView ? '64px' : '0',
       showPhoneBtn: phoneScreen && !!st.desktopView,
       toDesktop: function () { self.setDesktopView(true); },
       toPhone: function () { self.setDesktopView(false); },
@@ -3335,10 +3335,10 @@ function view(V) {
 
 <header style="position: relative; border-bottom: 1px solid #E2D8C6; background: #FBF7EF">
 ${(V.showDesktopBtn) ? html`
-<button type="button" class="be-dbtn" onClick=${V.toDesktop} aria-label="Switch to desktop view" style="position: fixed; top: calc(12px + env(safe-area-inset-top, 0px)); right: calc(12px + env(safe-area-inset-right, 0px)); z-index: 50; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 52px; min-height: 48px; padding: 6px 8px; border-radius: 12px; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.18)"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4" width="19" height="12.5" rx="1.5"></rect><path d="M8.5 20.5h7"></path><path d="M12 16.5v4"></path></svg><span style="font-size: 11px; font-weight: 700; white-space: nowrap">Desktop View</span></button>
+<button type="button" class="be-dbtn" onClick=${V.toDesktop} aria-label="Switch to desktop view" style="position: fixed; top: calc(12px + env(safe-area-inset-top, 0px)); right: calc(12px + env(safe-area-inset-right, 0px)); z-index: 50; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 52px; min-height: 48px; padding: 6px 8px; border-radius: 12px; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.18)"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4" width="19" height="12.5" rx="1.5"></rect><path d="M8.5 20.5h7"></path><path d="M12 16.5v4"></path></svg><span style="font-size: 10px; font-weight: 700; white-space: nowrap">Desktop</span></button>
 ` : null}
 <div style="max-width: 1360px; margin: 0 auto; padding: 16px 32px; display: flex; flex-wrap: wrap; align-items: center; gap: 14px 32px">
-<div style="display: flex; align-items: center; gap: 12px">
+<div style="display: flex; align-items: center; gap: 12px; min-width: 0; padding-right: ${V.brandPad}">
 <svg aria-hidden="true" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#7A3B1E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5c3-1.5 6.5-1.5 10 1 3.5-2.5 7-2.5 10-1v14c-3-1.5-6.5-1.5-10 1-3.5-2.5-7-2.5-10-1z"></path><path d="M12 6v14"></path></svg>
 <div>
 <div style="font-family: Fraunces, Georgia, serif; font-size: 24px; font-weight: 700; line-height: 1.1">Explore Your Bible</div>
