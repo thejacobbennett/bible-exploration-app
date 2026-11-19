@@ -2216,8 +2216,13 @@ class Component extends DCLogic {
 
     var ring = function (b) { return b.id === bookId ? '3px solid ' + INK : '3px solid transparent'; };
     // On phones the book card sits below the content, so bring it into view when a book is picked.
+    // The side panel starts open only on Overview, Read and Search; elsewhere it opens when a book is picked.
+    var asideMap = st.asideOpenMap || {};
+    var asideOpen = asideMap[tab] != null ? !!asideMap[tab] : ['overview', 'read', 'search'].indexOf(tab) >= 0;
     var pickBook = function (id) {
-      go({ book: id, chap: 1, hl: 0 });
+      var patch = { book: id, chap: 1, hl: 0 };
+      if (!asideOpen) { var am = Object.assign({}, asideMap); am[tab] = true; patch.asideOpenMap = am; }
+      go(patch);
       if (window.innerWidth < 900) self.scrollToId('book-card');
     };
     var chip = function (b) {
@@ -2246,7 +2251,7 @@ class Component extends DCLogic {
           bg: extra ? '#FFFDF8' : (b ? DIVM[b.div].color : '#E3DACA'),
           fg: extra ? '#231E19' : '#FFFFFF',
           border: extra ? '2px dashed #8C7A58' : '2px solid transparent',
-          pick: function () { if (b) { go({ tab: 'library', testa: 'all' }); pickBook(b.id); } }
+          pick: function () { if (b) { go({ tab: 'library', testa: 'all', book: b.id, chap: 1, hl: 0, asideOpenMap: Object.assign({}, asideMap, { library: true }) }); } }
         };
       }) };
     }) };
@@ -2999,7 +3004,7 @@ class Component extends DCLogic {
     var part = partSel ? {
       show: true, name: partSel.name, color: partSel.color, bg: partSel.bg, more: paras(partSel.more),
       books: BOOKS.filter(function (b) { return partSel.divs.indexOf(b.div) >= 0; }).map(function (b) {
-        return { name: b.name, bg: DIVM[b.div].color, pick: function () { go({ tab: 'library', book: b.id, chap: 1, hl: 0 }); window.scrollTo(0, 0); } };
+        return { name: b.name, bg: DIVM[b.div].color, pick: function () { go({ tab: 'library', book: b.id, chap: 1, hl: 0, asideOpenMap: Object.assign({}, asideMap, { library: true }) }); window.scrollTo(0, 0); } };
       }),
       refs: partSel.refs.map(function (r) { return { label: r[2], pick: function () { openChap(r[0], r[1], 0); } }; }),
       close: function () { go({ part: null }); }
@@ -3316,7 +3321,7 @@ class Component extends DCLogic {
       isRead: tab === 'read', isSearch: tab === 'search', tp: tp, srTopics: tab === 'search' && srMode === 'topics', srWords: tab === 'search' && srMode !== 'topics',
       segments: segments, legend: legend,
       filters: filters, divisions: divisions, libCanons: libCanons, libArr: libArr || { groups: [] }, libIsArr: !!libArr, libIsShelves: !libArr,
-      eras: eras, era: era, arc: arc, arcSel: arcSel, future: future, tl: tl, isTimeline: tab === 'timeline', cp: cp, chMap: chMap, listen: listen, player: player, cmp: cmp, isCompare: tab === 'compare', parts: parts, part: part, aside: (function () { var off = !!st.asideOff; var nar = self._narrow; return { open: !off, closed: off, flex: off ? (nar ? '1 1 100%' : '0 0 52px') : '1 1 340px', toggle: function () { go({ asideOff: !off }); }, hideRot: nar ? 90 : 0, showRot: nar ? -90 : 0, railDir: nar ? 'row' : 'column', railPad: nar ? '10px 14px' : '16px 6px', railWrite: nar ? 'horizontal-tb' : 'vertical-rl', railLabel: tab === 'read' ? 'Show chapter notes' : 'Show book details' }; })(),
+      eras: eras, era: era, arc: arc, arcSel: arcSel, future: future, tl: tl, isTimeline: tab === 'timeline', cp: cp, chMap: chMap, listen: listen, player: player, cmp: cmp, isCompare: tab === 'compare', parts: parts, part: part, aside: (function () { var off = !asideOpen; var nar = self._narrow; return { open: !off, closed: off, flex: off ? (nar ? '1 1 100%' : '0 0 52px') : '1 1 340px', toggle: function () { var am = Object.assign({}, asideMap); am[tab] = off; go({ asideOpenMap: am }); }, hideRot: nar ? 90 : 0, showRot: nar ? -90 : 0, railDir: nar ? 'row' : 'column', railPad: nar ? '10px 14px' : '16px 6px', railWrite: nar ? 'horizontal-tb' : 'vertical-rl', railLabel: tab === 'read' ? 'Show chapter notes' : 'Show book details' }; })(),
       showAside: tab !== 'compare' && tab !== 'timeline' && tab !== 'practice', pr: pr, isPractice: tab === 'practice',
       themeBtns: themeBtns, strip: strip, theme: theme,
       sel: sel
