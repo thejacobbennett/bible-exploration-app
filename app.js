@@ -1,4 +1,4 @@
-// Bible Explorer: generated from the design mockup. Edit freely.
+// Explore Your Bible: generated from the design mockup. Edit freely.
 import { h, render } from './preact.module.js';
 import htm from './htm.module.js';
 const html = htm.bind(h);
@@ -3252,14 +3252,14 @@ class Component extends DCLogic {
     cmp.showTableView = cmp.showVenn && cmp.view === 'table' && !showTrads;
     var phoneScreen = this.isPhoneScreen();
     var shareInfo = function () {
-      var params = [], title = 'Bible Explorer';
-      if (tab === 'library') { params.push('tab=library', 'book=' + B.id); title = B.name + ' \u00b7 Bible Explorer'; }
-      else if (tab === 'story') { params.push('tab=story', 'era=' + eraN); title = E.name + ' \u00b7 Bible Explorer'; }
-      else if (tab === 'timeline') { params.push('tab=timeline'); title = 'Timeline \u00b7 Bible Explorer'; }
-      else if (tab === 'compare') { params.push('tab=compare'); title = 'Compare traditions \u00b7 Bible Explorer'; }
-      else if (tab === 'themes') { params.push('tab=themes', 'theme=' + T.id); title = T.name + ' \u00b7 Bible Explorer'; }
-      else if (tab === 'read') { params.push('tab=read', 'book=' + B.id, 'chap=' + C); if (!isX && tr !== 'bsb') params.push('tr=' + tr); title = B.name + ' ' + C + ' \u00b7 Bible Explorer'; }
-      else if (tab === 'search' && q.trim()) { params.push('tab=search', 'q=' + encodeURIComponent(q.trim())); title = 'Search: ' + q.trim() + ' \u00b7 Bible Explorer'; }
+      var params = [], title = 'Explore Your Bible';
+      if (tab === 'library') { params.push('tab=library', 'book=' + B.id); title = B.name + ' \u00b7 Explore Your Bible'; }
+      else if (tab === 'story') { params.push('tab=story', 'era=' + eraN); title = E.name + ' \u00b7 Explore Your Bible'; }
+      else if (tab === 'timeline') { params.push('tab=timeline'); title = 'Timeline \u00b7 Explore Your Bible'; }
+      else if (tab === 'compare') { params.push('tab=compare'); title = 'Compare traditions \u00b7 Explore Your Bible'; }
+      else if (tab === 'themes') { params.push('tab=themes', 'theme=' + T.id); title = T.name + ' \u00b7 Explore Your Bible'; }
+      else if (tab === 'read') { params.push('tab=read', 'book=' + B.id, 'chap=' + C); if (!isX && tr !== 'bsb') params.push('tr=' + tr); title = B.name + ' ' + C + ' \u00b7 Explore Your Bible'; }
+      else if (tab === 'search' && q.trim()) { params.push('tab=search', 'q=' + encodeURIComponent(q.trim())); title = 'Search: ' + q.trim() + ' \u00b7 Explore Your Bible'; }
       var base = 'https://exploreyourbible.com/';
       try {
         var loc = window.location;
@@ -3341,7 +3341,7 @@ ${(V.showDesktopBtn) ? html`
 <div style="display: flex; align-items: center; gap: 12px">
 <svg aria-hidden="true" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#7A3B1E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5c3-1.5 6.5-1.5 10 1 3.5-2.5 7-2.5 10-1v14c-3-1.5-6.5-1.5-10 1-3.5-2.5-7-2.5-10-1z"></path><path d="M12 6v14"></path></svg>
 <div>
-<div style="font-family: Fraunces, Georgia, serif; font-size: 24px; font-weight: 700; line-height: 1.1">Bible Explorer</div>
+<div style="font-family: Fraunces, Georgia, serif; font-size: 24px; font-weight: 700; line-height: 1.1">Explore Your Bible</div>
 <div style="font-size: 13px; color: #6B5F52">Scripture, story and traditions</div>
 </div>
 </div>
