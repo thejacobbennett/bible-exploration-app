@@ -2203,7 +2203,7 @@ class Component extends DCLogic {
     var tabs = [['overview','Overview'],['library','Library'],['story','Story'],['themes','Themes'],['compare','Traditions'],['read','Read'],['search','Search']].map(function (t) {
       var grp = TAB_GROUPS[t[0]] || [t[0]];
       var on = grp.indexOf(tab) >= 0;
-      return { label: t[1], pressed: on, bg: on ? INK : 'transparent', fg: on ? PAPER : '#4A3F35', pick: function () { go({ tab: t[0] }); window.scrollTo(0, 0); } };
+      return { id: t[0], label: t[1], pressed: on, bg: on ? INK : 'transparent', fg: on ? PAPER : '#4A3F35', pick: function () { go({ tab: t[0] }); window.scrollTo(0, 0); } };
     });
     var seg = function (items, cur) {
       return items.map(function (it) {
@@ -3299,7 +3299,30 @@ class Component extends DCLogic {
       canonBtns: canonBtns, canon: canon,
       share: share, tts: tts,
       toast: this._toast || { text: '', show: false },
-      showDesktopBtn: phoneScreen && !st.desktopView, brandPad: phoneScreen && !st.desktopView ? '64px' : '0',
+      showDesktopBtn: phoneScreen && !st.desktopView && !self._narrow, brandPad: phoneScreen && !st.desktopView && !self._narrow ? '64px' : '0',
+      hdr: (function () {
+        var compact = !!self._narrow;
+        var menuOpen = compact && !!st.navOpen, searchOpen = compact && !!st.hdrSearch;
+        var SUBS = { overview: 'Start here', library: 'Every book', story: 'Storyline and timeline', themes: 'Threads through Scripture', compare: 'Beliefs and practice', read: 'Full text', search: 'Words and topics' };
+        var cur = tabs.filter(function (t) { return t.pressed; })[0];
+        var sub = { story: 'Storyline', timeline: 'Timeline', compare: st.cmpMode === 'fw' ? 'Frameworks' : 'Beliefs', practice: 'Practice' }[tab];
+        return {
+          compact: compact, full: !compact, pos: compact ? 'sticky' : 'relative', shadow: compact ? '0 2px 10px rgba(35,30,25,0.08)' : 'none',
+          current: cur ? cur.label + (sub ? ' · ' + sub : '') : '',
+          menuOpen: menuOpen, menuClosed: !menuOpen, menuAria: menuOpen ? 'Close menu' : 'Open menu',
+          searchOpen: searchOpen, searchBg: searchOpen ? '#231E19' : '#FFFDF8', searchFg: searchOpen ? '#FBF7EF' : '#231E19',
+          toggleMenu: function () { go({ navOpen: !menuOpen, hdrSearch: false }); },
+          toggleSearch: function () { go({ hdrSearch: !searchOpen, navOpen: false }); if (!searchOpen) setTimeout(function () { var el = document.getElementById('book-search'); if (el) el.focus(); }, 60); },
+          home: function () { go({ tab: 'overview', navOpen: false, hdrSearch: false }); window.scrollTo(0, 0); },
+          items: tabs.map(function (t) {
+            return { label: t.label, sub: SUBS[t.id] || '', pressed: t.pressed, bg: t.pressed ? INK : '#FFFDF8', fg: t.pressed ? PAPER : INK, border: t.pressed ? INK : '#E2D8C6',
+              pick: function () { go({ tab: t.id, navOpen: false, hdrSearch: false }); window.scrollTo(0, 0); } };
+          }),
+          listen: function () { go({ navOpen: false }); listen.pick(); },
+          share: function () { go({ navOpen: false }); share(); },
+          canDesktop: phoneScreen && !st.desktopView
+        };
+      })(),
       showPhoneBtn: phoneScreen && !!st.desktopView,
       toDesktop: function () { self.setDesktopView(true); },
       toPhone: function () { self.setDesktopView(false); },
@@ -3333,10 +3356,11 @@ class Component extends DCLogic {
 function view(V) {
   return html`<div style="min-height: 100vh; background: #F5EFE3; color: #231E19; font-family: Inter, system-ui, sans-serif; font-size: 15px; line-height: 1.5">
 
-<header style="position: relative; border-bottom: 1px solid #E2D8C6; background: #FBF7EF">
+<header style="position: ${V.hdr.pos}; top: 0; z-index: 40; border-bottom: 1px solid #E2D8C6; background: #FBF7EF; box-shadow: ${V.hdr.shadow}">
 ${(V.showDesktopBtn) ? html`
 <button type="button" class="be-dbtn" onClick=${V.toDesktop} aria-label="Switch to desktop view" style="position: fixed; top: calc(12px + env(safe-area-inset-top, 0px)); right: calc(12px + env(safe-area-inset-right, 0px)); z-index: 50; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 52px; min-height: 48px; padding: 6px 8px; border-radius: 12px; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.18)"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4" width="19" height="12.5" rx="1.5"></rect><path d="M8.5 20.5h7"></path><path d="M12 16.5v4"></path></svg><span style="font-size: 10px; font-weight: 700; white-space: nowrap">Desktop</span></button>
 ` : null}
+${(V.hdr.full) ? html`
 <div style="max-width: 1360px; margin: 0 auto; padding: 16px 32px; display: flex; flex-wrap: wrap; align-items: center; gap: 14px 32px">
 <div style="display: flex; align-items: center; gap: 12px; min-width: 0; padding-right: ${V.brandPad}">
 <svg aria-hidden="true" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#7A3B1E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5c3-1.5 6.5-1.5 10 1 3.5-2.5 7-2.5 10-1v14c-3-1.5-6.5-1.5-10 1-3.5-2.5-7-2.5-10-1z"></path><path d="M12 6v14"></path></svg>
@@ -3367,6 +3391,12 @@ ${(V.listen.on) ? html`
 <button type="button" onClick=${V.share} aria-label="Share this page" style="flex: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 16px; border-radius: 999px; border: none; background: #231E19; color: #FBF7EF; font-size: 14px; font-weight: 700"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="M7.5 7.5L12 3l4.5 4.5"></path><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"></path></svg>Share</button>
 </div>
 </div>
+` : null}
+${(V.hdr.compact) ? html`
+<div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px">${(V.nav.canBack) ? html`<button type="button" onClick=${V.nav.back} aria-label="Back to the previous view" style="flex: none; cursor: pointer; width: 44px; height: 44px; border-radius: 50%; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; display: flex; align-items: center; justify-content: center; padding: 0"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg></button>` : null}<button type="button" onClick=${V.hdr.home} aria-label="Explore Your Bible, go to Overview" style="flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: 8px; border: none; background: transparent; padding: 4px 0; cursor: pointer; text-align: left; color: #231E19"><svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#7A3B1E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="M2 5c3-1.5 6.5-1.5 10 1 3.5-2.5 7-2.5 10-1v14c-3-1.5-6.5-1.5-10 1-3.5-2.5-7-2.5-10-1z"></path><path d="M12 6v14"></path></svg><span style="min-width: 0; display: flex; flex-direction: column"><span style="font-family: Fraunces, Georgia, serif; font-size: 18px; font-weight: 700; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Explore Your Bible</span><span style="font-size: 12px; font-weight: 600; color: #7A3B1E; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">${V.hdr.current}</span></span></button><button type="button" onClick=${V.hdr.toggleSearch} aria-expanded=${V.hdr.searchOpen} aria-controls="hdr-search" aria-label="Search the Bible" style="flex: none; cursor: pointer; width: 44px; height: 44px; border-radius: 50%; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; display: flex; align-items: center; justify-content: center; padding: 0; background: ${V.hdr.searchBg}; color: ${V.hdr.searchFg}"><svg aria-hidden="true" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg></button><button type="button" onClick=${V.hdr.toggleMenu} aria-expanded=${V.hdr.menuOpen} aria-controls="hdr-menu" aria-label=${V.hdr.menuAria} style="flex: none; cursor: pointer; height: 44px; padding: 0 14px 0 12px; border-radius: 999px; border: none; background: #231E19; color: #FBF7EF; display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700">${(V.hdr.menuOpen) ? html`<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>` : null}${(V.hdr.menuClosed) ? html`<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>` : null}Menu</button></div>
+${(V.hdr.searchOpen) ? html`<div id="hdr-search" style="padding: 0 12px 10px"><div style="display: flex; align-items: center; gap: 8px; background: #FFFFFF; border: 1px solid #D9CDB8; border-radius: 999px; padding: 0 14px; min-height: 44px"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B5F52" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg><label for="book-search" class="sr">Search the Bible</label><input id="book-search" type="search" placeholder="Search the Bible…" value=${V.q} onInput=${V.onSearch} style="border: none; background: transparent; font-size: 16px; width: 100%; min-width: 0; color: #231E19; padding: 8px 0" /></div></div>` : null}
+${(V.hdr.menuOpen) ? html`<div id="hdr-menu" style="padding: 4px 12px 14px; display: flex; flex-direction: column; gap: 10px; border-top: 1px solid #EAE1D0"><nav aria-label="Sections" style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding-top: 10px">${(V.hdr.items || []).map((t, $index) => html`<button type="button" onClick=${t.pick} aria-pressed=${t.pressed} style="cursor: pointer; text-align: left; border: 1px solid ${t.border}; border-radius: 12px; padding: 9px 12px; min-height: 52px; background: ${t.bg}; color: ${t.fg}; display: flex; flex-direction: column; justify-content: center; gap: 1px"><span style="font-size: 15px; font-weight: 700">${t.label}</span><span style="font-size: 11px; opacity: 0.8; line-height: 1.3">${t.sub}</span></button>`)}</nav><div style="display: flex; flex-wrap: wrap; gap: 8px">${(V.listen.show) ? html`<button type="button" onClick=${V.hdr.listen} style="flex: 1 1 120px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 0 14px; border-radius: 999px; border: 1px solid #231E19; background: #FFFDF8; color: #231E19; font-size: 14px; font-weight: 700"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path></svg>${V.listen.label}</button>` : null}<button type="button" onClick=${V.hdr.share} style="flex: 1 1 120px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 0 14px; border-radius: 999px; border: none; background: #231E19; color: #FBF7EF; font-size: 14px; font-weight: 700"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="M7 8l5-5 5 5"></path><path d="M5 14v6h14v-6"></path></svg>Share</button>${(V.hdr.canDesktop) ? html`<button type="button" onClick=${V.toDesktop} style="flex: 1 1 100%; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid #D9CDB8; background: transparent; color: #4A3F35; font-size: 13px; font-weight: 600"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"></rect><path d="M8 20h8M12 16v4"></path></svg>Switch to desktop view</button>` : null}</div></div>` : null}
+` : null}
 </header>
 
 <main style="max-width: 1360px; margin: 0 auto; padding: 28px 32px 64px; display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-start; box-sizing: border-box">
