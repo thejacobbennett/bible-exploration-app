@@ -1413,6 +1413,63 @@ var PRACTICES = [
     } }
 ];
 
+// Practice comparison: concrete practices, each tagged with the traditions where it is the official or majority practice.
+// Feeds the Venn diagram and side-by-side table under Traditions · Practice · Compare.
+var PRAC_POS = [
+  ['Daily prayer', 'Pray the Lord’s Prayer and the Psalms', ALL9],
+  ['Daily prayer', 'Set morning and evening prayers from a prayer book (the Hours, a prayer rule, the Daily Office)', ['C', 'O', 'L', 'A']],
+  ['Daily prayer', 'Ask Mary and the saints to pray for you', ['C', 'O']],
+  ['Daily prayer', 'Pray the Rosary', ['C']],
+  ['Daily prayer', 'Pray the Jesus Prayer, often with a prayer rope', ['O']],
+  ['Daily prayer', 'Pray mostly in your own words rather than from a book', ['R', 'B', 'P']],
+  ['Daily prayer', 'Pray in tongues', ['P']],
+  ['Reading Scripture', 'Scripture read aloud in every worship service', ALL9],
+  ['Reading Scripture', 'Set Sunday readings from a lectionary that follows the church year', ['C', 'O', 'L', 'A', 'M']],
+  ['Reading Scripture', 'Sermons often preach straight through a book of the Bible', ['R', 'B']],
+  ['Sunday worship and the Lord’s Supper', 'Gather on Sunday for Scripture, prayer and singing', ALL9],
+  ['Sunday worship and the Lord’s Supper', 'The Lord’s Supper is the center of the main Sunday service', ['C', 'O', 'L', 'A']],
+  ['Sunday worship and the Lord’s Supper', 'Icons or statues, incense and vestments in worship', ['C', 'O']],
+  ['Sunday worship and the Lord’s Supper', 'Infants and young children receive Communion', ['O']],
+  ['Sunday worship and the Lord’s Supper', 'The Lord’s Supper is shared monthly or less often', ['M', 'B', 'P', 'N']],
+  ['Sunday worship and the Lord’s Supper', 'Footwashing alongside the Lord’s Supper', ['N']],
+  ['Confession and repentance', 'Confess sins to God and seek reconciliation with others', ALL9],
+  ['Confession and repentance', 'Confession to a priest is a sacrament', ['C', 'O']],
+  ['Confession and repentance', 'Private confession to a pastor is offered, but not required', ['L', 'A']],
+  ['Confession and repentance', 'A prayer of confession said together in the Sunday service', ['C', 'L', 'A', 'R', 'M']],
+  ['Confession and repentance', 'Formal church discipline, following Matthew 18', ['R', 'B', 'N']],
+  ['Fasting', 'Fasting to humble oneself and make room for prayer', ALL9],
+  ['Fasting', 'Keep Lent as a season of fasting and repentance', ['C', 'O', 'L', 'A', 'M']],
+  ['Fasting', 'Fasts set by the Church’s calendar', ['C', 'O']],
+  ['Fasting', 'No meat on Fridays in Lent; fast on Ash Wednesday and Good Friday', ['C']],
+  ['Fasting', 'Fast from meat, dairy, wine and oil on most Wednesdays and Fridays', ['O']],
+  ['Fasting', 'Fasting is voluntary, often for a special need or decision', ['R', 'B', 'P', 'N']],
+  ['The Lord’s Day and rest', 'Sunday as the day of worship, honoring the resurrection', ALL9],
+  ['The Lord’s Day and rest', 'Attending Sunday worship is a formal obligation', ['C']],
+  ['The Lord’s Day and rest', 'Rest from ordinary work and business on Sunday', ['R', 'N']],
+  ['Giving and generosity', 'Give to the church and the poor as part of following Jesus', ALL9],
+  ['Giving and generosity', 'Almsgiving joined to prayer and fasting in Lent', ['C', 'O']],
+  ['Giving and generosity', 'The tithe (10%) taught as the standard', ['B', 'P']],
+  ['Giving and generosity', 'Mutual aid: members cover one another’s needs, such as medical bills', ['N']],
+  ['Serving the poor and seeking justice', 'Works of mercy: feed the hungry, visit the sick and prisoners', ALL9],
+  ['Serving the poor and seeking justice', 'A formal body of social teaching on justice, work and the common good', ['C']],
+  ['Serving the poor and seeking justice', 'Works of mercy as a “means of grace” and “social holiness”', ['M']],
+  ['Serving the poor and seeking justice', 'Nonviolence and refusing military service', ['N']],
+  ['Fellowship and hospitality', 'Shared meals, care for one another and welcome for newcomers', ALL9],
+  ['Fellowship and hospitality', 'Small groups or Bible studies during the week', ['M', 'B', 'P']],
+  ['Faith at home', 'Grace at meals and prayer with children', ALL9],
+  ['Faith at home', 'Icons, a crucifix or a prayer corner in the home', ['C', 'O']],
+  ['Faith at home', 'The Small Catechism taught at home', ['L']],
+  ['Faith at home', 'Daily family worship: a Bible reading, prayer and a psalm', ['R']],
+  ['Work and calling', 'Ordinary work done honestly can serve God and neighbor', ALL9],
+  ['Work and calling', 'Every honest job is a calling from God (vocation)', ['L', 'R']],
+  ['Work and calling', 'Monks and nuns devote their lives to prayer and work', ['C', 'O']],
+  ['Sharing the faith', 'Share the good news in word and deed', ALL9],
+  ['Sharing the faith', 'Personal evangelism and invitations to faith', ['B', 'P']],
+  ['Sharing the faith', 'Expect signs and wonders, such as healing, alongside preaching', ['P']],
+  ['Sharing the faith', 'Witness through a peaceful, simple life more than persuasion', ['N']]
+];
+
+
 
 // ----- Where to turn: passages for particular situations, like the topical index in many printed Bibles -----
 // Each passage: [book, chapter, first verse, last verse, why it speaks to this]. Catholic and Orthodox books are marked in the app.
@@ -2062,7 +2119,7 @@ class Component extends DCLogic {
     if (q.get('prMode') === 'trad' || q.get('prMode') === 'practice') patch.prMode = q.get('prMode');
     if (q.get('prId') && PRACTICES.some(function (x) { return x.id === q.get('prId'); })) patch.prId = q.get('prId');
     if (q.get('prTrad') && TRAD_NAME[q.get('prTrad')]) patch.prTrad = q.get('prTrad');
-    if (q.get('cmpMode') === 'fw' || q.get('cmpMode') === 'trad') patch.cmpMode = q.get('cmpMode');
+    if (q.get('cmpMode') === 'fw' || q.get('cmpMode') === 'trad' || q.get('cmpMode') === 'pr') patch.cmpMode = q.get('cmpMode');
     if (q.get('cmpFam') && FW_FAMILIES.some(function (f) { return f.id === q.get('cmpFam'); })) patch.cmpFam = q.get('cmpFam');
     if (['all', 'OT', 'NT', 'AP'].indexOf(q.get('testa')) >= 0) patch.testa = q.get('testa');
     if (q.get('libCanon') && CANONS[q.get('libCanon')]) patch.libCanon = q.get('libCanon');
@@ -2262,8 +2319,8 @@ class Component extends DCLogic {
       });
     };
     var storyViews = seg([['story', 'Storyline', { tab: 'story' }], ['timeline', 'Timeline', { tab: 'timeline' }]], tab);
-    var tradView = tab === 'practice' ? 'practice' : (st.cmpMode === 'fw' ? 'fw' : 'trad');
-    var tradViews = seg([['trad', 'Beliefs', { tab: 'compare', cmpMode: 'trad', cmpReg: null }], ['fw', 'Frameworks', { tab: 'compare', cmpMode: 'fw', cmpReg: null }], ['practice', 'Practice', { tab: 'practice' }]], tradView);
+    var tradView = tab === 'practice' || st.cmpMode === 'pr' ? 'practice' : (st.cmpMode === 'fw' ? 'fw' : 'trad');
+    var tradViews = seg([['trad', 'Beliefs', { tab: 'compare', cmpMode: 'trad', cmpReg: null }], ['fw', 'Frameworks', { tab: 'compare', cmpMode: 'fw', cmpReg: null }], ['practice', 'Practice', { tab: 'compare', cmpMode: 'pr', cmpReg: null }]], tradView);
 
     var ring = function (b) { return b.id === bookId ? '3px solid ' + INK : '3px solid transparent'; };
     // On phones the book card sits below the content, so bring it into view when a book is picked.
@@ -3133,9 +3190,10 @@ class Component extends DCLogic {
     var prHide = st.prHide || {};
     var prSrc = function (w) { return w && w[2] ? [{ label: w[2][0], url: w[2][1] }] : []; };
     var pr = {
-      modes: [['practice', 'By practice'], ['trad', 'By tradition']].map(function (m) {
+      modes: [['compare', 'Compare'], ['practice', 'By practice'], ['trad', 'By tradition']].map(function (m) {
         var on = m[0] === prMode;
-        return { label: m[1], pressed: on, bg: on ? INK : 'transparent', fg: on ? PAPER : '#4A3F35', pick: function () { go({ prMode: m[0] }); } };
+        return { label: m[1], pressed: on, bg: on ? INK : 'transparent', fg: on ? PAPER : '#4A3F35',
+          pick: function () { if (m[0] === 'compare') go({ tab: 'compare', cmpMode: 'pr', cmpReg: null }); else go({ tab: 'practice', prMode: m[0] }); } };
       }),
       isPractice: prMode === 'practice', isTrad: prMode === 'trad',
       practices: PRACTICES.map(function (q) {
@@ -3180,20 +3238,20 @@ class Component extends DCLogic {
     };
 
     // Compare traditions and frameworks
-    var cmpMode = st.cmpMode === 'fw' ? 'fw' : 'trad';
+    var cmpMode = st.cmpMode === 'fw' ? 'fw' : st.cmpMode === 'pr' ? 'pr' : 'trad';
     var cmpFam = FW_FAMILIES.filter(function (f) { return f.id === st.cmpFam; })[0] || FW_FAMILIES[0];
-    var cItems = cmpMode === 'trad' ? TRADS : cmpFam.fws;
-    var cDefault = cmpMode === 'trad' ? ['C', 'O', 'L'] : cmpFam.fws.slice(0, 3).map(function (f) { return f.id; });
-    var cStored = cmpMode === 'trad' ? st.cmpSel : (st.cmpFw || {})[cmpFam.id];
+    var cItems = cmpMode !== 'fw' ? TRADS : cmpFam.fws;
+    var cDefault = cmpMode !== 'fw' ? ['C', 'O', 'L'] : cmpFam.fws.slice(0, 3).map(function (f) { return f.id; });
+    var cStored = cmpMode !== 'fw' ? st.cmpSel : (st.cmpFw || {})[cmpFam.id];
     var cIds = (cStored || cDefault).filter(function (id) { return cItems.some(function (x) { return x.id === id; }); });
     var cTable = st.cmpView === 'table';
     var cAll = cIds.map(function (id) { return cItems.filter(function (x) { return x.id === id; })[0]; });
     var cSel = cTable ? cAll : cAll.slice(0, 3);
     var setIds = function (ids) {
-      if (cmpMode === 'trad') go({ cmpSel: ids, cmpReg: null });
+      if (cmpMode !== 'fw') go({ cmpSel: ids, cmpReg: null });
       else { var o = Object.assign({}, st.cmpFw || {}); o[cmpFam.id] = ids; go({ cmpFw: o, cmpReg: null }); }
     };
-    var cPos = cmpMode === 'trad' ? TRAD_POS.map(function (p) { return { topic: p[0], text: p[1], holders: p[2] }; })
+    var cPos = cmpMode !== 'fw' ? (cmpMode === 'pr' ? PRAC_POS : TRAD_POS).map(function (p) { return { topic: p[0], text: p[1], holders: p[2] }; })
       : cmpFam.claims.map(function (c) { return { topic: '', text: c[0], holders: c[1] }; });
     var LET = ['a', 'b', 'c'];
     var nSel = cSel.length;
@@ -3220,7 +3278,16 @@ class Component extends DCLogic {
     };
     var vp = function (v, d) { return pct(v / d * 100); };
     var cmp = {
-      isTrad: cmpMode === 'trad', isFw: cmpMode === 'fw',
+      isTrad: cmpMode === 'trad', isFw: cmpMode === 'fw', isPr: cmpMode === 'pr',
+      eyebrow: 'Traditions · ' + (cmpMode === 'fw' ? 'Frameworks' : cmpMode === 'pr' ? 'Practice' : 'Beliefs') + ' · Compare',
+      h1: cmpMode === 'pr' ? 'How Christians live it out, compared' : 'Where Christians agree, and where they differ',
+      intro: cmpMode === 'pr' ? 'Pick traditions to see which everyday practices they share and which are their own. Each entry is a tradition’s official or common practice; individual churches and families vary, and every tradition teaches that these practices respond to God’s grace rather than earn it.'
+        : 'Pick two or three traditions, or theological frameworks, to see what they share and where they part ways. Each summary describes a tradition’s official or majority teaching in terms its own members would recognize; every tradition holds a range of views, and nothing here ranks one above another.',
+      prModes: [['compare', 'Compare'], ['practice', 'By practice'], ['trad', 'By tradition']].map(function (m) {
+        var on = m[0] === 'compare';
+        return { label: m[1], pressed: on, bg: on ? INK : 'transparent', fg: on ? PAPER : '#4A3F35',
+          pick: function () { if (m[0] !== 'compare') { go({ tab: 'practice', prMode: m[0] }); window.scrollTo(0, 0); } } };
+      }),
       modes: [['trad', 'Christian traditions'], ['fw', 'Theological frameworks']].map(function (m) {
         var on = m[0] === cmpMode;
         return { label: m[1], pressed: on, bg: on ? INK : 'transparent', fg: on ? PAPER : '#4A3F35', pick: function () { go({ cmpMode: m[0], cmpReg: null }); } };
@@ -3242,9 +3309,9 @@ class Component extends DCLogic {
       pickLabel: cTable ? 'Choose as many as you like' : 'Choose up to three',
       hint: cTable ? '' : cAll.length > 3 ? 'The Venn diagram shows the first three you picked. Switch to Side by side to see all ' + cAll.length + '.' : nSel < 2 ? 'Pick at least two to compare (up to three in the Venn diagram; any number side by side).' : 'Tap a number in the diagram to see just that overlap, or scroll through all of them below.',
       exportTable: function () {
-        var rows = [[cmpMode === 'trad' ? 'Topic' : 'Claim'].concat(cSel.map(function (x) { return x.name; }))];
+        var rows = [[cmpMode === 'trad' ? 'Topic' : cmpMode === 'pr' ? 'Practice' : 'Claim'].concat(cSel.map(function (x) { return x.name; }))];
         cmp.tblRows.forEach(function (r) { rows.push([r.label].concat(r.cells.map(function (c) { return c.text === '\u2014' ? '' : c.text.replace(/^\u2713 /, ''); }))); });
-        self.exportCSV(cmpMode === 'trad' ? 'compare-traditions' : 'compare-' + cmpFam.id, rows);
+        self.exportCSV(cmpMode === 'trad' ? 'compare-traditions' : cmpMode === 'pr' ? 'compare-practice' : 'compare-' + cmpFam.id, rows);
       },
       exportLists: function () {
         var rows = [['Group', 'Topic', 'Belief or practice']];
@@ -3275,12 +3342,13 @@ class Component extends DCLogic {
       }),
       tblHead: cSel.map(function (x) { return { name: x.name, color: x.color }; }),
       tblRows: (function () {
-        if (cmpMode === 'trad') {
+        if (cmpMode !== 'fw') {
+          var POS = cmpMode === 'pr' ? PRAC_POS : TRAD_POS;
           var topics = [];
-          TRAD_POS.forEach(function (p) { if (topics.indexOf(p[0]) < 0) topics.push(p[0]); });
+          POS.forEach(function (p) { if (topics.indexOf(p[0]) < 0) topics.push(p[0]); });
           return topics.map(function (t) {
             return { label: t, cells: cSel.map(function (x) {
-              var ps = TRAD_POS.filter(function (p) { return p[0] === t && p[2].indexOf(x.id) >= 0; }).map(function (p) { return p[1]; });
+              var ps = POS.filter(function (p) { return p[0] === t && p[2].indexOf(x.id) >= 0; }).map(function (p) { return p[1]; });
               return { text: ps.length ? ps.join(' • ') : '—' };
             }) };
           });
@@ -3293,7 +3361,7 @@ class Component extends DCLogic {
         var ft = FW_TRADS[x.id];
         var found = ft ? ft.T.split('').map(function (t) { return { label: TRAD_NAME[t].name, color: TRAD_NAME[t].color, bg: TRAD_NAME[t].color, fg: '#FFFFFF', style: 'solid', tip: 'Official or majority view in this tradition' }; })
           .concat(ft.S.split('').filter(Boolean).map(function (t) { return { label: TRAD_NAME[t].name, color: TRAD_NAME[t].color, bg: '#FFFDF8', fg: TRAD_NAME[t].color, style: 'dashed', tip: 'Found in some churches or among many members' }; })) : [];
-        var typical = cmpMode === 'trad' ? FW_FAMILIES.map(function (f) {
+        var typical = cmpMode !== 'fw' ? FW_FAMILIES.map(function (f) {
           var hits = f.fws.filter(function (w) { return FW_TRADS[w.id] && FW_TRADS[w.id].T.indexOf(x.id) >= 0; }).map(function (w) { return w.name; });
           var some = f.fws.filter(function (w) { return FW_TRADS[w.id] && FW_TRADS[w.id].S.indexOf(x.id) >= 0; }).map(function (w) { return w.name; });
           return { topic: f.name.split(':')[0], main: hits.join(', '), some: some.length ? 'also some: ' + some.join(', ') : '', has: hits.length + some.length > 0,
@@ -3304,7 +3372,7 @@ class Component extends DCLogic {
           typical: typical, hasTypical: typical.length > 0,
           meta1: x.origin ? 'Origins: ' + x.origin : 'Held by: ' + x.who, meta2: x.docs ? 'Key documents: ' + x.docs : '',
           hasMeta2: !!x.docs, hasProCon: !!x.pro, pro: x.pro || '', con: x.con || '',
-          canLive: cmpMode === 'trad', live: function () { go({ tab: 'practice', prMode: 'trad', prTrad: x.id }); window.scrollTo(0, 0); },
+          canLive: cmpMode !== 'fw', live: function () { go({ tab: 'practice', prMode: 'trad', prTrad: x.id }); window.scrollTo(0, 0); },
           src: x.src.map(function (q) { return { label: q[0], url: q[1] }; }) };
       }),
       famName: cmpFam.name
@@ -3383,7 +3451,7 @@ class Component extends DCLogic {
         var menuOpen = compact && !!st.navOpen, searchOpen = compact && !!st.hdrSearch;
         var SUBS = { overview: 'Start here', library: 'Every book', story: 'Storyline and timeline', themes: 'Threads through Scripture', compare: 'Beliefs and practice', read: 'Full text', search: 'Words and topics', about: 'Why this site, FAQ' };
         var cur = tabs.filter(function (t) { return t.pressed; })[0];
-        var sub = { story: 'Storyline', timeline: 'Timeline', compare: st.cmpMode === 'fw' ? 'Frameworks' : 'Beliefs', practice: 'Practice' }[tab];
+        var sub = { story: 'Storyline', timeline: 'Timeline', compare: st.cmpMode === 'fw' ? 'Frameworks' : st.cmpMode === 'pr' ? 'Practice' : 'Beliefs', practice: 'Practice' }[tab];
         return {
           compact: compact, full: !compact, pos: compact ? 'sticky' : 'relative', shadow: compact ? '0 2px 10px rgba(35,30,25,0.08)' : 'none',
           current: cur ? cur.label + (sub ? ' · ' + sub : '') : '',
@@ -4056,10 +4124,15 @@ ${(V.isCompare) ? html`
 <section style="display: flex; flex-direction: column; gap: 18px">
 <div role="group" aria-label="Traditions view" style="display: flex; flex-wrap: wrap; gap: 4px; background: #EAE1D0; padding: 4px; border-radius: 999px; align-self: flex-start">${(V.tradViews || []).map((v, $index) => html`<button type="button" onClick=${v.pick} aria-pressed=${v.pressed} style="border: none; cursor: pointer; padding: 8px 18px; min-height: 44px; border-radius: 999px; font-size: 14px; font-weight: 700; background: ${v.bg}; color: ${v.fg}">${v.label}</button>`)}</div>
 <div>
-<div style="font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #7A3B1E">Traditions · Compare</div>
-<h1 style="margin: 4px 0 8px; font-family: Fraunces, Georgia, serif; font-size: 36px; line-height: 1.1">Where Christians agree, and where they differ</h1>
-<p style="margin: 0; color: #4A3F35; max-width: 780px">Pick two or three traditions, or theological frameworks, to see what they share and where they part ways. Each summary describes a tradition’s official or majority teaching in terms its own members would recognize; every tradition holds a range of views, and nothing here ranks one above another.</p>
+<div style="font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #7A3B1E">${V.cmp.eyebrow}</div>
+<h1 style="margin: 4px 0 8px; font-family: Fraunces, Georgia, serif; font-size: 36px; line-height: 1.1">${V.cmp.h1}</h1>
+<p style="margin: 0; color: #4A3F35; max-width: 780px">${V.cmp.intro}</p>
 </div>
+${(V.cmp.isPr) ? html`
+<div role="group" aria-label="View" style="display: flex; gap: 4px; background: #EAE1D0; padding: 4px; border-radius: 999px; align-self: flex-start">
+${(V.cmp.prModes || []).map((m, $index) => html`<button type="button" onClick=${m.pick} aria-pressed=${m.pressed} style="border: none; cursor: pointer; padding: 8px 16px; min-height: 44px; border-radius: 999px; font-size: 14px; font-weight: 700; background: ${m.bg}; color: ${m.fg}">${m.label}</button>`)}
+</div>
+` : null}
 ${(V.cmp.isFw) ? html`
 <div>
 <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52; margin-bottom: 8px">Topic</div>
