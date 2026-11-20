@@ -3041,7 +3041,7 @@ class Component extends DCLogic {
       var on = p === partSel;
       var pb = BOOKS.filter(function (b) { return p.divs.indexOf(b.div) >= 0; });
       var pch = pb.reduce(function (n, b) { return n + b.ch; }, 0);
-      return { name: p.name, short: p.short, color: p.color, bg: p.bg, pressed: on, border: on ? p.color : 'transparent', chev: on ? 180 : 0,
+      return { name: p.name, short: p.short, color: p.color, bg: p.bg, pressed: on, border: on ? '#FFFDF8' : p.color, ring: on ? '0 0 0 3px ' + p.color : 'none', chev: on ? 180 : 0,
         ch: pch, meta: pb.length + (pb.length === 1 ? ' book' : ' books') + ' · ' + pch + ' chapters', segLabel: p.name + ': ' + pch + ' chapters',
         segOp: partSel && !on ? 0.45 : 1,
         pick: function () { go({ part: on ? null : p.id }); if (!on) setTimeout(function () { var d = document.getElementById('part-detail'); if (d && d.getBoundingClientRect().bottom > window.innerHeight) d.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 80); } };
@@ -3479,10 +3479,10 @@ ${(V.parts || []).map((p, $index) => html`
 <p style="margin: 0; font-size: 14px; color: #4A3F35">Tap a part to read more about it.</p>
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; grid-auto-flow: dense">
 ${(V.parts || []).map((p, $index) => html`
-<button type="button" onClick=${p.pick} aria-expanded=${p.pressed} style="cursor: pointer; text-align: left; border-radius: 12px; padding: 16px; background: ${p.bg}; border: 2px solid ${p.border}; display: flex; flex-direction: column; gap: 4px; color: #231E19">
-<span style="display: flex; justify-content: space-between; align-items: center; gap: 6px; font-weight: 700; color: ${p.color}">${p.name}<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(${p.chev}deg); transition: transform 0.2s ease"><path d="M6 9l6 6 6-6"></path></svg></span>
-<span style="font-size: 14px; color: #4A3F35">${p.short}</span>
-<span style="font-size: 12px; color: #6B5F52; margin-top: 2px">${p.meta}</span>
+<button type="button" onClick=${p.pick} aria-expanded=${p.pressed} style="cursor: pointer; text-align: left; border-radius: 12px; padding: 16px; background: ${p.color}; border: 3px solid ${p.border}; box-shadow: ${p.ring}; display: flex; flex-direction: column; gap: 4px; color: #FFFFFF">
+<span style="display: flex; justify-content: space-between; align-items: center; gap: 6px; font-weight: 700; color: #FFFFFF">${p.name}<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(${p.chev}deg); transition: transform 0.2s ease"><path d="M6 9l6 6 6-6"></path></svg></span>
+<span style="font-size: 14px; color: rgba(255,255,255,0.92)">${p.short}</span>
+<span style="font-size: 12px; color: rgba(255,255,255,0.78); margin-top: 2px">${p.meta}</span>
 </button>
 ${(p.pressed) ? html`
 <div id="part-detail" style="grid-column: 1 / -1; scroll-margin-top: 12px; border-radius: 14px; padding: 18px 20px; background: ${V.part.bg}; border-left: 5px solid ${V.part.color}; display: flex; flex-direction: column; gap: 12px">
