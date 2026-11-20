@@ -3208,7 +3208,8 @@ class Component extends DCLogic {
             setIds(ids);
           } };
       }),
-      hint: cTable ? 'Side by side: pick as many as you like.' : cAll.length > 3 ? 'The Venn diagram shows the first three you picked. Switch to Side by side to see all ' + cAll.length + '.' : nSel < 2 ? 'Pick at least two to compare (up to three in the Venn diagram; any number side by side).' : 'Tap a number in the diagram to see just that overlap, or scroll through all of them below.',
+      pickLabel: cTable ? 'Choose as many as you like' : 'Choose up to three',
+      hint: cTable ? '' : cAll.length > 3 ? 'The Venn diagram shows the first three you picked. Switch to Side by side to see all ' + cAll.length + '.' : nSel < 2 ? 'Pick at least two to compare (up to three in the Venn diagram; any number side by side).' : 'Tap a number in the diagram to see just that overlap, or scroll through all of them below.',
       exportTable: function () {
         var rows = [[cmpMode === 'trad' ? 'Topic' : 'Claim'].concat(cSel.map(function (x) { return x.name; }))];
         cmp.tblRows.forEach(function (r) { rows.push([r.label].concat(r.cells.map(function (c) { return c.text === '\u2014' ? '' : c.text.replace(/^\u2713 /, ''); }))); });
@@ -4038,7 +4039,7 @@ ${(V.cmp.fams || []).map((f, $index) => html`
 </div>
 ` : null}
 <div>
-<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52; margin-bottom: 8px">Choose up to three</div>
+<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52; margin-bottom: 8px">${V.cmp.pickLabel}</div>
 <div style="display: flex; flex-wrap: wrap; gap: 8px">
 ${(V.cmp.chips || []).map((c, $index) => html`
 <button type="button" onClick=${c.pick} aria-pressed=${c.pressed} style="cursor: pointer; border: 2px solid ${c.border}; border-radius: 999px; padding: 6px 14px; min-height: 40px; font-size: 14px; font-weight: 700; background: ${c.bg}; color: ${c.fg}; display: inline-flex; align-items: center; gap: 6px">${(c.lettered) ? html`<span style="font-size: 11px; background: rgba(255,255,255,0.3); border-radius: 50%; width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center">${c.letter}</span>` : null}${c.label}</button>
