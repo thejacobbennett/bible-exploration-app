@@ -2255,8 +2255,20 @@ class Component extends DCLogic {
 
     // Overview
     var segments = DIVS.map(function (d) { return { ch: d.ch, bg: d.color, label: d.name + ': ' + d.ch + ' chapters' }; });
+    // Open the Library's shelves and scroll to one division, clearing the sticky header on phones.
+    var jumpLib = function (divId, extra) {
+      go(Object.assign({ tab: 'library', testa: 'all', libCanon: 'protestant', q: '' }, extra || {}));
+      var tries = 0;
+      (function seek() {
+        var el = document.getElementById('lib-div-' + divId);
+        if (!el) { if (tries++ < 30) setTimeout(seek, 50); return; }
+        var h = document.querySelector('header');
+        var off = h && getComputedStyle(h).position === 'sticky' ? h.offsetHeight + 12 : 16;
+        window.scrollTo({ top: Math.max(0, el.getBoundingClientRect().top + window.scrollY - off), behavior: 'auto' });
+      })();
+    };
     var legend = DIVS.map(function (d) {
-      return { name: d.name, bg: d.color, meta: d.count + (d.count === 1 ? ' book' : ' books') + ' · ' + d.ch + ' ch', pick: function () { go({ tab: 'library', testa: 'all', q: '' }); } };
+      return { name: d.name, bg: d.color, meta: d.count + (d.count === 1 ? ' book' : ' books') + ' · ' + d.ch + ' ch', pick: function () { jumpLib(d.id); } };
     });
 
     // Traditions (canons) on the Overview
@@ -2334,7 +2346,7 @@ class Component extends DCLogic {
       var pt = PARTS.filter(function (q) { return q.divs.indexOf(d.id) >= 0; })[0];
       var first = pt && pt.divs.filter(function (x) { return LIBDIVS.some(function (L) { return L.id === x && (testa === 'all' || L.t === testa); }); })[0] === d.id;
       var open = !!(pt && (st.libMore || {})[pt.id]);
-      return { name: d.name, color: d.color, blurb: d.blurb, meta: meta, books: bs, has: bs.length > 0, note: d.note || '', hasNote: !!d.note,
+      return { domId: 'lib-div-' + d.id, name: d.name, color: d.color, blurb: d.blurb, meta: meta, books: bs, has: bs.length > 0, note: d.note || '', hasNote: !!d.note,
         hasPart: !!(pt && first), partName: pt ? pt.name : '', partShort: pt ? pt.short : '', partBg: pt ? pt.bg : '#FFFDF8', partColor: pt ? pt.color : d.color,
         partSpan: pt && pt.divs.length > 1 ? 'Covers ' + pt.divs.map(function (x) { return DIVM[x] ? DIVM[x].name : x; }).join(' and ') + '.' : '',
         partOpen: open, partChev: open ? 180 : 0, partLabel: open ? 'Show less' : 'Read more', partAria: (open ? 'Show less about ' : 'Read more about ') + (pt ? pt.name : ''),
@@ -3036,6 +3048,7 @@ class Component extends DCLogic {
         return { name: b.name, bg: DIVM[b.div].color, pick: function () { go({ tab: 'library', book: b.id, chap: 1, hl: 0, asideOpenMap: Object.assign({}, asideMap, { library: true }) }); window.scrollTo(0, 0); } };
       }),
       refs: partSel.refs.map(function (r) { return { label: r[2], pick: function () { openChap(r[0], r[1], 0); } }; }),
+      toLib: function () { jumpLib(partSel.divs[0]); },
       close: function () { go({ part: null }); }
     } : { show: false };
 
@@ -3495,6 +3508,7 @@ ${(V.part.refs || []).map((c, $index) => html`
 <button type="button" onClick=${c.pick} style="cursor: pointer; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; border-radius: 999px; padding: 5px 11px; min-height: 32px; font-size: 13px; font-weight: 600">${c.label}</button>
 `)}
 </div>
+<button type="button" onClick=${V.part.toLib} style="align-self: flex-start; cursor: pointer; border: none; background: transparent; color: #7A3B1E; font-size: 14px; font-weight: 700; padding: 2px 0; min-height: 32px; text-decoration: underline; text-underline-offset: 3px">See these books in the Library →</button>
 </div>
 ` : null}
 `)}
@@ -3580,7 +3594,7 @@ ${(V.libArr.groups || []).map((g, $index) => html`
 ` : null}
 ${(V.libIsShelves) ? html`
 ${(V.divisions || []).map((d, $index) => html`
-<div style="display: flex; flex-direction: column; gap: 10px">
+<div id=${d.domId} style="display: flex; flex-direction: column; gap: 10px">
 <div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px">
 <span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 3px; background: ${d.color}"></span>
 <h2 style="margin: 0; font-family: Fraunces, Georgia, serif; font-size: 22px">${d.name}</h2>
