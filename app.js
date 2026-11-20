@@ -2090,17 +2090,26 @@ class Component extends DCLogic {
     try { voices = window.speechSynthesis.getVoices() || []; } catch (err) {}
     var en = voices.filter(function (v) { return /^en(-|_|$)/i.test(v.lang); });
     var score = function (v) {
-      var n = v.name, sc = 0;
+      var n = v.name + ' ' + (v.voiceURI || ''), sc = 0;
       if (/\(natural\)|natural|neural/i.test(n)) sc += 8;           // Edge / Windows online neural voices
       if (/premium/i.test(n)) sc += 7;                               // Apple premium voices
       if (/enhanced|siri/i.test(n)) sc += 6;                         // Apple enhanced and Siri voices
       if (/^google /i.test(n)) sc += 5;                              // Chrome's online Google voices
       if (/ava|zoe|evan|nathan|samantha|daniel|aria|jenny|guy|allison|serena|karen|moira|tom|susan/i.test(n)) sc += 2;
+      if (/\.super-compact|\.compact\./i.test(v.voiceURI || '')) sc -= 3;
       if (/compact|espeak|robot|novelty|bad news|bells|boing|bubbles|cellos|whisper|zarvox|trinoids|organ|jester|superstar|wobble|albert|fred|junior|ralph|kathy|bahh/i.test(n)) sc -= 10;
       if (/^en-us/i.test(v.lang)) sc += 1;
       return sc;
     };
     return en.slice().sort(function (a, b) { return score(b) - score(a) || a.name.localeCompare(b.name); });
+  }
+  // Apple puts the quality tier in the voice ID (com.apple.voice.premium.en-US.Ava), not the name.
+  voiceTier(v) {
+    var s = (v.name || '') + ' ' + (v.voiceURI || '');
+    if (/premium/i.test(s)) return 'Premium';
+    if (/enhanced/i.test(s)) return 'Enhanced';
+    if (/natural|neural/i.test(s)) return 'Natural';
+    return '';
   }
   ttsVoice() {
     var list = this.ttsVoices();
@@ -3044,7 +3053,9 @@ class Component extends DCLogic {
         commitSeek();
       },
       voices: this.ttsVoices().map(function (v) {
-        return { id: v.voiceURI, label: v.name.replace(/^Microsoft /, '').replace(/ - English \(.*\)$/, '') + ' · ' + v.lang.replace('_', '-'), sel: curVoice && v.voiceURI === curVoice.voiceURI };
+        var tier = self.voiceTier(v), nm = v.name.replace(/^Microsoft /, '').replace(/ - English \(.*\)$/, '');
+        if (tier && nm.toLowerCase().indexOf(tier.toLowerCase()) < 0) nm += ' (' + tier + ')';
+        return { id: v.voiceURI, label: nm + ' · ' + v.lang.replace('_', '-'), sel: curVoice && v.voiceURI === curVoice.voiceURI };
       }),
       hasVoices: this.ttsVoices().length > 1,
       voiceOpen: !!this._voiceOpen, voiceOp: this._voiceOpen ? 1 : 0.8,
