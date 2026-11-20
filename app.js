@@ -1415,7 +1415,7 @@ var PRACTICES = [
 
 
 // ----- Where to turn: passages for particular situations, like the topical index in many printed Bibles -----
-// Each passage: [book, chapter, first verse, last verse, why it speaks to this]. Extra-biblical books are marked in the app.
+// Each passage: [book, chapter, first verse, last verse, why it speaks to this]. Catholic and Orthodox books are marked in the app.
 var TOPICS = [
   { id: 'grief', name: 'Grief and loss', icon: 'M12 21s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.6-7 10-7 10z', practice: 'pray',
     intro: 'Scripture does not hurry grief. It gives words for lament and the hope that death is not the end.',
@@ -2005,7 +2005,7 @@ class Component extends DCLogic {
     var q;
     try { q = new URLSearchParams(window.location.search); } catch (err) { return; }
     var patch = {};
-    var tabs = ['overview', 'library', 'story', 'timeline', 'themes', 'compare', 'practice', 'read', 'search'];
+    var tabs = ['overview', 'library', 'story', 'timeline', 'themes', 'compare', 'practice', 'read', 'search', 'about'];
     var tab = q.get('tab');
     if (tab && tabs.indexOf(tab) >= 0) patch.tab = tab;
     var book = q.get('book');
@@ -2217,7 +2217,7 @@ class Component extends DCLogic {
 
     // Story = Storyline + Timeline; Traditions = beliefs, frameworks and practice.
     var TAB_GROUPS = { story: ['story', 'timeline'], compare: ['compare', 'practice'] };
-    var tabs = [['overview','Overview'],['library','Library'],['story','Story'],['themes','Themes'],['compare','Traditions'],['read','Read'],['search','Search']].map(function (t) {
+    var tabs = [['overview','Overview'],['library','Library'],['story','Story'],['themes','Themes'],['compare','Traditions'],['read','Read'],['search','Search'],['about','About']].map(function (t) {
       var grp = TAB_GROUPS[t[0]] || [t[0]];
       var on = grp.indexOf(tab) >= 0;
       return { id: t[0], label: t[1], pressed: on, bg: on ? INK : 'transparent', fg: on ? PAPER : '#4A3F35', pick: function () { go({ tab: t[0] }); window.scrollTo(0, 0); } };
@@ -2522,8 +2522,8 @@ class Component extends DCLogic {
       withX: withX, onWithX: function (e) { go({ withX: !!e.target.checked }); },
       nextIsExtra: !!(nc && findBook(nc.id).extra && nc.id !== B.id), prevIsExtra: !!(pc && findBook(pc.id).extra && pc.id !== B.id)
     };
-    rd.nextLabel = nc ? nc.label + (rd.nextIsExtra ? ' (extra-biblical)' : '') : 'End';
-    rd.prevLabel = pc ? pc.label + (rd.prevIsExtra ? ' (extra-biblical)' : '') : 'Start';
+    rd.nextLabel = nc ? nc.label + (rd.nextIsExtra ? ' (Catholic & Orthodox)' : '') : 'End';
+    rd.prevLabel = pc ? pc.label + (rd.prevIsExtra ? ' (Catholic & Orthodox)' : '') : 'Start';
 
     // Right-hand panel that follows the chapter being read
     var chD = this._chData;
@@ -2713,12 +2713,12 @@ class Component extends DCLogic {
       exportRes: function () {
         var rows = [['Reference', 'Book group', 'Verse text (' + TR_NAMES[tr] + ')']];
         res.hits.forEach(function (h) { var b = BOOKS[h.bi]; rows.push([b.name + ' ' + (h.ci + 1) + ':' + (h.vi + 1), DIVM[b.div].name, text[h.bi][h.ci][h.vi]]); });
-        (res.xhits || []).forEach(function (h) { var b = findBook(h.xb); rows.push([b.name + ' ' + ((b.chFirst || 1) + h.ci) + ':' + (h.vi + 1), 'Extra-biblical (KJV Apocrypha)', apocT[h.xb][h.ci][h.vi]]); });
+        (res.xhits || []).forEach(function (h) { var b = findBook(h.xb); rows.push([b.name + ' ' + ((b.chFirst || 1) + h.ci) + ':' + (h.vi + 1), 'Catholic & Orthodox book (KJV Apocrypha)', apocT[h.xb][h.ci][h.vi]]); });
         self.exportCSV('search-' + qlow.replace(/[^a-z0-9]+/g, '-'), rows);
       },
       xresults: xresults, hasX: withXS && res.xtotal > 0, xLoading: withXS && searching && !apocT,
       xNone: withXS && searching && !!apocT && res.xtotal === 0,
-      xLabel: res.xtotal.toLocaleString() + (res.xtotal === 1 ? ' verse' : ' verses') + ' in extra-biblical books' + (res.xtotal > XCAP ? ' (showing the first ' + XCAP + ')' : ''),
+      xLabel: res.xtotal.toLocaleString() + (res.xtotal === 1 ? ' verse' : ' verses') + ' in the Catholic and Orthodox books' + (res.xtotal > XCAP ? ' (showing the first ' + XCAP + ')' : ''),
       withX: withXS, xDisabled: !(scope === 'all' || scope === 'OT'), onlyX: onlyX, notOnlyX: !onlyX,
       onWithX: function (e) { go({ searchX: !!e.target.checked }); },
       suggestions: SUGGESTIONS.map(function (w) { return { label: w, pick: function () { go({ q: w }); } }; })
@@ -3314,7 +3314,7 @@ class Component extends DCLogic {
       exportLibrary: function () {
         var rows = [['Order', 'Book', 'Testament', 'Group', 'Chapters', 'Key figures', 'Summary', 'In which Bibles']];
         BOOKS.forEach(function (b, i) { var d = DIVM[b.div]; rows.push([i + 1, b.name, d.t === 'OT' ? 'Old Testament' : 'New Testament', d.name, b.ch, b.people, b.sum, 'All Christian Bibles']); });
-        XBOOKS.forEach(function (b) { rows.push(['', b.name, 'Extra-biblical (Apocrypha / deuterocanon)', XDIV.name, b.ch, b.people, b.sum, b.trad]); });
+        XBOOKS.forEach(function (b) { rows.push(['', b.name, 'Catholic & Orthodox (deuterocanonical)', XDIV.name, b.ch, b.people, b.sum, b.trad]); });
         self.exportCSV('bible-books', rows);
       },
       libTitle: testa === 'AP' ? 'Books beyond the Protestant Bible' : testa === 'all' ? 'The 66 books, plus the Apocrypha' : 'The 66 books, shelf by shelf',
@@ -3325,7 +3325,7 @@ class Component extends DCLogic {
       hdr: (function () {
         var compact = !!self._narrow;
         var menuOpen = compact && !!st.navOpen, searchOpen = compact && !!st.hdrSearch;
-        var SUBS = { overview: 'Start here', library: 'Every book', story: 'Storyline and timeline', themes: 'Threads through Scripture', compare: 'Beliefs and practice', read: 'Full text', search: 'Words and topics' };
+        var SUBS = { overview: 'Start here', library: 'Every book', story: 'Storyline and timeline', themes: 'Threads through Scripture', compare: 'Beliefs and practice', read: 'Full text', search: 'Words and topics', about: 'Why this site, FAQ' };
         var cur = tabs.filter(function (t) { return t.pressed; })[0];
         var sub = { story: 'Storyline', timeline: 'Timeline', compare: st.cmpMode === 'fw' ? 'Frameworks' : 'Beliefs', practice: 'Practice' }[tab];
         return {
@@ -3369,7 +3369,7 @@ class Component extends DCLogic {
       segments: segments, legend: legend,
       filters: filters, divisions: divisions, libCanons: libCanons, libArr: libArr || { groups: [] }, libIsArr: !!libArr, libIsShelves: !libArr,
       eras: eras, era: era, arc: arc, arcSel: arcSel, future: future, tl: tl, isTimeline: tab === 'timeline', cp: cp, chMap: chMap, listen: listen, player: player, cmp: cmp, isCompare: tab === 'compare', parts: parts, part: part, aside: (function () { var off = !asideOpen; var nar = self._narrow; return { open: !off, closed: off, flex: off ? (nar ? '1 1 100%' : '0 0 52px') : '1 1 340px', toggle: function () { var am = Object.assign({}, asideMap); am[tab] = off; go({ asideOpenMap: am }); }, hideRot: nar ? 90 : 0, showRot: nar ? -90 : 0, railDir: nar ? 'row' : 'column', railPad: nar ? '10px 14px' : '16px 6px', railWrite: nar ? 'horizontal-tb' : 'vertical-rl', railLabel: tab === 'read' ? 'Show chapter notes' : 'Show book details' }; })(),
-      showAside: tab !== 'compare' && tab !== 'timeline' && tab !== 'practice', pr: pr, isPractice: tab === 'practice',
+      showAside: tab !== 'compare' && tab !== 'timeline' && tab !== 'practice' && tab !== 'about', isAbout: tab === 'about', pr: pr, isPractice: tab === 'practice',
       themeBtns: themeBtns, strip: strip, theme: theme,
       sel: sel
     };
@@ -3431,7 +3431,7 @@ ${(V.isOverview) ? html`
 <div>
 <div style="font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #7A3B1E">Overview</div>
 <h1 style="margin: 6px 0 10px; font-family: Fraunces, Georgia, serif; font-size: 44px; line-height: 1.1; font-weight: 700">The Bible: its books, its story, and how Christians read it</h1>
-<p style="margin: 0; font-size: 18px; color: #4A3F35; max-width: 720px">Written over more than a thousand years, the Bible tells of God and the nation of Israel in the Old Testament and of Jesus and his followers in the New. Christian traditions count its books differently: 66 in Protestant Bibles, 73 in Catholic Bibles and a few more in Orthodox ones. This guide is organized around the 66, and it also includes the Catholic and Orthodox books, with their full text to read and search, summaries, background, maps and analysis. They are clearly marked as extra-biblical wherever they appear.</p>
+<p style="margin: 0; font-size: 18px; color: #4A3F35; max-width: 720px">Written over more than a thousand years, the Bible tells of God and the nation of Israel in the Old Testament and of Jesus and his followers in the New. Christian traditions count its books differently: 66 in Protestant Bibles, 73 in Catholic Bibles and a few more in Orthodox ones. This guide is organized around the 66, and it also includes the Catholic and Orthodox books, with their full text to read and search, summaries, background, maps and analysis. They are clearly marked wherever they appear.</p>
 </div>
 
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px">
@@ -4150,9 +4150,9 @@ ${(V.trBtns || []).map((t, $index) => html`
 ` : null}
 </div>
 ${(V.rd.isExtra) ? html`
-<div style="border: 2px dashed #8C7A58; border-radius: 12px; padding: 12px 14px; background: #F5EFE3; font-size: 14px; color: #31291F"><strong>Extra-biblical: not in the Protestant Bible.</strong> ${V.rd.extraNote}</div>
+<div style="border: 2px dashed #8C7A58; border-radius: 12px; padding: 12px 14px; background: #F5EFE3; font-size: 14px; color: #31291F"><strong>Catholic & Orthodox book: not in the Protestant Bible.</strong> ${V.rd.extraNote}</div>
 ` : null}
-<label style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #31291F; cursor: pointer; align-self: flex-start"><input type="checkbox" checked=${V.rd.withX} onInput=${V.rd.onWithX} style="width: 20px; height: 20px; accent-color: #6B5848" />Include extra-biblical books (Apocrypha) when paging through, in Catholic and Orthodox order</label>
+<label style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #31291F; cursor: pointer; align-self: flex-start"><input type="checkbox" checked=${V.rd.withX} onInput=${V.rd.onWithX} style="width: 20px; height: 20px; accent-color: #6B5848" />Include the Catholic and Orthodox books when paging through, in Catholic and Orthodox order</label>
 <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end">
 <div style="display: flex; flex-direction: column; gap: 4px; flex: 1 1 220px">
 <label for="rd-book" style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52">Book</label>
@@ -4223,6 +4223,34 @@ ${(V.rd.verses || []).map((v, $index) => html`
 </section>
 ` : null}
 
+${(V.isAbout) ? html`
+<section style="display: flex; flex-direction: column; gap: 22px; max-width: 780px">
+<div>
+<div style="font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #7A3B1E">About</div>
+<h1 style="margin: 4px 0 0; font-family: Fraunces, Georgia, serif; font-size: 36px; line-height: 1.1">About Explore Your Bible</h1>
+</div>
+<p style="margin: 0; font-size: 18px; line-height: 1.6; color: #31291F">Explore Your Bible was originally built to help its creator better grasp the big picture of Scripture and the major themes that run throughout it. It’s now shared for anyone who wants the same: a way to see how the books fit together and the story they tell, with a timeline and maps to place it all in time and on the ground, and a look at how Christians across traditions read and live it.</p>
+<p style="margin: 0; font-size: 18px; line-height: 1.6; color: #31291F">It aims to be an even-handed presentation, not an argument. Where Christians agree, it says so. Where they differ, it describes each tradition as its own members would and doesn’t rank one above another. Where scholars debate a date or a place, it says that too.</p>
+<div style="border-top: 1px solid #E2D8C6; padding-top: 22px">
+<h2 style="margin: 0 0 6px; font-family: Fraunces, Georgia, serif; font-size: 26px">Frequently asked questions</h2>
+</div>
+<div style="display: flex; flex-direction: column; gap: 20px">
+<div><h3 style="margin: 0 0 6px; font-size: 17px; font-weight: 700">Why only the Berean Standard Bible and the King James Version?</h3><p style="margin: 0; font-size: 16px; line-height: 1.6; color: #4A3F35">Both are in the public domain, so their full text can be shown, searched and read aloud freely. Most modern translations, such as the NIV, ESV, NASB and NLT, are under copyright and need a publisher’s license.</p></div>
+<div><h3 style="margin: 0 0 6px; font-size: 17px; font-weight: 700">Why does the site include books that aren’t in every Bible?</h3><p style="margin: 0; font-size: 16px; line-height: 1.6; color: #4A3F35">Christians have long differed over books such as Tobit, Judith, Wisdom, Sirach and the Maccabees. Catholic and Orthodox Christians, about half of all Christians worldwide, receive them as Scripture. Protestants and Jews do not include them in their canon. Even so, the 1611 King James Bible printed them, and Luther included them in his German Bible as books “useful and good to read.” They also tell the story of the years between the Testaments, such as the Maccabean revolt behind the Feast of Dedication in John 10:22. On this site they’re always labeled so you know which Bibles include them. They’re left out when you page through the Bible unless you choose to include them.</p></div>
+<div><h3 style="margin: 0 0 6px; font-size: 17px; font-weight: 700">Where does the text of the Catholic and Orthodox books come from?</h3><p style="margin: 0; font-size: 16px; line-height: 1.6; color: #4A3F35">From the Apocrypha of the King James Bible, since the Berean Standard Bible doesn’t include them.</p></div>
+<div><h3 style="margin: 0 0 6px; font-size: 17px; font-weight: 700">Is the site affiliated with a church or denomination?</h3><p style="margin: 0; font-size: 16px; line-height: 1.6; color: #4A3F35">No.</p></div>
+<div><h3 style="margin: 0 0 6px; font-size: 17px; font-weight: 700">How are the traditions described?</h3><p style="margin: 0; font-size: 16px; line-height: 1.6; color: #4A3F35">By each tradition’s official or majority teaching, in terms its own members would recognize. Individual churches and believers vary.</p></div>
+<div><h3 style="margin: 0 0 6px; font-size: 17px; font-weight: 700">Where do the chapter summaries come from?</h3><p style="margin: 0; font-size: 16px; line-height: 1.6; color: #4A3F35">Mostly from Matthew Henry’s <em>Concise Commentary</em> (1706). It’s in the public domain and written from his Protestant perspective. A few were written for this site.</p></div>
+<div><h3 style="margin: 0 0 6px; font-size: 17px; font-weight: 700">How accurate are the dates and maps?</h3><p style="margin: 0; font-size: 16px; line-height: 1.6; color: #4A3F35">Dates from about the time of the kings onward are well established. Earlier dates are traditional and approximate, and Genesis 1–11 is left undated. Map locations are approximate, and uncertain places like Eden are labeled that way.</p></div>
+<div><h3 style="margin: 0 0 6px; font-size: 17px; font-weight: 700">Do I need an account?</h3><p style="margin: 0; font-size: 16px; line-height: 1.6; color: #4A3F35">No. There are no accounts, ads or tracking. Your read-aloud voice and the desktop-view setting are saved only in your own browser.</p></div>
+</div>
+<div style="border-top: 1px solid #E2D8C6; padding-top: 18px; font-size: 14px; line-height: 1.6; color: #6B5F52">
+<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #6B5848; margin-bottom: 6px">Sources and credits</div>
+Berean Standard Bible: public domain. King James Version (1769) and Apocrypha: public domain. Chapter events, people and places: <a href="https://github.com/robertrouse/theographic-bible-metadata" target="_blank" rel="noopener" style="color: #7A3B1E">Theographic Bible Metadata</a> (CC BY-SA 4.0). Chapter outlines: Matthew Henry’s <em>Concise Commentary</em> (1706), public domain, via <a href="https://github.com/lyteword/mhenry-concise" target="_blank" rel="noopener" style="color: #7A3B1E">mhenry-concise</a>. Base map: <a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener" style="color: #7A3B1E">Natural Earth</a> (public domain). Fonts: Fraunces and Inter (SIL Open Font License). Code: Preact (MIT) and htm (Apache 2.0).
+</div>
+</section>
+` : null}
+
 ${(V.isSearch) ? html`
 <section style="display: flex; flex-direction: column; gap: 18px">
 <div>
@@ -4248,7 +4276,7 @@ ${(V.trBtns || []).map((t, $index) => html`
 `)}
 </div>
 </div>
-<label style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #31291F; cursor: pointer; align-self: flex-start"><input type="checkbox" checked=${V.s.withX} disabled=${V.s.xDisabled} onInput=${V.s.onWithX} style="width: 20px; height: 20px; accent-color: #6B5848" />Also search the extra-biblical books (Apocrypha, King James 1611 text)</label>
+<label style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #31291F; cursor: pointer; align-self: flex-start"><input type="checkbox" checked=${V.s.withX} disabled=${V.s.xDisabled} onInput=${V.s.onWithX} style="width: 20px; height: 20px; accent-color: #6B5848" />Also search the Catholic and Orthodox books (King James 1611 text)</label>
 ${(V.s.hasBooks) ? html`
 <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center">
 <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52; margin-right: 4px">Books</span>
@@ -4301,11 +4329,11 @@ ${(V.s.results || []).map((r, $index) => html`
 </div>
 </div>
 ` : null}
-${(V.s.xLoading) ? html`<div style="font-size: 14px; color: #6B5F52">Loading the extra-biblical books…</div>` : null}
-${(V.s.xNone) ? html`<div style="font-size: 14px; color: #6B5F52">No matches in the extra-biblical books.</div>` : null}
+${(V.s.xLoading) ? html`<div style="font-size: 14px; color: #6B5F52">Loading the Catholic and Orthodox books…</div>` : null}
+${(V.s.xNone) ? html`<div style="font-size: 14px; color: #6B5F52">No matches in the Catholic and Orthodox books.</div>` : null}
 ${(V.s.hasX) ? html`
 <div style="border: 2px dashed #8C7A58; border-radius: 14px; padding: 14px 16px; background: #F5EFE3; display: flex; flex-direction: column; gap: 4px">
-<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5848">Extra-biblical · not in the Protestant Bible</div>
+<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5848">Catholic & Orthodox books · not in the Protestant Bible</div>
 <h3 style="margin: 0 0 4px; font-family: Fraunces, Georgia, serif; font-size: 20px">${V.s.xLabel}</h3>
 <div style="display: flex; flex-direction: column">
 ${(V.s.xresults || []).map((r, $index) => html`
@@ -4355,7 +4383,7 @@ ${(V.cp.showCh) ? html`
 </div>
 </div>
 ${(V.cp.isExtra) ? html`
-<div style="border: 2px dashed #8C7A58; border-radius: 12px; padding: 10px 12px; background: #F5EFE3; font-size: 13px; color: #31291F"><strong>Extra-biblical.</strong> ${V.cp.extraNote}</div>
+<div style="border: 2px dashed #8C7A58; border-radius: 12px; padding: 10px 12px; background: #F5EFE3; font-size: 13px; color: #31291F"><strong>Catholic & Orthodox book.</strong> ${V.cp.extraNote}</div>
 ` : null}
 <div>
 <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52; margin-bottom: 6px">Chapter summary</div>
