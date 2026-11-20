@@ -3039,7 +3039,11 @@ class Component extends DCLogic {
     var partSel = PARTS.filter(function (p) { return p.id === st.part; })[0] || null;
     var parts = PARTS.map(function (p) {
       var on = p === partSel;
+      var pb = BOOKS.filter(function (b) { return p.divs.indexOf(b.div) >= 0; });
+      var pch = pb.reduce(function (n, b) { return n + b.ch; }, 0);
       return { name: p.name, short: p.short, color: p.color, bg: p.bg, pressed: on, border: on ? p.color : 'transparent', chev: on ? 180 : 0,
+        ch: pch, meta: pb.length + (pb.length === 1 ? ' book' : ' books') + ' · ' + pch + ' chapters', segLabel: p.name + ': ' + pch + ' chapters',
+        segOp: partSel && !on ? 0.45 : 1,
         pick: function () { go({ part: on ? null : p.id }); if (!on) setTimeout(function () { var d = document.getElementById('part-detail'); if (d && d.getBoundingClientRect().bottom > window.innerHeight) d.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 80); } };
     });
     var part = partSel ? {
@@ -3463,34 +3467,22 @@ ${(V.isOverview) ? html`
 
 <div data-focus="card" style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 14px"><button type="button" class="be-fbtn" onClick=${V.focusToggle} aria-label="Focus mode: show this section full screen" title="Focus mode (full screen)"><svg class="be-fi-in" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg><svg class="be-fi-out" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"></path><path d="M15 4v5h5"></path><path d="M9 20v-5H4"></path><path d="M15 20v-5h5"></path></svg></button><button type="button" class="be-sbtn" onClick=${V.areaSpeak} aria-label="Read this section aloud (press again to stop)" title="Read this section aloud"><svg class="be-si-play" aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg><svg class="be-si-stop" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"></rect></svg></button>
 <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: baseline">
-<h2 style="margin: 0; padding-right: 84px; font-family: Fraunces, Georgia, serif; font-size: 24px">How the length is split</h2>
+<h2 style="margin: 0; padding-right: 84px; font-family: Fraunces, Georgia, serif; font-size: 24px">How the parts fit together</h2>
 <div style="font-size: 14px; color: #6B5F52">The Old Testament holds about three-quarters of the Bible: 929 of 1,189 chapters.</div>
 </div>
 <button type="button" onClick=${V.home.lib} style="align-self: flex-start; cursor: pointer; border: none; background: transparent; color: #7A3B1E; font-size: 14px; font-weight: 700; padding: 2px 0; min-height: 32px; text-decoration: underline; text-underline-offset: 3px">Explore every book in the Library →</button>
-<div style="display: flex; height: 30px; border-radius: 8px; overflow: hidden; gap: 2px">
-${(V.segments || []).map((s, $index) => html`
-<div title=${s.label} style="flex: ${s.ch} 1 0px; background: ${s.bg}"></div>
+<div style="display: flex; height: 30px; border-radius: 8px; overflow: hidden; gap: 2px" role="group" aria-label="Share of the Bible's chapters in each part">
+${(V.parts || []).map((p, $index) => html`
+<button type="button" onClick=${p.pick} title=${p.segLabel} aria-label=${p.segLabel} style="flex: ${p.ch} 1 0px; min-width: 6px; padding: 0; border: none; cursor: pointer; background: ${p.color}; opacity: ${p.segOp}"></button>
 `)}
 </div>
-<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px">
-${(V.legend || []).map((l, $index) => html`
-<button type="button" onClick=${l.pick} style="display: flex; gap: 8px; align-items: flex-start; text-align: left; background: transparent; border: none; padding: 6px; border-radius: 8px; cursor: pointer; color: #231E19; min-height: 44px">
-<span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 3px; margin-top: 4px; flex: none; background: ${l.bg}"></span>
-<span><span style="display: block; font-weight: 600; font-size: 14px">${l.name}</span><span style="display: block; font-size: 12px; color: #6B5F52">${l.meta}</span></span>
-</button>
-`)}
-</div>
-</div>
-
-<div data-focus="card" style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 14px"><button type="button" class="be-fbtn" onClick=${V.focusToggle} aria-label="Focus mode: show this section full screen" title="Focus mode (full screen)"><svg class="be-fi-in" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg><svg class="be-fi-out" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"></path><path d="M15 4v5h5"></path><path d="M9 20v-5H4"></path><path d="M15 20v-5h5"></path></svg></button><button type="button" class="be-sbtn" onClick=${V.areaSpeak} aria-label="Read this section aloud (press again to stop)" title="Read this section aloud"><svg class="be-si-play" aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg><svg class="be-si-stop" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"></rect></svg></button>
-<h2 style="margin: 0; font-family: Fraunces, Georgia, serif; font-size: 24px">How the parts fit together</h2>
-<button type="button" onClick=${V.home.libParts} style="align-self: flex-start; cursor: pointer; border: none; background: transparent; color: #7A3B1E; font-size: 14px; font-weight: 700; padding: 2px 0; min-height: 32px; text-decoration: underline; text-underline-offset: 3px">See each part, with its books, in the Library →</button>
 <p style="margin: 0; font-size: 14px; color: #4A3F35">Tap a part to read more about it.</p>
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; grid-auto-flow: dense">
 ${(V.parts || []).map((p, $index) => html`
 <button type="button" onClick=${p.pick} aria-expanded=${p.pressed} style="cursor: pointer; text-align: left; border-radius: 12px; padding: 16px; background: ${p.bg}; border: 2px solid ${p.border}; display: flex; flex-direction: column; gap: 4px; color: #231E19">
 <span style="display: flex; justify-content: space-between; align-items: center; gap: 6px; font-weight: 700; color: ${p.color}">${p.name}<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(${p.chev}deg); transition: transform 0.2s ease"><path d="M6 9l6 6 6-6"></path></svg></span>
 <span style="font-size: 14px; color: #4A3F35">${p.short}</span>
+<span style="font-size: 12px; color: #6B5F52; margin-top: 2px">${p.meta}</span>
 </button>
 ${(p.pressed) ? html`
 <div id="part-detail" style="grid-column: 1 / -1; scroll-margin-top: 12px; border-radius: 14px; padding: 18px 20px; background: ${V.part.bg}; border-left: 5px solid ${V.part.color}; display: flex; flex-direction: column; gap: 12px">
