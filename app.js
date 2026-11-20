@@ -1737,11 +1737,16 @@ class Component extends DCLogic {
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && self._focusEl) self.focusExit(); });
     document.addEventListener('fullscreenchange', function () { if (!document.fullscreenElement && self._fsByUs) { self._fsByUs = false; if (self._focusEl) self.focusExit(); } });
     document.addEventListener('click', function () { setTimeout(function () { if (self._focusEl && !self._focusEl.isConnected) self.focusExit(); }, 60); });
-    this._narrow = window.innerWidth < 720;
-    window.addEventListener('resize', function () {
-      var n = window.innerWidth < 720;
-      if (n !== self._narrow) { self._narrow = n; self.forceUpdate(); }
-    });
+    // Layout width, not innerWidth: on iPhone innerWidth shrinks with pinch-zoom, which would flip the header to the phone layout.
+    this._isNarrow = function () {
+      if (self.state && self.state.desktopView) return false;
+      var w = document.documentElement.clientWidth || window.innerWidth;
+      return w < 720;
+    };
+    this._narrow = this._isNarrow();
+    var reNarrow = function () { var n = self._isNarrow(); if (n !== self._narrow) { self._narrow = n; self.forceUpdate(); } };
+    window.addEventListener('resize', reNarrow);
+    this._reNarrow = reNarrow;
   }
 
   loadText(tr) {
@@ -2176,7 +2181,8 @@ class Component extends DCLogic {
         : 'width=device-width, initial-scale=1');
     }, 400);
     try { window.localStorage.setItem('bibleExplorer.desktopView', on ? '1' : '0'); } catch (err) {}
-    this.setState({ desktopView: on });
+    var self = this;
+    this.setState({ desktopView: on }, function () { if (self._reNarrow) { self._reNarrow(); setTimeout(self._reNarrow, 500); } });
     window.scrollTo(0, 0);
   }
 
@@ -3317,7 +3323,7 @@ class Component extends DCLogic {
         XBOOKS.forEach(function (b) { rows.push(['', b.name, 'Catholic & Orthodox (deuterocanonical)', XDIV.name, b.ch, b.people, b.sum, b.trad]); });
         self.exportCSV('bible-books', rows);
       },
-      libTitle: testa === 'AP' ? 'Books beyond the Protestant Bible' : testa === 'all' ? 'The 66 books, plus the Apocrypha' : 'The 66 books, shelf by shelf',
+      libTitle: testa === 'AP' ? 'Books beyond the Protestant Bible' : testa === 'all' ? 'The 66 books, plus the Catholic & Orthodox books' : 'The 66 books, shelf by shelf',
       canonBtns: canonBtns, canon: canon,
       share: share, tts: tts,
       toast: this._toast || { text: '', show: false },
