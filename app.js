@@ -3045,7 +3045,7 @@ class Component extends DCLogic {
     var part = partSel ? {
       show: true, name: partSel.name, color: partSel.color, bg: partSel.bg, more: paras(partSel.more),
       books: BOOKS.filter(function (b) { return partSel.divs.indexOf(b.div) >= 0; }).map(function (b) {
-        return { name: b.name, bg: DIVM[b.div].color, pick: function () { go({ tab: 'library', book: b.id, chap: 1, hl: 0, asideOpenMap: Object.assign({}, asideMap, { library: true }) }); window.scrollTo(0, 0); } };
+        return { name: b.name, bg: DIVM[b.div].color, pick: function () { openChap(b.id, 1, 0); } };
       }),
       refs: partSel.refs.map(function (r) { return { label: r[2], pick: function () { openChap(r[0], r[1], 0); } }; }),
       toLib: function () { jumpLib(partSel.divs[0]); },
