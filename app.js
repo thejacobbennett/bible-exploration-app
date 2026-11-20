@@ -1891,6 +1891,48 @@ class Component extends DCLogic {
     this.followEl(this._psEl);
   }
 
+  // Speak items one at a time. The next one is queued only when the last finishes, and onItem runs right then,
+  // so highlighting follows the voice. (iPhone Safari fires onstart late or not at all for queued utterances.)
+  // A watchdog moves on if the browser never reports the end of an utterance.
+  speakSeq(texts, from, opts) {
+    var self = this, synth = window.speechSynthesis;
+    var gen = (this._seqGen || 0) + 1; this._seqGen = gen;
+    clearInterval(this._seqWatch);
+    try { synth.cancel(); } catch (err) {}
+    var voice = this.ttsVoice();
+    var live = function () { return self._seqGen === gen; };
+    var step = function (i) {
+      if (!live()) return;
+      clearInterval(self._seqWatch);
+      if (i >= texts.length) { if (opts.onDone) opts.onDone(); return; }
+      if (!texts[i]) { step(i + 1); return; }
+      opts.onItem(i);
+      var u = new window.SpeechSynthesisUtterance(texts[i]);
+      u.rate = opts.rate || 1; u.lang = voice ? voice.lang : 'en-US';
+      if (voice) u.voice = voice;
+      var done = false;
+      var finish = function () { if (done || !live()) return; done = true; step(i + 1); };
+      u.onend = finish;
+      u.onerror = function (e) { if (e && (e.error === 'interrupted' || e.error === 'canceled')) return; finish(); };
+      self._seqU = u; // keep a reference so the browser does not drop it mid-sentence
+      synth.speak(u);
+      var quiet = 0;
+      self._seqWatch = setInterval(function () {
+        if (!live() || done) { clearInterval(self._seqWatch); return; }
+        if (opts.isPaused && opts.isPaused()) { quiet = 0; return; }
+        quiet = synth.speaking || synth.pending ? 0 : quiet + 1;
+        if (quiet >= 3) finish();
+      }, 400);
+    };
+    step(from);
+  }
+
+  seqStop() {
+    this._seqGen = (this._seqGen || 0) + 1;
+    clearInterval(this._seqWatch);
+    try { window.speechSynthesis.cancel(); } catch (err) {}
+  }
+
   pageSpeakFrom(start) {
     var self = this, synth = window.speechSynthesis, parts = this._psParts || [];
     if (!parts.length) return;
@@ -1898,17 +1940,10 @@ class Component extends DCLogic {
     var gen = ((this._ps && this._ps.gen) || 0) + 1;
     var st = this.state || {};
     this._ps = { on: true, gen: gen, idx: start, total: parts.length, tab: st.tab || this.props.startTab || 'overview' };
-    var voice = this.ttsVoice();
-    synth.cancel();
-    this.pageMark(start);
-    parts.slice(start).forEach(function (p, j) {
-      var i = start + j;
-      var u = new window.SpeechSynthesisUtterance(p.text);
-      u.lang = voice ? voice.lang : 'en-US';
-      if (voice) u.voice = voice;
-      u.onstart = function () { if (self._ps && self._ps.gen === gen) { self._ps.idx = i; self.pageMark(i); self.forceUpdate(); } };
-      if (i === parts.length - 1) u.onend = function () { if (self._ps && self._ps.gen === gen) { self._ps.on = false; self.pageMark(-1); if (self._psArea) { self._psArea.classList.remove('be-reading'); self._psArea = null; } self.forceUpdate(); } };
-      synth.speak(u);
+    this.speakSeq(parts.map(function (p) { return p.text; }), start, {
+      isPaused: function () { return self._ps && self._ps.paused; },
+      onItem: function (i) { if (self._ps && self._ps.gen === gen) { self._ps.idx = i; self.pageMark(i); self.forceUpdate(); } },
+      onDone: function () { if (self._ps && self._ps.gen === gen) { self._ps.on = false; self.pageMark(-1); if (self._psArea) { self._psArea.classList.remove('be-reading'); self._psArea = null; } self.forceUpdate(); } }
     });
     this.forceUpdate();
   }
@@ -1938,7 +1973,7 @@ class Component extends DCLogic {
     if (this._psArea) { this._psArea.classList.remove('be-reading'); this._psArea = null; }
     var gen = ((this._ps && this._ps.gen) || 0) + 1;
     this._ps = { on: false, gen: gen };
-    try { window.speechSynthesis.cancel(); } catch (err) {}
+    this.seqStop();
     if (!quiet) this.forceUpdate();
   }
 
@@ -2109,49 +2144,32 @@ class Component extends DCLogic {
   }
 
   ttsStart(verses, fromVerse, title, key) {
-    var self = this, synth = window.speechSynthesis;
+    var self = this;
     var t = this._tts || {};
     var gen = (t.gen || 0) + 1;
     var rate = t.rate || 1;
-    synth.cancel();
     this._ps = { on: false, gen: ((this._ps && this._ps.gen) || 0) + 1 };
     this._tts = { status: 'playing', verse: fromVerse, total: verses.length, key: key, gen: gen, rate: rate, title: title, verses: verses };
-    var voice = this.ttsVoice();
-    var make = function (text) {
-      var u = new window.SpeechSynthesisUtterance(text);
-      u.rate = rate; u.lang = voice ? voice.lang : 'en-US';
-      if (voice) u.voice = voice;
-      return u;
-    };
-    this._utts = [];
-    if (fromVerse === 1) this._utts.push(make(title + '.'));
-    verses.slice(fromVerse - 1).forEach(function (text, i) {
-      var n = fromVerse + i;
-      if (!text || text === '\u2026') return;
-      var u = make(text.replace(/[\[\]]/g, ''));
-      u.onstart = function () {
-        if (!self._tts || self._tts.gen !== gen) return;
+    // Item 0 is the chapter title (read only when starting at verse 1); item n is verse n.
+    var texts = [fromVerse === 1 ? title + '.' : ''].concat(verses.map(function (v) { return !v || v === '\u2026' ? '' : v.replace(/[\[\]]/g, ''); }));
+    this.speakSeq(texts, fromVerse === 1 ? 0 : fromVerse, {
+      rate: rate,
+      isPaused: function () { return self._tts && self._tts.status === 'paused'; },
+      onItem: function (n) {
+        if (!self._tts || self._tts.gen !== gen || n < 1) return;
         self._tts.verse = n;
         self.forceUpdate();
         self.followEl(document.getElementById('v-' + n));
-      };
-      if (n === verses.length) {
-        u.onend = function () {
-          if (!self._tts || self._tts.gen !== gen) return;
-          self._tts.status = 'done';
-          self.forceUpdate();
-        };
-      }
-      self._utts.push(u);
+      },
+      onDone: function () { if (self._tts && self._tts.gen === gen) { self._tts.status = 'done'; self.forceUpdate(); } }
     });
-    this._utts.forEach(function (u) { synth.speak(u); });
     this.forceUpdate();
   }
 
   ttsStop(quiet) {
     var t = this._tts || {};
     this._tts = { status: 'idle', verse: 0, gen: (t.gen || 0) + 1, rate: t.rate || 1 };
-    try { window.speechSynthesis.cancel(); } catch (err) {}
+    this.seqStop();
     if (!quiet) this.forceUpdate();
   }
 
@@ -3029,6 +3047,8 @@ class Component extends DCLogic {
         return { id: v.voiceURI, label: v.name.replace(/^Microsoft /, '').replace(/ - English \(.*\)$/, '') + ' · ' + v.lang.replace('_', '-'), sel: curVoice && v.voiceURI === curVoice.voiceURI };
       }),
       hasVoices: this.ttsVoices().length > 1,
+      voiceOpen: !!this._voiceOpen, voiceOp: this._voiceOpen ? 1 : 0.8,
+      toggleVoice: function () { self._voiceOpen = !self._voiceOpen; self.forceUpdate(); },
       onVoice: function (e) {
         try { window.localStorage.setItem('bibleExplorer.voice', e.target.value); } catch (err) {}
         if (isReadP) { var t3 = self._tts; if (t3 && t3.verses) self.ttsStart(t3.verses, t3.verse || 1, t3.title, t3.key); }
@@ -3660,7 +3680,7 @@ ${(V.eras || []).map((e, $index) => html`
 </div>
 </div>
 <div data-focus="card" style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; border-left: 6px solid ${V.arcSel.color}; padding: 20px 24px; display: flex; flex-direction: column; gap: 14px"><button type="button" class="be-fbtn" onClick=${V.focusToggle} aria-label="Focus mode: show this section full screen" title="Focus mode (full screen)"><svg class="be-fi-in" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg><svg class="be-fi-out" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"></path><path d="M15 4v5h5"></path><path d="M9 20v-5H4"></path><path d="M15 20v-5h5"></path></svg></button><button type="button" class="be-sbtn" onClick=${V.areaSpeak} aria-label="Read this section aloud (press again to stop)" title="Read this section aloud"><svg class="be-si-play" aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg><svg class="be-si-stop" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"></rect></svg></button>
-<div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: baseline">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: baseline; padding-right: 76px">
 <div style="font-size: 13px; color: #6B5F52; font-weight: 600">The big story · movement ${V.arcSel.n} of 9 · ${V.arcSel.span}</div>
 <div style="display: flex; gap: 6px">
 ${(V.arcSel.hasPrev) ? html`<button type="button" onClick=${V.arcSel.goPrev} style="cursor: pointer; border: 1px solid #D9CDB8; background: #F5EFE3; color: #231E19; border-radius: 999px; padding: 6px 12px; min-height: 36px; font-size: 13px; font-weight: 600">${V.arcSel.prevLabel}</button>` : null}
@@ -4633,19 +4653,20 @@ ${(V.aside.closed) ? html`
 </aside>
 ` : null}
 </main>
-${(V.player.show) ? html`<div aria-hidden="true" style="height: 175px"></div>` : null}
+${(V.player.show) ? html`<div aria-hidden="true" style="height: 84px"></div>` : null}
 ${(V.player.show) ? html`
-<div role="region" data-player="1" aria-label="Reading aloud" style="position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 55; width: min(640px, calc(100vw - 24px)); box-sizing: border-box; background: #231E19; color: #FBF7EF; border-radius: 18px; padding: 12px 16px 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.35); display: flex; flex-direction: column; gap: 6px">
-<div style="display: flex; justify-content: space-between; gap: 10px; font-size: 13px"><span style="font-weight: 700">Listening · ${V.player.title}</span><span style="color: #D9CDB8">${V.player.posLabel}</span></div>
+<div role="region" data-player="1" aria-label="Reading aloud" style="position: fixed; left: 50%; bottom: 12px; transform: translateX(-50%); z-index: 55; width: min(560px, calc(100vw - 20px)); box-sizing: border-box; background: rgba(35,30,25,0.96); color: #FBF7EF; border-radius: 16px; padding: 4px 8px 6px; box-shadow: 0 8px 24px rgba(0,0,0,0.30); display: flex; flex-direction: column">
 <label for="player-seek" class="sr">Position</label>
-<input id="player-seek" type="range" min=${V.player.min} max=${V.player.max} step="1" value=${V.player.val} onInput=${V.player.onSeek} onPointerDown=${V.player.seekDown} onPointerUp=${V.player.seekUp} onPointerCancel=${V.player.seekUp} onKeyUp=${V.player.seekUp} style="width: 100%; height: 28px; margin: 2px 0; accent-color: #F6E2A8; cursor: pointer; touch-action: none" />
-<div style="display: flex; justify-content: center; align-items: center; gap: 18px">
-<button type="button" onClick=${V.player.back} aria-label="Back" title="Back" style="flex: none; cursor: pointer; width: 44px; height: 44px; border-radius: 50%; border: none; background: transparent; color: #FBF7EF; display: inline-flex; align-items: center; justify-content: center; padding: 0"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M11 6v12L3 12z"></path><path d="M20 6v12l-8-6z"></path></svg></button>
-<button type="button" onClick=${V.player.pause} aria-label="Pause or resume" title="Pause or resume" style="flex: none; cursor: pointer; width: 50px; height: 50px; border-radius: 50%; border: none; background: #FBF7EF; color: #231E19; display: inline-flex; align-items: center; justify-content: center; padding: 0">${(V.player.playing) ? html`<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4.5" width="4" height="15" rx="1"></rect><rect x="14" y="4.5" width="4" height="15" rx="1"></rect></svg>` : null}${(V.player.paused) ? html`<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"></path></svg>` : null}</button>
-<button type="button" onClick=${V.player.fwd} aria-label="Skip ahead" title="Skip ahead" style="flex: none; cursor: pointer; width: 44px; height: 44px; border-radius: 50%; border: none; background: transparent; color: #FBF7EF; display: inline-flex; align-items: center; justify-content: center; padding: 0"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M13 6v12l8-6z"></path><path d="M4 6v12l8-6z"></path></svg></button>
-<button type="button" onClick=${V.player.stop} aria-label="Stop" title="Stop" style="flex: none; cursor: pointer; width: 44px; height: 44px; border-radius: 50%; border: none; background: transparent; color: #FBF7EF; display: inline-flex; align-items: center; justify-content: center; padding: 0"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"></rect></svg></button>
+<input id="player-seek" class="be-seek" type="range" min=${V.player.min} max=${V.player.max} step="1" value=${V.player.val} onInput=${V.player.onSeek} onPointerDown=${V.player.seekDown} onPointerUp=${V.player.seekUp} onPointerCancel=${V.player.seekUp} onKeyUp=${V.player.seekUp} style="--fill: ${V.player.fill}%" />
+<div style="display: flex; align-items: center; gap: 4px">
+<button type="button" onClick=${V.player.pause} aria-label="Pause or resume" title="Pause or resume" style="flex: none; cursor: pointer; width: 40px; height: 40px; border-radius: 50%; border: none; background: #FBF7EF; color: #231E19; display: inline-flex; align-items: center; justify-content: center; padding: 0; margin-right: 6px">${(V.player.playing) ? html`<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4.5" width="4" height="15" rx="1"></rect><rect x="14" y="4.5" width="4" height="15" rx="1"></rect></svg>` : null}${(V.player.paused) ? html`<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"></path></svg>` : null}</button>
+<div style="flex: 1 1 auto; min-width: 0; line-height: 1.25"><div style="font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">${V.player.title}</div><div style="font-size: 12px; color: #D9CDB8; white-space: nowrap">${V.player.posLabel}</div></div>
+<button type="button" onClick=${V.player.back} aria-label="Back" title="Back" style="flex: none; cursor: pointer; width: 38px; height: 38px; border-radius: 50%; border: none; background: transparent; color: #FBF7EF; display: inline-flex; align-items: center; justify-content: center; padding: 0"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M11 6v12L3 12z"></path><path d="M20 6v12l-8-6z"></path></svg></button>
+<button type="button" onClick=${V.player.fwd} aria-label="Skip ahead" title="Skip ahead" style="flex: none; cursor: pointer; width: 38px; height: 38px; border-radius: 50%; border: none; background: transparent; color: #FBF7EF; display: inline-flex; align-items: center; justify-content: center; padding: 0"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M13 6v12l8-6z"></path><path d="M4 6v12l8-6z"></path></svg></button>
+${(V.player.hasVoices) ? html`<button type="button" onClick=${V.player.toggleVoice} aria-expanded=${V.player.voiceOpen} aria-label="Choose a voice" title="Choose a voice" style="flex: none; cursor: pointer; width: 38px; height: 38px; border-radius: 50%; border: none; background: transparent; color: #FBF7EF; display: inline-flex; align-items: center; justify-content: center; padding: 0; opacity: ${V.player.voiceOp}"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21v-1a6 6 0 0 1 6-6h0a6 6 0 0 1 6 6v1"></path><circle cx="10" cy="7" r="4"></circle><path d="M19 8a4 4 0 0 1 0 6"></path></svg></button>` : null}
+<button type="button" onClick=${V.player.stop} aria-label="Stop and close" title="Stop" style="flex: none; cursor: pointer; width: 38px; height: 38px; border-radius: 50%; border: none; background: transparent; color: #FBF7EF; display: inline-flex; align-items: center; justify-content: center; padding: 0"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
 </div>
-${(V.player.hasVoices) ? html`<div style="display: flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 12px; color: #D9CDB8"><label for="player-voice" style="flex: none">Voice</label><select id="player-voice" onChange=${V.player.onVoice} style="flex: 1 1 auto; min-width: 0; min-height: 32px; border-radius: 8px; border: 1px solid #4A3F35; background: #31291F; color: #FBF7EF; font-size: 13px; padding: 4px 8px">${(V.player.voices || []).map((vo, $index) => html`<option value=${vo.id} selected=${vo.sel}>${vo.label}</option>`)}</select></div>` : null}
+${(V.player.voiceOpen) ? html`<div style="display: flex; align-items: center; gap: 8px; margin: 6px 4px 2px; font-size: 12px; color: #D9CDB8"><label for="player-voice" style="flex: none">Voice</label><select id="player-voice" onChange=${V.player.onVoice} style="flex: 1 1 auto; min-width: 0; min-height: 32px; border-radius: 8px; border: 1px solid #4A3F35; background: #31291F; color: #FBF7EF; font-size: 13px; padding: 4px 8px">${(V.player.voices || []).map((vo, $index) => html`<option value=${vo.id} selected=${vo.sel}>${vo.label}</option>`)}</select></div>` : null}
 </div>
 ` : null}
 ${(V.toast.show) ? html`
