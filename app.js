@@ -2273,7 +2273,12 @@ class Component extends DCLogic {
   scrollToId(id) {
     setTimeout(function () {
       var el = document.getElementById(id);
-      if (el && el.scrollIntoView) el.scrollIntoView({ block: (id === 'reader-top' || id === 'book-card') ? 'start' : 'center', behavior: 'smooth' });
+      if (!el) return;
+      // A single verse is centered; anything else (a card, a section) lands at the top, below the sticky header on phones.
+      if (/^v-\d/.test(id)) { el.scrollIntoView({ block: 'center', behavior: 'smooth' }); return; }
+      var h = document.querySelector('header');
+      var off = h && getComputedStyle(h).position === 'sticky' ? h.offsetHeight + 12 : 12;
+      window.scrollTo({ top: Math.max(0, el.getBoundingClientRect().top + window.scrollY - off), behavior: 'smooth' });
     }, 150);
   }
 
