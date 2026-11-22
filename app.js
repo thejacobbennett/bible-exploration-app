@@ -2108,6 +2108,19 @@ var LABEL_STYLE = {
 };
 
 // ----- Chapter-by-chapter people, places and events (Theographic Bible Metadata, CC BY-SA 4.0) -----
+// Where a History topic lives: its section of the Traditions page, with the panel open.
+var hxTarget = function (id) {
+  var h = HISTORY.filter(function (x) { return x.id === id; })[0] || HISTORY[0];
+  if (h.kind === 'b') return { tab: 'compare', cmpMode: 'trad', cmpReg: null, hxId: h.id };
+  if (h.kind === 'fw') return { tab: 'compare', cmpMode: 'fw', cmpFam: h.fam || null, cmpReg: null, hxId: h.id };
+  if (h.pr) return { tab: 'practice', prMode: 'practice', prId: h.pr, hxId: h.id };
+  return { tab: 'compare', cmpMode: 'pr', cmpReg: null, hxId: h.id };
+};
+var HX_GROUPS = {
+  b: [['God, sin and salvation', ['trinity', 'origsin', 'justif']], ['Scripture and authority', ['canon', 'papacy']], ['Mary and the saints', ['mary', 'saints']], ['Death and the last things', ['purg', 'endtimes']]],
+  fw: [['Scripture and authority', ['sola', 'quad']], ['Salvation', ['predest', 'atone']], ['Reading the whole Bible', ['disp', 'covenant']], ['Sacraments', ['supper', 'bapt']], ['The Holy Spirit', ['tongues']]],
+  pr: [['Prayer and devotion', ['rosary', 'jesusprayer', 'signcross', 'icons']], ['Seasons and the Lord’s Day', ['churchyear', 'lent', 'lordsday']], ['Church life', ['confession', 'clergy', 'monastic', 'music', 'tithe']]]
+};
 var HIST_KEYS = ['planDay', 'tab', 'book', 'chap', 'era', 'theme', 'tr', 'q', 'prMode', 'prId', 'prTrad', 'cmpMode', 'cmpFam', 'hxId', 'hxKind', 'testa', 'libCanon', 'srMode', 'topic'];
 var CH_URL = 'chapters.json';
 var HN_URL = 'henry.json';
@@ -2712,6 +2725,7 @@ class Component extends DCLogic {
     if (q.get('hxId') && HISTORY.some(function (h) { return h.id === q.get('hxId'); })) patch.hxId = q.get('hxId');
     if (['b', 'fw', 'pr'].indexOf(q.get('hxKind')) >= 0) patch.hxKind = q.get('hxKind');
     if (q.get('cmpFam') && FW_FAMILIES.some(function (f) { return f.id === q.get('cmpFam'); })) patch.cmpFam = q.get('cmpFam');
+    if (q.get('tab') === 'history') { var hxT = hxTarget(patch.hxId); Object.keys(hxT).forEach(function (k) { patch[k] = hxT[k]; }); }
     if (['all', 'OT', 'NT', 'AP'].indexOf(q.get('testa')) >= 0) patch.testa = q.get('testa');
     if (q.get('libCanon') && CANONS[q.get('libCanon')]) patch.libCanon = q.get('libCanon');
     if (q.get('srMode') === 'topics') patch.srMode = 'topics';
@@ -2928,7 +2942,7 @@ class Component extends DCLogic {
       });
       if (P.j) cards.push({ kind: 'Follow the journey', color: '#1F5446', title: P.j[2], text: 'Open ' + bname(P.j[0]) + ' ' + P.j[1] + ' and tap Follow along under its map to trace each place as you read.', link: 'Open the chapter and map', pick: function () { openChap(P.j[0], P.j[1], 0); } });
       if (P.th) { var T = THEMES.filter(function (t) { return t.id === P.th[0]; })[0]; if (T) cards.push({ kind: 'Unifying theme', color: '#7A3B1E', title: T.name + ': ' + T.short, text: P.th[1], link: 'Trace this theme through the Bible', pick: function () { go({ tab: 'themes', theme: T.id }); window.scrollTo(0, 0); } }); }
-      if (P.dx) { var H = HISTORY.filter(function (h) { return h.id === P.dx[0]; })[0]; if (H) cards.push({ kind: 'Where Christians differ · ' + bname(P.dx[2]) + ' ' + P.dx[3], color: '#5B3A74', title: H.name, text: P.dx[1], link: 'How each tradition sees it', pick: function () { go({ tab: 'history', hxId: H.id }); window.scrollTo(0, 0); } }); }
+      if (P.dx) { var H = HISTORY.filter(function (h) { return h.id === P.dx[0]; })[0]; if (H) cards.push({ kind: 'Where Christians differ · ' + bname(P.dx[2]) + ' ' + P.dx[3], color: '#5B3A74', title: H.name, text: P.dx[1], link: 'How each tradition sees it', pick: function () { go(hxTarget(H.id)); window.scrollTo(0, 0); } }); }
       if (P.tp) { var TP = TOPICS.filter(function (t) { return t.id === P.tp[0]; })[0]; if (TP) cards.push({ kind: 'Where to turn', color: '#6B4A12', title: TP.name, text: bname(P.tp[1]) + ' ' + P.tp[2] + ' is one of the passages Christians turn to for ' + TP.name.toLowerCase() + '.', link: 'See more passages for ' + TP.name.toLowerCase(), pick: function () { go({ tab: 'search', srMode: 'topics', topic: TP.id }); window.scrollTo(0, 0); } }); }
       var months = [];
       for (var m = 0; m < 13; m++) {
@@ -3021,7 +3035,7 @@ class Component extends DCLogic {
     var tabs = [['overview','Overview'],['library','Library'],['story','Story'],['themes','Unifying Themes'],['compare','Traditions'],['read','Read'],['search','Search'],['plan','Daily'],['about','About']].map(function (t) {
       var grp = TAB_GROUPS[t[0]] || [t[0]];
       var on = grp.indexOf(tab) >= 0;
-      return { id: t[0], label: t[1], pressed: on, bg: on ? INK : 'transparent', fg: on ? PAPER : '#4A3F35', pick: function () { go(t[0] === 'compare' ? { tab: 'compare', cmpMode: 'trad', cmpReg: null } : { tab: t[0] }); window.scrollTo(0, 0); } };
+      return { id: t[0], label: t[1], pressed: on, bg: on ? INK : 'transparent', fg: on ? PAPER : '#4A3F35', pick: function () { go(t[0] === 'compare' ? { tab: 'compare', cmpMode: 'trad', cmpReg: null, hxId: null } : { tab: t[0], hxId: null }); window.scrollTo(0, 0); } };
     });
     var seg = function (items, cur) {
       return items.map(function (it) {
@@ -3031,7 +3045,7 @@ class Component extends DCLogic {
     };
     var storyViews = seg([['story', 'Storyline', { tab: 'story' }], ['timeline', 'Timeline', { tab: 'timeline' }]], tab);
     var tradView = tab === 'history' ? 'history' : tab === 'practice' || st.cmpMode === 'pr' ? 'practice' : (st.cmpMode === 'fw' ? 'fw' : 'trad');
-    var tradViews = seg([['trad', 'Beliefs', { tab: 'compare', cmpMode: 'trad', cmpReg: null }], ['fw', 'Frameworks', { tab: 'compare', cmpMode: 'fw', cmpReg: null }], ['practice', 'Practice', { tab: 'compare', cmpMode: 'pr', cmpReg: null }], ['history', 'History', { tab: 'history' }]], tradView);
+    var tradViews = seg([['trad', 'Beliefs', { tab: 'compare', cmpMode: 'trad', cmpReg: null, hxId: null }], ['fw', 'Frameworks', { tab: 'compare', cmpMode: 'fw', cmpReg: null, hxId: null }], ['practice', 'Practice', { tab: 'compare', cmpMode: 'pr', cmpReg: null, hxId: null }]], tradView);
 
     var ring = function (b) { return b.id === bookId ? '3px solid ' + INK : '3px solid transparent'; };
     // On phones the book card sits below the content, so bring it into view when a book is picked.
@@ -3950,7 +3964,7 @@ class Component extends DCLogic {
     tp.openPractice = function () { if (tp.practice) { go({ tab: 'practice', prMode: 'practice', prId: tp.practice.id }); window.scrollTo(0, 0); } };
 
     // History: how a belief, framework or practice developed
-    var openHx = function (id) { go({ tab: 'history', hxId: id }); window.scrollTo(0, 0); };
+    var openHx = function (id) { go({ hxId: id, trMenu: false }); setTimeout(function () { var p = document.getElementById('hxd-panel'); if (p) p.scrollTop = 0; var c = document.getElementById('hxd-close'); if (c) try { c.focus({ preventScroll: true }); } catch (err) {} }, 60); };
     var hxKind = ['b', 'fw', 'pr'].indexOf(st.hxKind) >= 0 ? st.hxKind : 'all';
     var hxSel = HISTORY.filter(function (h) { return h.id === st.hxId; })[0] || HISTORY[0];
     var hxRef = function (r) { return { label: r[3], pick: function () { openChap(r[0], r[1], r[2]); window.scrollTo(0, 0); } }; };
@@ -3979,9 +3993,9 @@ class Component extends DCLogic {
         hasLink: !!(hxSel.fw || hxSel.pr || hxSel.kind === 'b'),
         linkLabel: hxSel.fw ? 'Compare this with other views →' : hxSel.pr ? 'See this practice across traditions →' : 'Compare beliefs across traditions →',
         link: function () {
-          if (hxSel.fw) go({ tab: 'compare', cmpMode: 'fw', cmpFam: hxSel.fam, cmpReg: null });
-          else if (hxSel.pr) go({ tab: 'practice', prMode: 'practice', prId: hxSel.pr });
-          else go({ tab: 'compare', cmpMode: 'trad', cmpReg: null });
+          if (hxSel.fw) go({ tab: 'compare', cmpMode: 'fw', cmpFam: hxSel.fam, cmpReg: null, hxId: null });
+          else if (hxSel.pr) go({ tab: 'practice', prMode: 'practice', prId: hxSel.pr, hxId: null });
+          else go({ tab: 'compare', cmpMode: 'trad', cmpReg: null, hxId: null });
           window.scrollTo(0, 0);
         },
         steps: hxSteps.map(function (s, i) {
@@ -4011,10 +4025,10 @@ class Component extends DCLogic {
     var prHide = st.prHide || {};
     var prSrc = function (w) { return w && w[2] ? [{ label: w[2][0], url: w[2][1] }] : []; };
     var pr = {
-      modes: [['compare', 'Compare'], ['practice', 'By practice'], ['trad', 'By tradition']].map(function (m) {
+      modes: [['venn', 'Venn diagram'], ['table', 'Side by side'], ['practice', 'By practice'], ['trad', 'By tradition']].map(function (m) {
         var on = m[0] === prMode;
         return { label: m[1], pressed: on, bg: on ? INK : 'transparent', fg: on ? PAPER : '#4A3F35',
-          pick: function () { if (m[0] === 'compare') go({ tab: 'compare', cmpMode: 'pr', cmpReg: null }); else go({ tab: 'practice', prMode: m[0] }); } };
+          pick: function () { if (m[0] === 'venn' || m[0] === 'table') go({ tab: 'compare', cmpMode: 'pr', cmpView: m[0], cmpReg: null }); else go({ tab: 'practice', prMode: m[0] }); } };
       }),
       isPractice: prMode === 'practice', isTrad: prMode === 'trad',
       practices: PRACTICES.map(function (q) {
@@ -4117,8 +4131,9 @@ class Component extends DCLogic {
       }),
       fams: FW_FAMILIES.map(function (f) {
         var on = f === cmpFam;
-        return { label: f.name, pressed: on, bg: on ? INK : '#FFFDF8', fg: on ? PAPER : INK, pick: function () { go({ cmpFam: f.id, cmpReg: null }); } };
+        return { id: f.id, label: f.name, pressed: on, bg: on ? INK : '#FFFDF8', fg: on ? PAPER : INK, pick: function () { go({ cmpFam: f.id, cmpReg: null }); } };
       }),
+      famId: cmpFam.id, famCount: FW_FAMILIES.length, onFam: function (e) { go({ cmpFam: e.target.value, cmpReg: null }); },
       chips: cItems.map(function (x) {
         var i = cIds.indexOf(x.id), on = i >= 0;
         var lettered = on && !cTable && i < 3;
@@ -4143,7 +4158,8 @@ class Component extends DCLogic {
       },
       showVenn: nSel >= 2 || (cTable && nSel >= 1),
       view: st.cmpView === 'table' ? 'table' : 'venn',
-      views: [['venn', 'Venn diagram'], ['table', 'Side by side']].concat(cmpMode === 'fw' ? [['trads', 'By tradition']] : []).map(function (v) {
+      views: [['venn', 'Venn diagram'], ['table', 'Side by side']].concat(cmpMode === 'fw' ? [['trads', 'By tradition']] : cmpMode === 'pr' ? [['bypr', 'By practice'], ['bytr', 'By tradition']] : []).map(function (v) {
+        if (v[0] === 'bypr' || v[0] === 'bytr') return { label: v[1], pressed: false, bg: 'transparent', fg: '#4A3F35', pick: function () { go({ tab: 'practice', prMode: v[0] === 'bypr' ? 'practice' : 'trad', cmpReg: null }); } };
         var curV = st.cmpView === 'table' ? 'table' : (st.cmpView === 'trads' && cmpMode === 'fw') ? 'trads' : 'venn';
         var on = curV === v[0];
         return { label: v[1], pressed: on, bg: on ? INK : 'transparent', fg: on ? PAPER : '#4A3F35', pick: function () { go({ cmpView: v[0] }); } };
@@ -4160,7 +4176,9 @@ class Component extends DCLogic {
       sections: regionKeys.filter(function (k) { return (!cReg || k === cReg) && (byRegion[k] || []).length; }).map(function (k) {
         var dots = k.split('').map(function (l) { return { color: cSel[LET.indexOf(l)].color }; });
         var shared = k.length === nSel && nSel > 1;
+        var oSt = (st.cmpOpen || {})[k], open = cReg ? true : oSt != null ? !!oSt : shared;
         return { title: regName(k), dots: dots, count: byRegion[k].length, bg: shared ? '#EEF3EC' : k.length > 1 ? '#F5EFE3' : '#FFFDF8',
+          open: open, chev: open ? 180 : 0, toggle: function () { var o = {}; Object.keys(st.cmpOpen || {}).forEach(function (x) { o[x] = st.cmpOpen[x]; }); o[k] = !open; go({ cmpOpen: o }); },
           items: byRegion[k].map(function (p) { return { topic: p.topic, hasTopic: !!p.topic, text: p.text }; }) };
       }),
       tblHead: cSel.map(function (x) { return { name: x.name, color: x.color }; }),
@@ -4221,6 +4239,34 @@ class Component extends DCLogic {
     };
     cmp.showVennView = nSel >= 2 && cmp.view === 'venn';
     cmp.showTableView = cmp.showVenn && cmp.view === 'table' && !showTrads;
+    var trKind = tab === 'practice' || cmpMode === 'pr' ? 'pr' : cmpMode === 'fw' ? 'fw' : 'b';
+    var trItems = [];
+    if (tab === 'compare' && cmp.showVennView) trItems.push({ label: 'Download these overlap lists (CSV)', pick: function () { go({ trMenu: false }); cmp.exportLists(); } });
+    if (tab === 'compare' && cmp.showTableView) trItems.push({ label: 'Download this side-by-side table (CSV)', pick: function () { go({ trMenu: false }); cmp.exportTable(); } });
+    if (tab === 'compare' && showTrads) trItems.push({ label: 'Download this tradition chart (CSV)', pick: function () { go({ trMenu: false }); cmp.exportTrads(); } });
+    if (trKind === 'pr') trItems.push({ label: 'Download all practices (CSV)', pick: function () { go({ trMenu: false }); pr.exportAll(); } });
+    trItems.push({ label: 'Download all history timelines (CSV)', pick: function () { go({ trMenu: false }); hx.exportAll(); } });
+    var trMenu = { open: !!st.trMenu, toggle: function () { go({ trMenu: !st.trMenu }); }, items: trItems };
+    var hxName = function (id) { var h = HISTORY.filter(function (x) { return x.id === id; })[0]; return h ? { id: h.id, name: h.name } : null; };
+    var hxGroupsFor = function (kind) {
+      var used = {}, out = (HX_GROUPS[kind] || []).map(function (g) { var items = g[1].map(hxName).filter(Boolean); items.forEach(function (x) { used[x.id] = 1; }); return { label: g[0], items: items }; });
+      var rest = HISTORY.filter(function (h) { return h.kind === kind && !used[h.id]; }).map(function (h) { return { id: h.id, name: h.name }; });
+      if (rest.length) out.push({ label: 'More', items: rest });
+      return out.filter(function (g) { return g.items.length; });
+    };
+    var hxsN = HISTORY.filter(function (h) { return h.kind === trKind; }).length;
+    var hxs = { selId: 'hx-pick-' + trKind, groups: hxGroupsFor(trKind),
+      placeholder: 'Choose a ' + (trKind === 'b' ? 'belief' : trKind === 'fw' ? 'framework' : 'practice') + '…',
+      hint: hxsN + ' topics: where each began, who shaped it, and the Scripture behind it.',
+      onPick: function (e) { var v = e.target.value; if (v) openHx(v); } };
+    var hxClose = function () { go({ hxId: null }); };
+    var hxd = { open: !!st.hxId && (tab === 'compare' || tab === 'practice'), id: hxSel.id, close: hxClose,
+      onKey: function (e) { if (e.key === 'Escape') hxClose(); },
+      onPick: function (e) { openHx(e.target.value); },
+      groups: [['b', 'Beliefs'], ['fw', 'Frameworks'], ['pr', 'Practices']].map(function (k) { return { label: k[1], items: HISTORY.filter(function (h) { return h.kind === k[0]; }).map(function (h) { return { id: h.id, name: h.name }; }) }; }),
+      nViews: (hxSel.views || []).length, nSteps: hxSel.steps.length, nPeople: hxSel.people.length,
+      hasLink: hx.sel.hasLink && !(hxSel.fw ? (tab === 'compare' && cmpMode === 'fw' && (st.cmpFam || '') === (hxSel.fam || '')) : hxSel.pr ? (tab === 'practice' && prMode === 'practice' && prSel.id === hxSel.pr) : (tab === 'compare' && cmpMode === 'trad')) };
+
     var phoneScreen = this.isPhoneScreen();
     var shareInfo = function () {
       var params = [], title = 'Explore Your Bible';
@@ -4256,7 +4302,7 @@ class Component extends DCLogic {
     var canBack = (this._histDepth || 0) > 0;
     return {
       nav: { canBack: canBack, back: function () { self.histBack(); } },
-      storyViews: storyViews, tradViews: tradViews,
+      storyViews: storyViews, tradViews: tradViews, trMenu: trMenu, hxs: hxs, hxd: hxd,
       focusToggle: function (e) { self.focusToggle(e); },
       areaSpeak: function (e) { self.areaSpeak(e); },
       canSpeak: self.ttsSupported(),
@@ -4881,19 +4927,27 @@ ${(V.tl.detail.hasRead) ? html`
 
 ${(V.isPractice) ? html`
 <section style="display: flex; flex-direction: column; gap: 18px">
-<div class="be-seg" role="group" aria-label="Traditions view" style="display: flex; flex-wrap: wrap; gap: 4px; background: #EAE1D0; padding: 4px; border-radius: 999px; align-self: flex-start">${(V.tradViews || []).map((v, $index) => html`<button type="button" onClick=${v.pick} aria-pressed=${v.pressed} style="border: none; cursor: pointer; padding: 8px 18px; min-height: 44px; border-radius: 999px; font-size: 14px; font-weight: 700; background: ${v.bg}; color: ${v.fg}">${v.label}</button>`)}</div>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 10px"><div class="be-seg" role="group" aria-label="Traditions view" style="display: flex; flex-wrap: wrap; gap: 4px; background: #EAE1D0; padding: 4px; border-radius: 999px; min-width: 0">${(V.tradViews || []).map((v, $index) => html`<button type="button" onClick=${v.pick} aria-pressed=${v.pressed} style="border: none; cursor: pointer; padding: 8px 18px; min-height: 44px; border-radius: 999px; font-size: 14px; font-weight: 700; background: ${v.bg}; color: ${v.fg}">${v.label}</button>`)}</div><div style="position: relative; flex: none"><button type="button" onClick=${V.trMenu.toggle} aria-expanded=${V.trMenu.open} aria-haspopup="menu" aria-label="More options" title="More options" style="cursor: pointer; width: 44px; height: 44px; border-radius: 50%; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; display: inline-flex; align-items: center; justify-content: center; padding: 0"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="19" cy="12" r="2"></circle></svg></button>
+${(V.trMenu.open) ? html`<div role="menu" style="position: absolute; right: 0; top: 50px; z-index: 45; background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 12px; box-shadow: 0 8px 24px rgba(35,30,25,0.18); padding: 6px; width: 280px; display: flex; flex-direction: column">${(V.trMenu.items || []).map((mi, $index) => html`<button type="button" role="menuitem" onClick=${mi.pick} style="cursor: pointer; text-align: left; border: none; background: transparent; border-radius: 8px; padding: 10px 12px; min-height: 44px; font-size: 14px; font-weight: 600; color: #231E19; display: flex; align-items: center; gap: 8px"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12"></path><path d="M7 11l5 5 5-5"></path><path d="M5 20h14"></path></svg>${mi.label}</button>`)}</div>` : null}</div></div>
 <div>
 <div style="font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #7A3B1E">Traditions · Practice</div>
 <h1 style="margin: 4px 0 8px; font-family: Fraunces, Georgia, serif; font-size: 36px; line-height: 1.1">Living it out, day to day</h1>
 <p style="margin: 0 0 8px; color: #4A3F35; max-width: 800px">Beliefs shape a way of life. Here are twelve everyday practices, each with its basis in Scripture, the ground Christians share, and how each tradition typically lives it, drawing on Scripture and, for Catholic and Orthodox Christians, the Church’s Tradition. Each one ends with a small step to try this week.</p>
 <p style="margin: 0; font-size: 13px; color: #6B5F52; max-width: 800px">Every tradition teaches that these practices respond to God’s grace rather than earn it, though they explain that link differently (see Beliefs). Descriptions follow each tradition’s official teaching or common practice; individual churches vary.</p>
 </div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; background: #F5EFE3; border: 1px solid #E2D8C6; border-radius: 14px; padding: 10px 12px">
+<label for=${V.hxs.selId} style="display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: #231E19"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7A3B1E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>How it developed</label>
+<select id=${V.hxs.selId} value="" onChange=${V.hxs.onPick} style="flex: 1 1 220px; min-width: 0; width: 100%; max-width: 420px; min-height: 44px; border-radius: 10px; border: 1px solid #D9CDB8; background: #FFFFFF; padding: 0 10px; font-size: 15px; color: #231E19">
+<option value="">${V.hxs.placeholder}</option>
+${(V.hxs.groups || []).map((g, $index) => html`<optgroup label=${g.label}>${(g.items || []).map((o, $index) => html`<option value=${o.id}>${o.name}</option>`)}</optgroup>`)}
+</select>
+<span style="font-size: 13px; color: #6B5F52; flex: 1 1 200px">${V.hxs.hint}</span>
+</div>
 <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px">
 <div class="be-seg" role="group" aria-label="View" style="display: flex; gap: 4px; background: #EAE1D0; padding: 4px; border-radius: 999px">
 ${(V.pr.modes || []).map((m, $index) => html`<button type="button" onClick=${m.pick} aria-pressed=${m.pressed} style="border: none; cursor: pointer; padding: 8px 16px; min-height: 44px; border-radius: 999px; font-size: 14px; font-weight: 700; background: ${m.bg}; color: ${m.fg}">${m.label}</button>`)}
 </div>
 
-<button type="button" onClick=${V.pr.exportAll} style="cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; border-radius: 999px; padding: 8px 14px; min-height: 40px; font-size: 13px; font-weight: 700"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M5 21h14"></path></svg>Export all as CSV</button>
 </div>
 ${(V.pr.isPractice) ? html`
 <div>
@@ -4949,109 +5003,33 @@ ${(r.hasSrc) ? html`<div style="font-size: 13px">${(r.src || []).map((q, $index)
 <div style="font-size: 12px; color: #6B5F52; max-width: 820px">Summaries are written for this app from each tradition’s catechisms, prayer books and confessions, linked where used. Practice varies by country, parish and family; for guidance, talk with a pastor or priest in your own tradition.</div>
 </section>
 ` : null}
-${(V.isHistory) ? html`
-<section style="display: flex; flex-direction: column; gap: 18px">
-<div class="be-seg" role="group" aria-label="Traditions view" style="display: flex; flex-wrap: wrap; gap: 4px; background: #EAE1D0; padding: 4px; border-radius: 999px; align-self: flex-start">${(V.tradViews || []).map((v, $index) => html`<button type="button" onClick=${v.pick} aria-pressed=${v.pressed} style="border: none; cursor: pointer; padding: 8px 18px; min-height: 44px; border-radius: 999px; font-size: 14px; font-weight: 700; background: ${v.bg}; color: ${v.fg}">${v.label}</button>`)}</div>
-<div>
-<div style="font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #7A3B1E">Traditions · History</div>
-<h1 style="margin: 4px 0 8px; font-family: Fraunces, Georgia, serif; font-size: 36px; line-height: 1.1">How it developed</h1>
-<p style="margin: 0; color: #4A3F35; max-width: 800px">Some of what Christians believe and do is spelled out in Scripture; some grew over centuries through councils, teachers and devotion. Pick a belief, framework or practice to see where it started, who shaped it, and the Bible passages behind it.</p>
-</div>
-<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px">
-<div class="be-seg" role="group" aria-label="Show" style="display: flex; flex-wrap: wrap; gap: 4px; background: #EAE1D0; padding: 4px; border-radius: 999px">
-${(V.hx.kinds || []).map((m, $index) => html`<button type="button" onClick=${m.pick} aria-pressed=${m.pressed} style="border: none; cursor: pointer; padding: 8px 16px; min-height: 44px; border-radius: 999px; font-size: 14px; font-weight: 700; background: ${m.bg}; color: ${m.fg}">${m.label}</button>`)}
-</div>
-<button type="button" onClick=${V.hx.exportAll} style="cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; border-radius: 999px; padding: 8px 14px; min-height: 40px; font-size: 13px; font-weight: 700"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M5 21h14"></path></svg>Export all timelines (CSV)</button>
-</div>
-<div>
-<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52; margin-bottom: 8px">Topic</div>
-<div role="group" aria-label="Topic" style="display: flex; flex-wrap: wrap; gap: 6px">
-${(V.hx.list || []).map((q, $index) => html`<button type="button" onClick=${q.pick} aria-pressed=${q.pressed} style="cursor: pointer; border: 1px solid #D9CDB8; border-radius: 999px; padding: 6px 12px; min-height: 38px; font-size: 13px; font-weight: 600; background: ${q.bg}; color: ${q.fg}">${q.label}</button>`)}
-</div>
-</div>
-<article id="hx-top" data-focus="card" style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 18px; padding: 22px 24px; display: flex; flex-direction: column; gap: 14px"><button type="button" class="be-fbtn" onClick=${V.focusToggle} aria-label="Focus mode: show this section full screen" title="Focus mode (full screen)"><svg class="be-fi-in" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg><svg class="be-fi-out" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"></path><path d="M15 4v5h5"></path><path d="M9 20v-5H4"></path><path d="M15 20v-5h5"></path></svg></button>
-<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding-right: 80px">
-<span style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52">${V.hx.sel.kindLabel}</span>
-<span style="font-size: 12px; font-weight: 700; border-radius: 999px; padding: 3px 10px; background: ${V.hx.sel.basisBg}; color: ${V.hx.sel.basisFg}">${V.hx.sel.basisLabel}</span>
-</div>
-<h2 style="margin: -4px 0 0; font-family: Fraunces, Georgia, serif; font-size: 30px; line-height: 1.15">${V.hx.sel.name}</h2>
-<p style="margin: 0; font-size: 17px; line-height: 1.6; color: #231E19; max-width: 840px; font-weight: 500">${V.hx.sel.sum}</p>
-${(V.hx.sel.hasMore) ? html`<div style="display: flex; flex-direction: column; gap: 12px; max-width: 840px">${(V.hx.sel.more || []).map((mp, $index) => html`<p style="margin: 0; font-size: 16px; line-height: 1.65; color: #31291F">${mp.text}</p>`)}</div>` : null}
-<div style="background: #F5EFE3; border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px">
-<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52">Scripture or tradition?</div>
-<p style="margin: 0; font-size: 15px; line-height: 1.55; color: #31291F; max-width: 820px">${V.hx.sel.note}</p>
-<div style="display: flex; flex-wrap: wrap; gap: 6px">${(V.hx.sel.refs || []).map((r, $index) => html`<button type="button" onClick=${r.pick} title="Read this passage" style="cursor: pointer; border: 1px solid #D9CDB8; background: #FFFDF8; color: #7A3B1E; border-radius: 999px; padding: 6px 12px; min-height: 36px; font-size: 13px; font-weight: 700">${r.label}</button>`)}</div>
-</div>
-${(V.hx.sel.hasViews) ? html`<div style="display: flex; flex-direction: column; gap: 10px">
-<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52">How the traditions see it</div>
-${(V.hx.sel.views || []).map((v, $index) => html`<div style="border: 1px solid #E2D8C6; border-radius: 12px; padding: 10px 12px; background: #FFFDF8; display: flex; flex-direction: column; gap: 4px; max-width: 840px"><div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap"><span aria-hidden="true" style="display: inline-flex; gap: 3px">${(v.dots || []).map((dt, $index) => html`<span style="width: 10px; height: 10px; border-radius: 50%; background: ${dt.color}"></span>`)}</span><span style="font-size: 14px; font-weight: 700; color: #231E19">${v.label}</span></div><p style="margin: 0; font-size: 15px; line-height: 1.55; color: #31291F">${v.text}</p></div>`)}
-</div>` : null}
-<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px">
-<span style="font-size: 13px; font-weight: 700; color: #4A3F35; margin-right: 4px">${V.hx.sel.heldLabel}</span>
-${(V.hx.sel.trads || []).map((t, $index) => html`<span style="font-size: 12px; font-weight: 700; border-radius: 999px; padding: 3px 9px; background: ${t.color}; color: #FFFFFF">${t.label}</span>`)}
-</div>
-${(V.hx.sel.hasLink) ? html`<button type="button" onClick=${V.hx.sel.link} style="align-self: flex-start; cursor: pointer; border: 1px solid #231E19; background: #FFFDF8; color: #231E19; border-radius: 999px; padding: 6px 14px; min-height: 38px; font-size: 13px; font-weight: 700">${V.hx.sel.linkLabel}</button>` : null}
-</article>
-<div style="display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: #4A3F35" aria-label="Timeline key">
-${(V.hx.legend || []).map((g, $index) => html`<span style="display: inline-flex; align-items: center; gap: 6px"><span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 50%; background: ${g.color}"></span>${g.label}</span>`)}
-</div>
-<div data-focus="card" style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 18px; padding: 22px 20px 6px"><button type="button" class="be-fbtn" onClick=${V.focusToggle} aria-label="Focus mode: show this section full screen" title="Focus mode (full screen)"><svg class="be-fi-in" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg><svg class="be-fi-out" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"></path><path d="M15 4v5h5"></path><path d="M9 20v-5H4"></path><path d="M15 20v-5h5"></path></svg></button>
-<h2 style="margin: 0 0 16px; font-family: Fraunces, Georgia, serif; font-size: 22px; padding-right: 80px">Timeline</h2>
-<ol style="list-style: none; margin: 0; padding: 0">
-${(V.hx.sel.steps || []).map((s, $index) => html`
-<li style="display: grid; grid-template-columns: minmax(78px, 132px) 24px minmax(0, 1fr); column-gap: 10px">
-<div style="text-align: right; padding-top: 2px; font-size: 13px; font-weight: 800; line-height: 1.3; color: #231E19">${s.when}</div>
-<div aria-hidden="true" style="position: relative">
-<div style="position: absolute; left: 11px; top: ${s.lineTop}; bottom: 0; width: 2px; background: #E2D8C6"></div>
-<div style="position: relative; margin: 3px 0 0 4px; width: 12px; height: 12px; border-radius: 50%; background: ${s.color}; box-shadow: 0 0 0 3px #FFFDF8, 0 0 0 5px ${s.color}"></div>
-</div>
-<div style="padding: 0 0 22px; display: flex; flex-direction: column; gap: 5px; min-width: 0">
-<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px"><span style="font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52">${s.kindLabel}</span>${(s.hasTrad) ? html`<span style="font-size: 11px; font-weight: 700; border-radius: 999px; padding: 2px 8px; border: 1.5px solid ${s.tradColor}; color: ${s.tradColor}">${s.tradLabel}</span>` : null}</div>
-<h3 style="margin: 0; font-family: Fraunces, Georgia, serif; font-size: 18px; line-height: 1.25">${s.title}</h3>
-<p style="margin: 0; font-size: 15px; line-height: 1.55; color: #31291F; max-width: 760px">${s.text}</p>
-${(s.hasRefs) ? html`<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px">${(s.refs || []).map((r, $index) => html`<button type="button" onClick=${r.pick} title="Read this passage" style="cursor: pointer; border: 1px solid #D9CDB8; background: #F5EFE3; color: #7A3B1E; border-radius: 999px; padding: 4px 10px; min-height: 32px; font-size: 12px; font-weight: 700">${r.label}</button>`)}</div>` : null}
-</div>
-</li>
-`)}
-</ol>
-</div>
-<div>
-<h2 style="margin: 0 0 10px; font-family: Fraunces, Georgia, serif; font-size: 22px">Key people</h2>
-<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px">
-${(V.hx.sel.people || []).map((p, $index) => html`
-<div style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px">
-<div style="font-family: Fraunces, Georgia, serif; font-size: 16px; font-weight: 700; color: #231E19">${p.name}</div>
-<div style="font-size: 13px; color: #6B5F52">${p.dates}</div>
-${(p.hasRole) ? html`<div style="font-size: 14px; line-height: 1.45; color: #31291F">${p.role}</div>` : null}
-</div>
-`)}
-</div>
-</div>
-<div style="font-size: 13px">Read more: ${(V.hx.sel.src || []).map((q, $index) => html`<a href=${q.url} target="_blank" rel="noopener noreferrer" title="Opens in a new tab" style="color: #2E4A8A; font-weight: 600; margin-right: 10px">${q.label} ↗</a>`)}</div>
-<div style="font-size: 12px; color: #6B5F52; max-width: 820px">Dates before about AD 400 are often approximate, and some events (marked “traditional”) are handed down by tradition rather than recorded at the time. Summaries are written for this app; each tradition tells parts of this story in its own way.</div>
-</section>
-` : null}
 ${(V.isCompare) ? html`
 <section style="display: flex; flex-direction: column; gap: 18px">
-<div class="be-seg" role="group" aria-label="Traditions view" style="display: flex; flex-wrap: wrap; gap: 4px; background: #EAE1D0; padding: 4px; border-radius: 999px; align-self: flex-start">${(V.tradViews || []).map((v, $index) => html`<button type="button" onClick=${v.pick} aria-pressed=${v.pressed} style="border: none; cursor: pointer; padding: 8px 18px; min-height: 44px; border-radius: 999px; font-size: 14px; font-weight: 700; background: ${v.bg}; color: ${v.fg}">${v.label}</button>`)}</div>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 10px"><div class="be-seg" role="group" aria-label="Traditions view" style="display: flex; flex-wrap: wrap; gap: 4px; background: #EAE1D0; padding: 4px; border-radius: 999px; min-width: 0">${(V.tradViews || []).map((v, $index) => html`<button type="button" onClick=${v.pick} aria-pressed=${v.pressed} style="border: none; cursor: pointer; padding: 8px 18px; min-height: 44px; border-radius: 999px; font-size: 14px; font-weight: 700; background: ${v.bg}; color: ${v.fg}">${v.label}</button>`)}</div><div style="position: relative; flex: none"><button type="button" onClick=${V.trMenu.toggle} aria-expanded=${V.trMenu.open} aria-haspopup="menu" aria-label="More options" title="More options" style="cursor: pointer; width: 44px; height: 44px; border-radius: 50%; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; display: inline-flex; align-items: center; justify-content: center; padding: 0"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="19" cy="12" r="2"></circle></svg></button>
+${(V.trMenu.open) ? html`<div role="menu" style="position: absolute; right: 0; top: 50px; z-index: 45; background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 12px; box-shadow: 0 8px 24px rgba(35,30,25,0.18); padding: 6px; width: 280px; display: flex; flex-direction: column">${(V.trMenu.items || []).map((mi, $index) => html`<button type="button" role="menuitem" onClick=${mi.pick} style="cursor: pointer; text-align: left; border: none; background: transparent; border-radius: 8px; padding: 10px 12px; min-height: 44px; font-size: 14px; font-weight: 600; color: #231E19; display: flex; align-items: center; gap: 8px"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12"></path><path d="M7 11l5 5 5-5"></path><path d="M5 20h14"></path></svg>${mi.label}</button>`)}</div>` : null}</div></div>
 <div>
 <div style="font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #7A3B1E">${V.cmp.eyebrow}</div>
 <h1 style="margin: 4px 0 8px; font-family: Fraunces, Georgia, serif; font-size: 36px; line-height: 1.1">${V.cmp.h1}</h1>
 <p style="margin: 0; color: #4A3F35; max-width: 780px">${V.cmp.intro}</p>
 </div>
-${(V.cmp.isPr) ? html`
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; background: #F5EFE3; border: 1px solid #E2D8C6; border-radius: 14px; padding: 10px 12px">
+<label for=${V.hxs.selId} style="display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: #231E19"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7A3B1E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>How it developed</label>
+<select id=${V.hxs.selId} value="" onChange=${V.hxs.onPick} style="flex: 1 1 220px; min-width: 0; width: 100%; max-width: 420px; min-height: 44px; border-radius: 10px; border: 1px solid #D9CDB8; background: #FFFFFF; padding: 0 10px; font-size: 15px; color: #231E19">
+<option value="">${V.hxs.placeholder}</option>
+${(V.hxs.groups || []).map((g, $index) => html`<optgroup label=${g.label}>${(g.items || []).map((o, $index) => html`<option value=${o.id}>${o.name}</option>`)}</optgroup>`)}
+</select>
+<span style="font-size: 13px; color: #6B5F52; flex: 1 1 200px">${V.hxs.hint}</span>
+</div>
 <div class="be-seg" role="group" aria-label="View" style="display: flex; gap: 4px; background: #EAE1D0; padding: 4px; border-radius: 999px; align-self: flex-start">
-${(V.cmp.prModes || []).map((m, $index) => html`<button type="button" onClick=${m.pick} aria-pressed=${m.pressed} style="border: none; cursor: pointer; padding: 8px 16px; min-height: 44px; border-radius: 999px; font-size: 14px; font-weight: 700; background: ${m.bg}; color: ${m.fg}">${m.label}</button>`)}
+${(V.cmp.views || []).map((v, $index) => html`<button type="button" onClick=${v.pick} aria-pressed=${v.pressed} style="border: none; cursor: pointer; padding: 8px 16px; min-height: 44px; border-radius: 999px; font-size: 14px; font-weight: 700; background: ${v.bg}; color: ${v.fg}">${v.label}</button>`)}
 </div>
-` : null}
 ${(V.cmp.isFw) ? html`
-<div>
-<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52; margin-bottom: 8px">Topic</div>
-<div role="group" aria-label="Topic" style="display: flex; flex-wrap: wrap; gap: 6px">
-${(V.cmp.fams || []).map((f, $index) => html`
-<button type="button" onClick=${f.pick} aria-pressed=${f.pressed} style="cursor: pointer; border: 1px solid #D9CDB8; border-radius: 999px; padding: 6px 12px; min-height: 38px; font-size: 13px; font-weight: 600; background: ${f.bg}; color: ${f.fg}">${f.label}</button>
-`)}
-</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<label for="fw-topic" style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52">Topic</label>
+<select id="fw-topic" value=${V.cmp.famId} onChange=${V.cmp.onFam} style="width: 100%; max-width: 480px; min-height: 48px; border-radius: 10px; border: 1px solid #D9CDB8; background: #FFFFFF; padding: 0 12px; font-size: 16px; font-weight: 600; color: #231E19">
+${(V.cmp.fams || []).map((f, $index) => html`<option value=${f.id}>${f.label}</option>`)}
+</select>
+<div style="font-size: 13px; color: #6B5F52">${V.cmp.famCount} topics. Each one lays out the main views Christians hold.</div>
 </div>
 ` : null}
 ${(V.cmp.showPicker) ? html`
@@ -5063,13 +5041,6 @@ ${(V.cmp.chips || []).map((c, $index) => html`
 `)}
 </div>
 <div style="font-size: 13px; color: #6B5F52; margin-top: 8px">${V.cmp.hint}</div>
-</div>
-` : null}
-${(V.cmp.showVenn) ? html`
-<div class="be-seg" role="group" aria-label="View" style="display: flex; gap: 4px; background: #EAE1D0; padding: 4px; border-radius: 999px; align-self: flex-start">
-${(V.cmp.views || []).map((v, $index) => html`
-<button type="button" onClick=${v.pick} aria-pressed=${v.pressed} style="border: none; cursor: pointer; padding: 6px 14px; min-height: 38px; border-radius: 999px; font-size: 13px; font-weight: 700; background: ${v.bg}; color: ${v.fg}">${v.label}</button>
-`)}
 </div>
 ` : null}
 ${(V.cmp.showVennView) ? html`
@@ -5089,25 +5060,23 @@ ${(V.cmp.counts || []).map((k, $index) => html`
 </div>
 <div style="text-align: center; font-size: 13px; color: #6B5F52; margin-top: 6px">Numbers show how many beliefs or practices fall in each part of the diagram.</div>
 </div>
-<button type="button" onClick=${V.cmp.exportLists} style="align-self: flex-start; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; border-radius: 999px; padding: 6px 14px; min-height: 38px; font-size: 13px; font-weight: 700"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"></path><path d="M7.5 10.5L12 15l4.5-4.5"></path><path d="M5 19h14"></path></svg>Export overlaps (CSV)</button>
 ${(V.cmp.regFilter) ? html`
 <div style="display: flex; align-items: center; gap: 10px; font-size: 14px"><span>Showing: <strong>${V.cmp.regLabel}</strong></span><button type="button" onClick=${V.cmp.clearReg} style="cursor: pointer; border: 1px solid #D9CDB8; background: #FFFDF8; border-radius: 999px; padding: 4px 12px; min-height: 34px; font-size: 13px; font-weight: 600">Show all</button></div>
 ` : null}
 <div style="display: flex; flex-direction: column; gap: 12px">
 ${(V.cmp.sections || []).map((sec, $index) => html`
 <div style="border: 1px solid #E2D8C6; border-radius: 14px; padding: 14px 16px; background: ${sec.bg}">
-<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px"><span style="display: inline-flex; gap: 3px">${(sec.dots || []).map((d, $index) => html`<span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 50%; background: ${d.color}"></span>`)}</span><h2 style="margin: 0; font-family: Fraunces, Georgia, serif; font-size: 19px">${sec.title}</h2><span style="font-size: 13px; color: #6B5F52">${sec.count}</span></div>
-<ul style="margin: 0; padding: 0 0 0 18px; display: flex; flex-direction: column; gap: 5px">
+<button type="button" onClick=${sec.toggle} aria-expanded=${sec.open} style="cursor: pointer; width: 100%; border: none; background: transparent; padding: 0; min-height: 36px; display: flex; align-items: center; gap: 8px; text-align: left; color: #231E19"><span style="display: inline-flex; gap: 3px">${(sec.dots || []).map((d, $index) => html`<span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 50%; background: ${d.color}"></span>`)}</span><h2 style="margin: 0; font-family: Fraunces, Georgia, serif; font-size: 19px">${sec.title}</h2><span style="font-size: 13px; color: #6B5F52; flex: 1 1 auto">${sec.count}</span><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex: none; transform: rotate(${sec.chev}deg); transition: transform 0.2s ease"><path d="M6 9l6 6 6-6"></path></svg></button>
+${(sec.open) ? html`<ul style="margin: 0; padding: 0 0 0 18px; margin-top: 8px; display: flex; flex-direction: column; gap: 5px">
 ${(sec.items || []).map((it, $index) => html`
 <li style="font-size: 15px; line-height: 1.5; color: #31291F">${(it.hasTopic) ? html`<span style="font-weight: 700; color: #6B5F52">${it.topic}: </span>` : null}${it.text}${(it.hasHx) ? html` <button type="button" onClick=${it.hxPick} style="cursor: pointer; border: none; background: transparent; padding: 0 2px; color: #2E4A8A; font-weight: 700; font-size: 13px; text-decoration: underline">How it developed →</button>` : null}</li>
 `)}
-</ul>
+</ul>` : null}
 </div>
 `)}
 </div>
 ` : null}
 ${(V.cmp.showTableView) ? html`
-<button type="button" onClick=${V.cmp.exportTable} style="align-self: flex-start; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; border-radius: 999px; padding: 6px 14px; min-height: 38px; font-size: 13px; font-weight: 700"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"></path><path d="M7.5 10.5L12 15l4.5-4.5"></path><path d="M5 19h14"></path></svg>Export table (CSV)</button>
 <div data-focus="card" style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: 48px 6px 6px; overflow-x: auto"><button type="button" class="be-fbtn" onClick=${V.focusToggle} aria-label="Focus mode: show this section full screen" title="Focus mode (full screen)"><svg class="be-fi-in" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg><svg class="be-fi-out" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"></path><path d="M15 4v5h5"></path><path d="M9 20v-5H4"></path><path d="M15 20v-5h5"></path></svg></button><button type="button" class="be-sbtn" onClick=${V.areaSpeak} aria-label="Read this section aloud (press again to stop)" title="Read this section aloud"><svg class="be-si-play" aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg><svg class="be-si-stop" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"></rect></svg></button>
 <table style="width: 100%; border-collapse: collapse; min-width: 560px; font-size: 14px">
 <thead><tr><th style="text-align: left; padding: 10px; width: 22%"></th>
@@ -5125,7 +5094,6 @@ ${(r.cells || []).map((c, $index) => html`<td style="vertical-align: top; paddin
 ` : null}
 ${(V.cmp.showTradsView) ? html`
 <div style="font-size: 14px; color: #31291F; max-width: 780px">Where each view in <strong>${V.cmp.famName}</strong> is found. This is a loose association: a <strong>filled dot</strong> marks the official or majority view of a tradition; a <strong>dashed ring</strong> means it is found in some churches or among many members. Individual congregations and believers vary.</div>
-<button type="button" onClick=${V.cmp.exportTrads} style="align-self: flex-start; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; border-radius: 999px; padding: 6px 14px; min-height: 38px; font-size: 13px; font-weight: 700">Export (CSV)</button>
 <div data-focus="card" style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: 48px 6px 6px; overflow-x: auto"><button type="button" class="be-fbtn" onClick=${V.focusToggle} aria-label="Focus mode: show this section full screen" title="Focus mode (full screen)"><svg class="be-fi-in" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg><svg class="be-fi-out" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"></path><path d="M15 4v5h5"></path><path d="M9 20v-5H4"></path><path d="M15 20v-5h5"></path></svg></button><button type="button" class="be-sbtn" onClick=${V.areaSpeak} aria-label="Read this section aloud (press again to stop)" title="Read this section aloud"><svg class="be-si-play" aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg><svg class="be-si-stop" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"></rect></svg></button>
 <table style="width: 100%; border-collapse: collapse; min-width: 760px; font-size: 13px">
 <thead><tr><th style="text-align: left; padding: 8px"></th>
@@ -5166,6 +5134,59 @@ ${(c.canLive) ? html`<button type="button" onClick=${c.live} style="align-self: 
 </section>
 ` : null}
 
+${(V.hxd.open) ? html`
+<div class="be-hxd" role="dialog" aria-modal="true" aria-labelledby="hxd-title" onKeyDown=${V.hxd.onKey} style="position: fixed; inset: 0; z-index: 200; display: flex; justify-content: flex-end; align-items: stretch">
+<div onClick=${V.hxd.close} aria-hidden="true" style="position: absolute; inset: 0; background: rgba(35,30,25,0.38)"></div>
+<div id="hxd-panel" class="be-hxd-panel" data-noread="1" style="position: relative; width: min(620px, 100%); height: 100%; background: #FBF7EF; overflow-y: auto; overscroll-behavior: contain; box-shadow: -8px 0 30px rgba(0,0,0,0.22); display: flex; flex-direction: column">
+<div style="position: sticky; top: 0; z-index: 2; background: #FBF7EF; border-bottom: 1px solid #E2D8C6; padding: 10px 14px; display: flex; align-items: center; gap: 10px">
+<label for="hxd-pick" class="sr">Topic</label>
+<select id="hxd-pick" value=${V.hxd.id} onChange=${V.hxd.onPick} style="flex: 1 1 auto; min-width: 0; min-height: 44px; border-radius: 10px; border: 1px solid #D9CDB8; background: #FFFFFF; padding: 0 10px; font-size: 15px; color: #231E19">
+${(V.hxd.groups || []).map((g, $index) => html`<optgroup label=${g.label}>${(g.items || []).map((o, $index) => html`<option value=${o.id}>${o.name}</option>`)}</optgroup>`)}
+</select>
+<button type="button" id="hxd-close" onClick=${V.hxd.close} aria-label="Close" title="Close (Esc)" style="flex: none; cursor: pointer; width: 44px; height: 44px; border-radius: 50%; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; display: inline-flex; align-items: center; justify-content: center; padding: 0"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+</div>
+<div style="padding: 18px 20px 28px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px">
+<span style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #7A3B1E">How it developed · ${V.hx.sel.kindLabel}</span>
+<span style="font-size: 12px; font-weight: 700; border-radius: 999px; padding: 3px 10px; background: ${V.hx.sel.basisBg}; color: ${V.hx.sel.basisFg}">${V.hx.sel.basisLabel}</span>
+</div>
+<h2 id="hxd-title" style="margin: -4px 0 0; font-family: Fraunces, Georgia, serif; font-size: 28px; line-height: 1.15">${V.hx.sel.name}</h2>
+<p style="margin: 0; font-size: 17px; line-height: 1.6; color: #231E19; font-weight: 500">${V.hx.sel.sum}</p>
+<div style="background: #F5EFE3; border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px">
+<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52">Scripture or tradition?</div>
+<p style="margin: 0; font-size: 15px; line-height: 1.55; color: #31291F">${V.hx.sel.note}</p>
+<div style="display: flex; flex-wrap: wrap; gap: 6px">${(V.hx.sel.refs || []).map((r, $index) => html`<button type="button" onClick=${r.pick} title="Read this passage" style="cursor: pointer; border: 1px solid #D9CDB8; background: #FFFDF8; color: #7A3B1E; border-radius: 999px; padding: 6px 12px; min-height: 36px; font-size: 13px; font-weight: 700">${r.label}</button>`)}</div>
+</div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px">
+<span style="font-size: 13px; font-weight: 700; color: #4A3F35; margin-right: 4px">${V.hx.sel.heldLabel}</span>
+${(V.hx.sel.trads || []).map((t, $index) => html`<span style="font-size: 12px; font-weight: 700; border-radius: 999px; padding: 3px 9px; background: ${t.color}; color: #FFFFFF">${t.label}</span>`)}
+</div>
+<div>
+${(V.hx.sel.hasMore) ? html`<details class="be-det" style="border-top: 1px solid #E2D8C6; padding: 4px 0"><summary style="display: flex; align-items: center; gap: 8px; min-height: 48px; font-size: 15px; font-weight: 700; color: #231E19"><span style="flex: 1 1 auto">The fuller story</span><svg class="be-chev" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.2s ease"><path d="M6 9l6 6 6-6"></path></svg></summary><div style="padding: 4px 0 14px; display: flex; flex-direction: column; gap: 10px">${(V.hx.sel.more || []).map((mp, $index) => html`<p style="margin: 0; font-size: 16px; line-height: 1.65; color: #31291F">${mp.text}</p>`)}</div></details>` : null}
+${(V.hx.sel.hasViews) ? html`<details class="be-det" style="border-top: 1px solid #E2D8C6; padding: 4px 0"><summary style="display: flex; align-items: center; gap: 8px; min-height: 48px; font-size: 15px; font-weight: 700; color: #231E19"><span style="flex: 1 1 auto">How each tradition sees it</span><span style="font-size: 13px; font-weight: 500; color: #6B5F52">${V.hxd.nViews}</span><svg class="be-chev" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.2s ease"><path d="M6 9l6 6 6-6"></path></svg></summary><div style="padding: 4px 0 14px; display: flex; flex-direction: column; gap: 10px">${(V.hx.sel.views || []).map((v, $index) => html`<div style="border: 1px solid #E2D8C6; border-radius: 12px; padding: 10px 12px; background: #FFFDF8; display: flex; flex-direction: column; gap: 4px"><div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap"><span aria-hidden="true" style="display: inline-flex; gap: 3px">${(v.dots || []).map((d, $index) => html`<span style="width: 10px; height: 10px; border-radius: 50%; background: ${d.color}"></span>`)}</span><strong style="font-size: 14px; color: #231E19">${v.label}</strong></div><p style="margin: 0; font-size: 14px; line-height: 1.55; color: #31291F">${v.text}</p></div>`)}</div></details>` : null}
+<details class="be-det" style="border-top: 1px solid #E2D8C6; padding: 4px 0"><summary style="display: flex; align-items: center; gap: 8px; min-height: 48px; font-size: 15px; font-weight: 700; color: #231E19"><span style="flex: 1 1 auto">Timeline</span><span style="font-size: 13px; font-weight: 500; color: #6B5F52">${V.hxd.nSteps} moments</span><svg class="be-chev" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.2s ease"><path d="M6 9l6 6 6-6"></path></svg></summary><div style="padding: 4px 0 14px; display: flex; flex-direction: column; gap: 10px"><div style="display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: #4A3F35; margin-bottom: 4px" aria-label="Timeline key">${(V.hx.legend || []).map((g, $index) => html`<span style="display: inline-flex; align-items: center; gap: 5px"><span aria-hidden="true" style="width: 10px; height: 10px; border-radius: 50%; background: ${g.color}"></span>${g.label}</span>`)}</div>
+<ol style="list-style: none; margin: 0; padding: 0">
+${(V.hx.sel.steps || []).map((s, $index) => html`
+<li style="display: grid; grid-template-columns: minmax(62px, 92px) 24px minmax(0, 1fr); column-gap: 8px">
+<div style="text-align: right; padding-top: 2px; font-size: 12px; font-weight: 800; line-height: 1.3; color: #231E19">${s.when}</div>
+<div aria-hidden="true" style="position: relative"><div style="position: absolute; left: 11px; top: ${s.lineTop}; bottom: 0; width: 2px; background: #E2D8C6"></div><div style="position: relative; margin: 3px 0 0 4px; width: 12px; height: 12px; border-radius: 50%; background: ${s.color}; box-shadow: 0 0 0 3px #FBF7EF, 0 0 0 5px ${s.color}"></div></div>
+<div style="padding: 0 0 18px; display: flex; flex-direction: column; gap: 4px; min-width: 0">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px"><span style="font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52">${s.kindLabel}</span>${(s.hasTrad) ? html`<span style="font-size: 11px; font-weight: 700; border-radius: 999px; padding: 1px 8px; background: ${s.tradColor}; color: #FFFFFF">${s.tradLabel}</span>` : null}</div>
+<h3 style="margin: 0; font-family: Fraunces, Georgia, serif; font-size: 17px; line-height: 1.25">${s.title}</h3>
+<p style="margin: 0; font-size: 14px; line-height: 1.55; color: #31291F">${s.text}</p>
+${(s.hasRefs) ? html`<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px">${(s.refs || []).map((r, $index) => html`<button type="button" onClick=${r.pick} title="Read this passage" style="cursor: pointer; border: 1px solid #D9CDB8; background: #F5EFE3; color: #7A3B1E; border-radius: 999px; padding: 4px 10px; min-height: 32px; font-size: 12px; font-weight: 700">${r.label}</button>`)}</div>` : null}
+</div>
+</li>
+`)}
+</ol></div></details>
+<details class="be-det" style="border-top: 1px solid #E2D8C6; padding: 4px 0"><summary style="display: flex; align-items: center; gap: 8px; min-height: 48px; font-size: 15px; font-weight: 700; color: #231E19"><span style="flex: 1 1 auto">Key people</span><span style="font-size: 13px; font-weight: 500; color: #6B5F52">${V.hxd.nPeople}</span><svg class="be-chev" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.2s ease"><path d="M6 9l6 6 6-6"></path></svg></summary><div style="padding: 4px 0 14px; display: flex; flex-direction: column; gap: 10px">${(V.hx.sel.people || []).map((p, $index) => html`<div style="border-left: 3px solid #E2D8C6; padding: 2px 0 2px 10px"><div style="font-family: Fraunces, Georgia, serif; font-size: 16px; font-weight: 700; color: #231E19">${p.name} <span style="font-family: Inter, system-ui, sans-serif; font-size: 12px; font-weight: 500; color: #6B5F52">${p.dates}</span></div>${(p.hasRole) ? html`<div style="font-size: 14px; line-height: 1.45; color: #31291F">${p.role}</div>` : null}</div>`)}</div></details>
+<details class="be-det" style="border-top: 1px solid #E2D8C6; padding: 4px 0"><summary style="display: flex; align-items: center; gap: 8px; min-height: 48px; font-size: 15px; font-weight: 700; color: #231E19"><span style="flex: 1 1 auto">Sources and notes</span><svg class="be-chev" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.2s ease"><path d="M6 9l6 6 6-6"></path></svg></summary><div style="padding: 4px 0 14px; display: flex; flex-direction: column; gap: 10px"><div style="font-size: 14px">Read more: ${(V.hx.sel.src || []).map((q, $index) => html`<a href=${q.url} target="_blank" rel="noopener noreferrer" title="Opens in a new tab" style="color: #2E4A8A; font-weight: 600; margin-right: 10px">${q.label} ↗</a>`)}</div><div style="font-size: 13px; color: #6B5F52; line-height: 1.5">Dates before about AD 400 are often approximate, and some events (marked “traditional”) are handed down by tradition rather than recorded at the time. Summaries are written for this app; each tradition tells parts of this story in its own way.</div></div></details>
+</div>
+${(V.hxd.hasLink) ? html`<button type="button" onClick=${V.hx.sel.link} style="align-self: flex-start; cursor: pointer; border: 1px solid #231E19; background: #FFFDF8; color: #231E19; border-radius: 999px; padding: 8px 16px; min-height: 44px; font-size: 14px; font-weight: 700">${V.hx.sel.linkLabel}</button>` : null}
+</div>
+</div>
+</div>
+` : null}
 ${(V.isRead) ? html`
 <section id="reader-top" style="display: flex; flex-direction: column; gap: 18px">
 <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; justify-content: space-between">
