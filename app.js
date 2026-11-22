@@ -2975,6 +2975,21 @@ class Component extends DCLogic {
         onRate: function (e) { var r = parseFloat(e.target.value) || 1, cur = self._tts || {}; cur.rate = r; self._tts = cur;
           if (cur.key === pKey && (cur.status === 'playing' || cur.status === 'paused')) self.ttsStart(pFlat, cur.verse || 1, pTitle, pKey); else self.forceUpdate(); }
       };
+      var HN = self._hnData, pOff = {}, pCount = 0;
+      P.r.forEach(function (r) { var Bk = findBook(r[0]); if (!Bk) return; for (var c = r[1]; c <= r[2]; c++) { pOff[r[0] + c] = pCount; pCount += PT ? ((PT[Bk.idx] || [])[c - 1] || []).length : 0; } });
+      var pJump = function (key, v) { if (!PT) return; var go2 = function () { self.scrollToId('v-' + (pOff[key] + v)); var el = document.getElementById('v-' + (pOff[key] + v)); if (el) { el.style.background = '#F6E2A8'; setTimeout(function () { el.style.background = ''; }, 1800); } };
+        if (!pOpen) { go({ planTxt: true }); setTimeout(go2, 60); } else go2(); };
+      var pOwnAny = false;
+      var pSums = [];
+      P.r.forEach(function (r) { var Bk = findBook(r[0]); if (!Bk) return; for (var c = r[1]; c <= r[2]; c++) (function (Bk, c) {
+        var row = HN && HN[Bk.id] ? (HN[Bk.id][c - 1] || []) : [];
+        if (HN && HN._own && HN._own[Bk.id] && HN._own[Bk.id][String(c)]) pOwnAny = true;
+        var ol = row.map(function (o) { var first = parseInt(o[1], 10);
+          return { text: o[0], ref: o[1] ? (/[–,]/.test(o[1]) ? 'vv. ' : 'v. ') + o[1] : '', hasRef: !!o[1], pick: function () { if (first) pJump(Bk.id + c, first); } }; });
+        var chRow = self._chData && self._chData.books[Bk.id] ? self._chData.books[Bk.id][c - 1] : null;
+        if (!ol.length && chRow) ol = chRow[0].map(function (e) { return { text: e[0], ref: 'v. ' + e[1], hasRef: true, pick: function () { pJump(Bk.id + c, e[1]); } }; });
+        pSums.push({ title: Bk.name + ' ' + c, outline: ol, hasOutline: ol.length > 0, noOutline: !!HN && !ol.length, fallback: 'No chapter outline is available here. The book in brief: ' + Bk.sum });
+      })(Bk, c); });
       var setDone = function (on) { var v = self.planLoad(); if (on) v.done[dayN] = 1; else delete v.done[dayN]; self.planSave(v); };
       return {
         started: started, notStarted: !started, startLabel: started ? 'Started ' + fmt(d0(PS.start)) : '',
@@ -2995,6 +3010,7 @@ class Component extends DCLogic {
         textLoading: !PT, textReady: !!PT,
         textMsg: (self._failed || {})[ptr] ? 'The scripture text couldn’t load. Try switching translations or reopening the page.' : 'Loading the text…',
         textChaps: pChaps, tts: pTts,
+        sums: HN ? pSums : [], sumLoading: !HN && !self._hnFailed, sumHenry: !!HN, sumOwnNote: pOwnAny ? '. Where it has no outline for a chapter, the outline was written for this app.' : '.',
         txtOpen: pOpen, txtMax: pOpen ? 'none' : '228px', txtOv: pOpen ? 'visible' : 'auto', txtChev: pOpen ? 180 : 0,
         txtPad: self._narrow ? '18px 16px' : '32px 40px', cardPad: self._narrow ? '16px 12px' : '20px',
         txtLabel: pOpen ? 'Collapse text' : 'Expand full reading',
@@ -3002,7 +3018,7 @@ class Component extends DCLogic {
         txtToggle: function () { go({ planTxt: !pOpen }); if (pOpen) setTimeout(function () { var a = document.getElementById('plan-text'); if (a && a.getBoundingClientRect().top < 0) a.scrollIntoView({ block: 'start' }); }, 40); }
       };
     };
-    var tabs = [['overview','Overview'],['plan','Daily'],['library','Library'],['story','Story'],['themes','Unifying Themes'],['compare','Traditions'],['read','Read'],['search','Search'],['about','About']].map(function (t) {
+    var tabs = [['overview','Overview'],['library','Library'],['story','Story'],['themes','Unifying Themes'],['compare','Traditions'],['read','Read'],['search','Search'],['plan','Daily'],['about','About']].map(function (t) {
       var grp = TAB_GROUPS[t[0]] || [t[0]];
       var on = grp.indexOf(tab) >= 0;
       return { id: t[0], label: t[1], pressed: on, bg: on ? INK : 'transparent', fg: on ? PAPER : '#4A3F35', pick: function () { go(t[0] === 'compare' ? { tab: 'compare', cmpMode: 'trad', cmpReg: null } : { tab: t[0] }); window.scrollTo(0, 0); } };
@@ -5310,6 +5326,22 @@ ${(tc.verses || []).map((v, $index) => html`<span id=${v.id} style="border-radiu
 <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-top: -6px"><button type="button" onClick=${V.plan.txtToggle} aria-expanded=${V.plan.txtOpen} aria-controls="plan-text" style="cursor: pointer; display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 6px 14px 6px 10px; border-radius: 999px; border: 1px solid #D9CDB8; background: #F5EFE3; color: #231E19; font-size: 14px; font-weight: 700"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(${V.plan.txtChev}deg); transition: transform 0.2s ease"><path d="M6 9l6 6 6-6"></path></svg>${V.plan.txtLabel}</button><span style="font-size: 13px; color: #6B5F52">${V.plan.txtHint}</span></div>
 <div style="font-size: 12px; color: #6B5F52">${V.plan.trName} · public domain. Words in [brackets] are supplied by the translators.</div>
 ` : null}
+<div style="border: 1px solid #E2D8C6; border-radius: 14px; padding: 14px 16px; display: flex; flex-direction: column; gap: 14px; background: #FFFDF8">
+<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52">Chapter summary</div>
+${(V.plan.sumLoading) ? html`<div style="font-size: 14px; color: #6B5F52">Loading…</div>` : null}
+${(V.plan.sums || []).map((cs, $index) => html`
+<div>
+<div style="font-family: Fraunces, Georgia, serif; font-size: 17px; font-weight: 700; color: #231E19; margin-bottom: 2px">${cs.title}</div>
+${(cs.hasOutline) ? html`<ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px">
+${(cs.outline || []).map((o, $index) => html`
+<li><button type="button" onClick=${o.pick} title="Jump to ${o.ref}" style="width: 100%; text-align: left; cursor: pointer; border: none; background: transparent; border-radius: 8px; padding: 6px 4px; min-height: 36px; display: flex; gap: 10px; align-items: baseline; color: #231E19; font-size: 15px; line-height: 1.45"><span aria-hidden="true" style="flex: none; width: 8px; height: 8px; border-radius: 50%; background: ${V.plan.color}; transform: translateY(-1px)"></span><span style="flex: 1 1 auto">${o.text}</span>${(o.hasRef) ? html`<span style="flex: none; font-size: 12px; color: #6B5F52; white-space: nowrap">${o.ref}</span>` : null}</button></li>
+`)}
+</ol>` : null}
+${(cs.noOutline) ? html`<p style="margin: 4px 0 0; font-size: 15px; line-height: 1.55; color: #31291F">${cs.fallback}</p>` : null}
+</div>
+`)}
+${(V.plan.sumHenry) ? html`<div style="font-size: 12px; color: #6B5F52; line-height: 1.45">Outlines from Matthew Henry’s <a href="https://github.com/lyteword/mhenry-concise" target="_blank" rel="noopener" style="color: #7A3B1E">Concise Commentary</a> (1706), a classic Protestant commentary in the public domain${V.plan.sumOwnNote}</div>` : null}
+</div>
 <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center">
 <button type="button" onClick=${V.plan.toggleDone} aria-pressed=${V.plan.isDone} style="cursor: pointer; border: 1px solid ${V.plan.doneBorder}; background: ${V.plan.doneBg}; color: ${V.plan.doneFg}; border-radius: 999px; padding: 10px 16px; min-height: 44px; font-size: 15px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"></path></svg>${V.plan.doneLabel}</button>
 <span style="font-size: 13px; color: #6B5F52">Notes and maps for each chapter:</span>
