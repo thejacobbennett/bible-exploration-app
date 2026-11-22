@@ -2956,7 +2956,23 @@ class Component extends DCLogic {
         readLabel: parts.join('; '), chaps: chaps, readFirst: function () { openChap(P.r[0][0], P.r[0][1], 0); },
         isDone: isDone, doneLabel: isDone ? 'Done' : 'Mark as done', doneBg: isDone ? '#1F5446' : '#FFFDF8', doneFg: isDone ? '#FBF7EF' : '#231E19', doneBorder: isDone ? '#1F5446' : '#D9CDB8',
         toggleDone: function () { setDone(!isDone); },
-        cards: cards, hasQ: !!P.q, q: P.q || '', months: months
+        cards: cards, hasQ: !!P.q, q: P.q || '', months: months,
+        textOpen: !!st.planText, textRot: st.planText ? 180 : 0, textBtn: st.planText ? 'Hide the text' : 'Read today’s text here',
+        toggleText: function () { var on = !st.planText; if (on) self.loadText(st.tr || 'bsb'); go({ planText: on }); },
+        trName: TR_NAMES[st.tr || 'bsb'],
+        trs: ['bsb', 'kjv'].map(function (t) { var on = (st.tr || 'bsb') === t; return { label: t.toUpperCase(), title: TR_NAMES[t], pressed: on, bg: on ? '#231E19' : 'transparent', fg: on ? '#FBF7EF' : '#4A3F35', pick: function () { self.loadText(t); go({ tr: t }); } }; }),
+        textLoading: !!st.planText && !(self._texts || {})[st.tr || 'bsb'],
+        textMsg: (self._failed || {})[st.tr || 'bsb'] ? 'The text could not load. Check your connection, or use Start reading.' : 'Loading the text…',
+        textReady: !!st.planText && !!(self._texts || {})[st.tr || 'bsb'],
+        textChaps: (function () {
+          var T = (self._texts || {})[st.tr || 'bsb']; if (!st.planText || !T) return [];
+          var out = [];
+          P.r.forEach(function (r) { var Bk = findBook(r[0]); if (!Bk) return; for (var c = r[1]; c <= r[2]; c++) {
+            var arr = (T[Bk.idx] || [])[c - 1] || [];
+            out.push({ title: Bk.name + ' ' + c, verses: arr.map(function (t, i) { return { n: i + 1, t: t }; }).filter(function (v) { return v.t && v.t !== '…'; }) });
+          } });
+          return out;
+        })()
       };
     };
     var tabs = [['overview','Overview'],['plan','Daily'],['library','Library'],['story','Story'],['themes','Unifying Themes'],['compare','Traditions'],['read','Read'],['search','Search'],['about','About']].map(function (t) {
@@ -5226,6 +5242,27 @@ ${(V.plan.notToday) ? html`<button type="button" onClick=${V.plan.goToday} style
 <div style="display: flex; flex-direction: column; gap: 10px">
 <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52">Read</div>
 <div style="font-family: Fraunces, Georgia, serif; font-size: 22px; font-weight: 700; color: #231E19">${V.plan.readLabel}</div>
+<div style="border: 1px solid #D9CDB8; border-radius: 14px; background: #FBF7EF; overflow: hidden">
+<button type="button" onClick=${V.plan.toggleText} aria-expanded=${V.plan.textOpen} style="cursor: pointer; width: 100%; border: none; background: transparent; color: #231E19; padding: 12px 14px; min-height: 48px; display: flex; align-items: center; gap: 10px; text-align: left; font-size: 15px; font-weight: 700">
+<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7A3B1E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5h7a3 3 0 0 1 3 3v12a2 2 0 0 0-2-2H2z"></path><path d="M22 5h-7a3 3 0 0 0-3 3v12a2 2 0 0 1 2-2h8z"></path></svg>
+<span style="flex: 1 1 auto">${V.plan.textBtn}</span>
+<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(${V.plan.textRot}deg); transition: transform 0.2s"><path d="M6 9l6 6 6-6"></path></svg>
+</button>
+${(V.plan.textOpen) ? html`<div style="border-top: 1px solid #E2D8C6; padding: 4px 16px 16px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; padding-top: 8px"><span style="font-size: 12px; color: #6B5F52">${V.plan.trName}</span><span style="display: inline-flex; gap: 4px">${(V.plan.trs || []).map((t, $index) => html`<button type="button" onClick=${t.pick} aria-pressed=${t.pressed} title=${t.title} style="cursor: pointer; border: 1px solid #D9CDB8; background: ${t.bg}; color: ${t.fg}; border-radius: 999px; padding: 4px 10px; min-height: 32px; font-size: 12px; font-weight: 700">${t.label}</button>`)}</span></div>
+${(V.plan.textLoading) ? html`<p style="margin: 0; font-size: 14px; color: #6B5F52">${V.plan.textMsg}</p>` : null}
+${(V.plan.textChaps || []).map((tc, $index) => html`
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h3 style="margin: 0; font-family: Fraunces, Georgia, serif; font-size: 19px; color: #231E19">${tc.title}</h3>
+<p style="margin: 0; font-family: Fraunces, Georgia, serif; font-size: 17px; line-height: 1.7; color: #231E19">${(tc.verses || []).map((v, $index) => html`<sup style="font-family: Inter, sans-serif; font-size: 10px; font-weight: 700; color: #7A3B1E; margin-right: 2px">${v.n}</sup>${v.t} `)}</p>
+</div>
+`)}
+${(V.plan.textReady) ? html`<div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; border-top: 1px solid #E2D8C6; padding-top: 12px">
+<button type="button" onClick=${V.plan.toggleDone} aria-pressed=${V.plan.isDone} style="cursor: pointer; border: 1px solid ${V.plan.doneBorder}; background: ${V.plan.doneBg}; color: ${V.plan.doneFg}; border-radius: 999px; padding: 10px 16px; min-height: 44px; font-size: 15px; font-weight: 700">${V.plan.doneLabel}</button>
+<button type="button" onClick=${V.plan.toggleText} style="cursor: pointer; border: none; background: transparent; color: #7A3B1E; font-size: 14px; font-weight: 700; padding: 4px 0; min-height: 36px">Collapse text</button>
+</div>` : null}
+</div>` : null}
+</div>
 <div style="display: flex; flex-wrap: wrap; gap: 6px">
 ${(V.plan.chaps || []).map((c, $index) => html`<button type="button" onClick=${c.pick} style="cursor: pointer; border: 1px solid #D9CDB8; background: #F5EFE3; color: #231E19; border-radius: 999px; padding: 6px 12px; min-height: 36px; font-size: 14px; font-weight: 600">${c.label}</button>`)}
 </div>
