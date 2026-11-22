@@ -2942,6 +2942,39 @@ class Component extends DCLogic {
         var f = PLAN[m * 30].r[0];
         months.push({ label: 'Days ' + (m * 30 + 1) + '–' + Math.min(365, m * 30 + 30) + ' · from ' + bname(f[0]) + ' ' + f[1], days: days });
       }
+      var ptr = st.tr === 'kjv' ? 'kjv' : 'bsb', PT = (self._texts || {})[ptr];
+      if (!PT) self.loadText(ptr);
+      var pOpen = st.planTxt != null ? !!st.planTxt : !(self._narrow || self.isPhoneScreen());
+      var pKey = 'plan|' + dayN + '|' + ptr, ptt = self._tts || { status: 'idle', verse: 0, rate: 1 };
+      if (ptt.status !== 'idle' && ptt.key !== pKey && String(ptt.key || '').indexOf('plan|') === 0) { self.ttsStop(true); ptt = self._tts; }
+      var pOn = ptt.key === pKey && (ptt.status === 'playing' || ptt.status === 'paused');
+      var pFlat = [], pChaps = [];
+      if (PT) P.r.forEach(function (r) { var Bk = findBook(r[0]); if (!Bk) return; for (var c = r[1]; c <= r[2]; c++) {
+        var arr = (PT[Bk.idx] || [])[c - 1] || [], vs = [];
+        arr.forEach(function (t, i) { if (!t || t === '…') { pFlat.push(''); return; }
+          pFlat.push((i === 0 && pFlat.length ? Bk.name + ', chapter ' + c + '. ' : '') + t);
+          var n = pFlat.length; vs.push({ n: i + 1, t: t, id: 'v-' + n, bg: pOn && n === ptt.verse ? '#DCE8F0' : 'transparent' }); });
+        pChaps.push({ title: Bk.name + ' ' + c, showTitle: true, verses: vs });
+      } });
+      var pTitle = parts.join('; ').replace(/–/g, ' to ').replace(/(\w) (\d)/g, '$1, chapter $2');
+      var pVerseOf = function () { var n = ptt.verse, k = 0; for (var i = 0; i < pChaps.length; i++) { if (n <= k + pChaps[i].verses.length) return pChaps[i].title + ':' + (n - k); k += pChaps[i].verses.length; } return ''; };
+      var pTts = {
+        supported: self.ttsSupported(), active: pOn,
+        showPlay: !(pOn && ptt.status === 'playing'), showPause: pOn && ptt.status === 'playing',
+        label: !pOn ? (ptt.key === pKey && ptt.status === 'done' ? 'Listen again' : 'Listen to today’s reading') : ptt.status === 'playing' ? 'Pause' : 'Resume',
+        status: pOn ? (ptt.status === 'playing' ? 'Reading ' : 'Paused at ') + pVerseOf() : ptt.key === pKey && ptt.status === 'done' ? 'Finished day ' + dayN + '.' : 'Read aloud by your device’s built-in voice.',
+        rateVal: String(ptt.rate || 1),
+        playPause: function () {
+          var cur = self._tts || {};
+          if (cur.key === pKey && cur.status === 'playing') { try { window.speechSynthesis.pause(); } catch (err) {} cur.status = 'paused'; self.forceUpdate(); return; }
+          if (cur.key === pKey && cur.status === 'paused') { try { window.speechSynthesis.resume(); } catch (err) {} cur.status = 'playing'; self.forceUpdate(); return; }
+          self.ttsStart(pFlat, 1, pTitle, pKey);
+        },
+        stop: function () { self.ttsStop(false); },
+        back: function () { self.ttsSkip(-1); }, fwd: function () { self.ttsSkip(1); },
+        onRate: function (e) { var r = parseFloat(e.target.value) || 1, cur = self._tts || {}; cur.rate = r; self._tts = cur;
+          if (cur.key === pKey && (cur.status === 'playing' || cur.status === 'paused')) self.ttsStart(pFlat, cur.verse || 1, pTitle, pKey); else self.forceUpdate(); }
+      };
       var setDone = function (on) { var v = self.planLoad(); if (on) v.done[dayN] = 1; else delete v.done[dayN]; self.planSave(v); };
       return {
         started: started, notStarted: !started, startLabel: started ? 'Started ' + fmt(d0(PS.start)) : '',
@@ -2957,22 +2990,16 @@ class Component extends DCLogic {
         isDone: isDone, doneLabel: isDone ? 'Done' : 'Mark as done', doneBg: isDone ? '#1F5446' : '#FFFDF8', doneFg: isDone ? '#FBF7EF' : '#231E19', doneBorder: isDone ? '#1F5446' : '#D9CDB8',
         toggleDone: function () { setDone(!isDone); },
         cards: cards, hasQ: !!P.q, q: P.q || '', months: months,
-        textOpen: !!st.planText, textRot: st.planText ? 180 : 0, textBtn: st.planText ? 'Hide the text' : 'Read today’s text here',
-        toggleText: function () { var on = !st.planText; if (on) self.loadText(st.tr || 'bsb'); go({ planText: on }); },
-        trName: TR_NAMES[st.tr || 'bsb'],
-        trs: ['bsb', 'kjv'].map(function (t) { var on = (st.tr || 'bsb') === t; return { label: t.toUpperCase(), title: TR_NAMES[t], pressed: on, bg: on ? '#231E19' : 'transparent', fg: on ? '#FBF7EF' : '#4A3F35', pick: function () { self.loadText(t); go({ tr: t }); } }; }),
-        textLoading: !!st.planText && !(self._texts || {})[st.tr || 'bsb'],
-        textMsg: (self._failed || {})[st.tr || 'bsb'] ? 'The text could not load. Check your connection, or use Start reading.' : 'Loading the text…',
-        textReady: !!st.planText && !!(self._texts || {})[st.tr || 'bsb'],
-        textChaps: (function () {
-          var T = (self._texts || {})[st.tr || 'bsb']; if (!st.planText || !T) return [];
-          var out = [];
-          P.r.forEach(function (r) { var Bk = findBook(r[0]); if (!Bk) return; for (var c = r[1]; c <= r[2]; c++) {
-            var arr = (T[Bk.idx] || [])[c - 1] || [];
-            out.push({ title: Bk.name + ' ' + c, verses: arr.map(function (t, i) { return { n: i + 1, t: t }; }).filter(function (v) { return v.t && v.t !== '…'; }) });
-          } });
-          return out;
-        })()
+        trName: TR_NAMES[ptr], color: (DIVM[(findBook(P.r[0][0]) || {}).div] || { color: '#7A3B1E' }).color,
+        trs: ['bsb', 'kjv'].map(function (t) { var on = ptr === t; return { label: t.toUpperCase(), title: TR_NAMES[t], pressed: on, bg: on ? '#231E19' : 'transparent', fg: on ? '#FBF7EF' : '#4A3F35', pick: function () { self.loadText(t); go({ tr: t }); } }; }),
+        textLoading: !PT, textReady: !!PT,
+        textMsg: (self._failed || {})[ptr] ? 'The scripture text couldn’t load. Try switching translations or reopening the page.' : 'Loading the text…',
+        textChaps: pChaps, tts: pTts,
+        txtOpen: pOpen, txtMax: pOpen ? 'none' : '228px', txtOv: pOpen ? 'visible' : 'auto', txtChev: pOpen ? 180 : 0,
+        txtPad: self._narrow ? '18px 16px' : '32px 40px', cardPad: self._narrow ? '16px 12px' : '20px',
+        txtLabel: pOpen ? 'Collapse text' : 'Expand full reading',
+        txtHint: pOpen ? 'Shrink the text to a few lines to bring the rest of today’s plan closer.' : 'Scroll inside the text to keep reading. The rest of today’s plan is just below.',
+        txtToggle: function () { go({ planTxt: !pOpen }); if (pOpen) setTimeout(function () { var a = document.getElementById('plan-text'); if (a && a.getBoundingClientRect().top < 0) a.scrollIntoView({ block: 'start' }); }, 40); }
       };
     };
     var tabs = [['overview','Overview'],['plan','Daily'],['library','Library'],['story','Story'],['themes','Unifying Themes'],['compare','Traditions'],['read','Read'],['search','Search'],['about','About']].map(function (t) {
@@ -3218,7 +3245,7 @@ class Component extends DCLogic {
     var ttsKey = (isX ? 'apoc' : tr) + '|' + B.id + '|' + C;
     if (this._ps && this._ps.on && this._ps.tab !== tab) this.pageStop(true);
     var tt = this._tts || { status: 'idle', verse: 0, rate: 1 };
-    if (tt.status !== 'idle' && (tt.key !== ttsKey || tab !== 'read')) { this.ttsStop(true); tt = this._tts; }
+    if (tt.status !== 'idle' && !(tab === 'plan' && String(tt.key || '').indexOf('plan|') === 0) && (tt.key !== ttsKey || tab !== 'read')) { this.ttsStop(true); tt = this._tts; }
     var ttsOn = tt.status === 'playing' || tt.status === 'paused';
     var verses = chapArr ? chapArr.map(function (t, i) {
       return { n: i + 1, id: 'v-' + (i + 1), text: t, bg: (ttsOn && (i + 1) === (st.seekV != null ? st.seekV : tt.verse)) ? '#DCE8F0' : (i + 1) === hl ? '#F6E2A8' : 'transparent' };
@@ -5228,7 +5255,7 @@ ${(V.plan.notStarted) ? html`<div style="background: #FFFDF8; border: 1px solid 
 <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; font-size: 13px; color: #4A3F35"><span>${V.plan.progressLabel}</span>${(V.plan.started) ? html`<span>${V.plan.startLabel} · <button type="button" onClick=${V.plan.reset} style="cursor: pointer; border: none; background: transparent; color: #7A3B1E; font-size: 13px; font-weight: 700; text-decoration: underline; padding: 0">Restart</button></span>` : null}</div>
 <div aria-hidden="true" style="height: 6px; border-radius: 3px; background: #EAE1D0; overflow: hidden"><div style="height: 100%; width: ${V.plan.pct}%; background: #7A3B1E"></div></div>
 </div>
-<article style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 18px; padding: 20px; display: flex; flex-direction: column; gap: 16px; box-shadow: 0 1px 4px rgba(35,30,25,0.06)">
+<article style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 18px; padding: ${V.plan.cardPad}; display: flex; flex-direction: column; gap: 16px; box-shadow: 0 1px 4px rgba(35,30,25,0.06)">
 <div style="display: flex; align-items: center; gap: 10px">
 <button type="button" onClick=${V.plan.prev} disabled=${V.plan.noPrev} aria-label="Previous day" style="flex: none; cursor: pointer; width: 44px; height: 44px; border-radius: 50%; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; display: inline-flex; align-items: center; justify-content: center; padding: 0"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg></button>
 <div style="flex: 1 1 auto; min-width: 0; text-align: center">
@@ -5239,36 +5266,54 @@ ${(V.plan.notStarted) ? html`<div style="background: #FFFDF8; border: 1px solid 
 </div>
 ${(V.plan.notToday) ? html`<button type="button" onClick=${V.plan.goToday} style="align-self: flex-start; cursor: pointer; border: none; background: transparent; color: #7A3B1E; font-size: 13px; font-weight: 700; text-decoration: underline; padding: 0; margin-top: -8px; align-self: center">Back to today (day ${V.plan.todayN})</button>` : null}
 
-<div style="display: flex; flex-direction: column; gap: 10px">
-<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52">Read</div>
-<div style="font-family: Fraunces, Georgia, serif; font-size: 22px; font-weight: 700; color: #231E19">${V.plan.readLabel}</div>
-<div style="border: 1px solid #D9CDB8; border-radius: 14px; background: #FBF7EF; overflow: hidden">
-<button type="button" onClick=${V.plan.toggleText} aria-expanded=${V.plan.textOpen} style="cursor: pointer; width: 100%; border: none; background: transparent; color: #231E19; padding: 12px 14px; min-height: 48px; display: flex; align-items: center; gap: 10px; text-align: left; font-size: 15px; font-weight: 700">
-<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7A3B1E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5h7a3 3 0 0 1 3 3v12a2 2 0 0 0-2-2H2z"></path><path d="M22 5h-7a3 3 0 0 0-3 3v12a2 2 0 0 1 2-2h8z"></path></svg>
-<span style="flex: 1 1 auto">${V.plan.textBtn}</span>
-<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(${V.plan.textRot}deg); transition: transform 0.2s"><path d="M6 9l6 6 6-6"></path></svg>
-</button>
-${(V.plan.textOpen) ? html`<div style="border-top: 1px solid #E2D8C6; padding: 4px 16px 16px; display: flex; flex-direction: column; gap: 14px">
-<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; padding-top: 8px"><span style="font-size: 12px; color: #6B5F52">${V.plan.trName}</span><span style="display: inline-flex; gap: 4px">${(V.plan.trs || []).map((t, $index) => html`<button type="button" onClick=${t.pick} aria-pressed=${t.pressed} title=${t.title} style="cursor: pointer; border: 1px solid #D9CDB8; background: ${t.bg}; color: ${t.fg}; border-radius: 999px; padding: 4px 10px; min-height: 32px; font-size: 12px; font-weight: 700">${t.label}</button>`)}</span></div>
-${(V.plan.textLoading) ? html`<p style="margin: 0; font-size: 14px; color: #6B5F52">${V.plan.textMsg}</p>` : null}
+<div style="display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; flex-wrap: wrap">
+<div><div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52">Read</div>
+<div style="font-family: Fraunces, Georgia, serif; font-size: 24px; font-weight: 700; color: #231E19">${V.plan.readLabel}</div></div>
+<div role="group" aria-label="Translation" style="display: inline-flex; gap: 4px">${(V.plan.trs || []).map((t, $index) => html`<button type="button" onClick=${t.pick} aria-pressed=${t.pressed} title=${t.title} style="cursor: pointer; border: 1px solid #D9CDB8; background: ${t.bg}; color: ${t.fg}; border-radius: 999px; padding: 6px 12px; min-height: 36px; font-size: 13px; font-weight: 700">${t.label}</button>`)}</div>
+</div>
+${(V.plan.textLoading) ? html`<div style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: 24px; color: #6B5F52">${V.plan.textMsg}</div>` : null}
+${(V.plan.textReady) ? html`
+${(V.plan.tts.supported) ? html`
+<div role="group" aria-label="Read aloud" style="display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 14px; padding: 10px 12px">
+<button type="button" onClick=${V.plan.tts.playPause} style="cursor: pointer; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 18px; border-radius: 999px; border: none; background: ${V.plan.color}; color: #FFFFFF; font-size: 15px; font-weight: 700">
+${(V.plan.tts.showPlay) ? html`<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"></path></svg>` : null}
+${(V.plan.tts.showPause) ? html`<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4.5" width="4" height="15" rx="1"></rect><rect x="14" y="4.5" width="4" height="15" rx="1"></rect></svg>` : null}
+${V.plan.tts.label}</button>
+${(V.plan.tts.active) ? html`
+<button type="button" onClick=${V.plan.tts.back} aria-label="Back one verse" title="Back one verse" style="flex: none; cursor: pointer; width: 44px; height: 44px; border-radius: 50%; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; display: inline-flex; align-items: center; justify-content: center; padding: 0"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M11 6v12L3 12z"></path><path d="M20 6v12l-8-6z"></path></svg></button>
+<button type="button" onClick=${V.plan.tts.fwd} aria-label="Skip ahead one verse" title="Skip ahead one verse" style="flex: none; cursor: pointer; width: 44px; height: 44px; border-radius: 50%; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; display: inline-flex; align-items: center; justify-content: center; padding: 0"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M13 6v12l8-6z"></path><path d="M4 6v12l8-6z"></path></svg></button>
+<button type="button" onClick=${V.plan.tts.stop} aria-label="Stop reading" style="cursor: pointer; display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; border: 1px solid #D9CDB8; background: #FFFFFF; color: #231E19"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"></rect></svg></button>
+` : null}
+<div style="display: flex; align-items: center; gap: 6px">
+<label for="plan-tts-rate" style="font-size: 13px; font-weight: 600; color: #4A3F35">Speed</label>
+<select id="plan-tts-rate" value=${V.plan.tts.rateVal} onChange=${V.plan.tts.onRate} style="min-height: 40px; border-radius: 10px; border: 1px solid #D9CDB8; background: #FFFFFF; padding: 0 10px; font-size: 14px; color: #231E19">
+<option value="0.75">0.75×</option>
+<option value="1">1×</option>
+<option value="1.25">1.25×</option>
+<option value="1.5">1.5×</option>
+</select>
+</div>
+<span aria-live="polite" style="font-size: 13px; color: #6B5F52; flex: 1 1 160px">${V.plan.tts.status}</span>
+</div>
+` : null}
+<article id="plan-text" data-focus="text" style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; padding: ${V.plan.txtPad}; font-family: Georgia, 'Times New Roman', serif; font-size: 19px; line-height: 1.8; color: #231E19; max-height: ${V.plan.txtMax}; overflow-y: ${V.plan.txtOv}; overscroll-behavior: contain"><button type="button" class="be-fbtn" onClick=${V.focusToggle} aria-label="Focus mode: show this section full screen" title="Focus mode (full screen)"><svg class="be-fi-in" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg><svg class="be-fi-out" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"></path><path d="M15 4v5h5"></path><path d="M9 20v-5H4"></path><path d="M15 20v-5h5"></path></svg></button><button type="button" class="be-sbtn" onClick=${V.areaSpeak} aria-label="Read this section aloud (press again to stop)" title="Read this section aloud"><svg class="be-si-play" aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg><svg class="be-si-stop" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"></rect></svg></button>
+<div style="max-width: 720px">
 ${(V.plan.textChaps || []).map((tc, $index) => html`
-<div style="display: flex; flex-direction: column; gap: 6px">
-<h3 style="margin: 0; font-family: Fraunces, Georgia, serif; font-size: 19px; color: #231E19">${tc.title}</h3>
-<p style="margin: 0; font-family: Fraunces, Georgia, serif; font-size: 17px; line-height: 1.7; color: #231E19">${(tc.verses || []).map((v, $index) => html`<sup style="font-family: Inter, sans-serif; font-size: 10px; font-weight: 700; color: #7A3B1E; margin-right: 2px">${v.n}</sup>${v.t} `)}</p>
+<div style="margin-bottom: 14px">
+${(tc.showTitle) ? html`<div style="font-family: Inter, system-ui, sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #7A3B1E; margin: 4px 0 2px">${tc.title}</div>` : null}
+${(tc.verses || []).map((v, $index) => html`<span id=${v.id} style="border-radius: 4px; padding: 2px 0; background: ${v.bg}"><sup style="font-family: Inter, system-ui, sans-serif; font-size: 11px; font-weight: 700; color: #7A3B1E; margin: 0 4px 0 6px">${v.n}</sup>${v.t} </span>`)}
 </div>
 `)}
-${(V.plan.textReady) ? html`<div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; border-top: 1px solid #E2D8C6; padding-top: 12px">
-<button type="button" onClick=${V.plan.toggleDone} aria-pressed=${V.plan.isDone} style="cursor: pointer; border: 1px solid ${V.plan.doneBorder}; background: ${V.plan.doneBg}; color: ${V.plan.doneFg}; border-radius: 999px; padding: 10px 16px; min-height: 44px; font-size: 15px; font-weight: 700">${V.plan.doneLabel}</button>
-<button type="button" onClick=${V.plan.toggleText} style="cursor: pointer; border: none; background: transparent; color: #7A3B1E; font-size: 14px; font-weight: 700; padding: 4px 0; min-height: 36px">Collapse text</button>
-</div>` : null}
-</div>` : null}
 </div>
-<div style="display: flex; flex-wrap: wrap; gap: 6px">
-${(V.plan.chaps || []).map((c, $index) => html`<button type="button" onClick=${c.pick} style="cursor: pointer; border: 1px solid #D9CDB8; background: #F5EFE3; color: #231E19; border-radius: 999px; padding: 6px 12px; min-height: 36px; font-size: 14px; font-weight: 600">${c.label}</button>`)}
-</div>
+</article>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-top: -6px"><button type="button" onClick=${V.plan.txtToggle} aria-expanded=${V.plan.txtOpen} aria-controls="plan-text" style="cursor: pointer; display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 6px 14px 6px 10px; border-radius: 999px; border: 1px solid #D9CDB8; background: #F5EFE3; color: #231E19; font-size: 14px; font-weight: 700"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(${V.plan.txtChev}deg); transition: transform 0.2s ease"><path d="M6 9l6 6 6-6"></path></svg>${V.plan.txtLabel}</button><span style="font-size: 13px; color: #6B5F52">${V.plan.txtHint}</span></div>
+<div style="font-size: 12px; color: #6B5F52">${V.plan.trName} · public domain. Words in [brackets] are supplied by the translators.</div>
+` : null}
 <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center">
-<button type="button" onClick=${V.plan.readFirst} style="cursor: pointer; border: none; background: #231E19; color: #FBF7EF; border-radius: 999px; padding: 10px 18px; min-height: 44px; font-size: 15px; font-weight: 700">Start reading →</button>
 <button type="button" onClick=${V.plan.toggleDone} aria-pressed=${V.plan.isDone} style="cursor: pointer; border: 1px solid ${V.plan.doneBorder}; background: ${V.plan.doneBg}; color: ${V.plan.doneFg}; border-radius: 999px; padding: 10px 16px; min-height: 44px; font-size: 15px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"></path></svg>${V.plan.doneLabel}</button>
+<span style="font-size: 13px; color: #6B5F52">Notes and maps for each chapter:</span>
+${(V.plan.chaps || []).map((c, $index) => html`<button type="button" onClick=${c.pick} style="cursor: pointer; border: 1px solid #D9CDB8; background: #F5EFE3; color: #231E19; border-radius: 999px; padding: 6px 12px; min-height: 36px; font-size: 14px; font-weight: 600">${c.label}</button>`)}
 </div>
 </div>
 
