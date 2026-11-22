@@ -2863,7 +2863,7 @@ class Component extends DCLogic {
 
     // Story = Storyline + Timeline; Traditions = beliefs, frameworks and practice.
     var TAB_GROUPS = { story: ['story', 'timeline'], compare: ['compare', 'practice', 'history'] };
-    var tabs = [['overview','Overview'],['library','Library'],['story','Story'],['themes','Themes'],['compare','Traditions'],['read','Read'],['search','Search'],['about','About']].map(function (t) {
+    var tabs = [['overview','Overview'],['library','Library'],['story','Story'],['themes','Unifying Themes'],['compare','Traditions'],['read','Read'],['search','Search'],['about','About']].map(function (t) {
       var grp = TAB_GROUPS[t[0]] || [t[0]];
       var on = grp.indexOf(tab) >= 0;
       return { id: t[0], label: t[1], pressed: on, bg: on ? INK : 'transparent', fg: on ? PAPER : '#4A3F35', pick: function () { go(t[0] === 'compare' ? { tab: 'compare', cmpMode: 'trad', cmpReg: null } : { tab: t[0] }); window.scrollTo(0, 0); } };
@@ -4547,9 +4547,9 @@ ${(V.eraMap.list || []).map((it, $index) => html`
 ${(V.isThemes) ? html`
 <section style="display: flex; flex-direction: column; gap: 20px">
 <div>
-<div style="font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #7A3B1E">Themes</div>
-<h1 style="margin: 4px 0 8px; font-family: Fraunces, Georgia, serif; font-size: 36px; line-height: 1.1">Threads from Genesis to Revelation</h1>
-<p style="margin: 0; color: #4A3F35; max-width: 720px">Pick a thread to light up every book it runs through.</p>
+<div style="font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #7A3B1E">Unifying Themes</div>
+<h1 style="margin: 4px 0 8px; font-family: Fraunces, Georgia, serif; font-size: 36px; line-height: 1.1">The threads that hold Scripture together</h1>
+<p style="margin: 0; color: #4A3F35; max-width: 720px">Nine ideas run from Genesis to Revelation and tie its many books into one story. Pick a theme to light up every book it runs through.</p>
 </div>
 <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px">
 ${(V.themeBtns || []).map((t, $index) => html`
