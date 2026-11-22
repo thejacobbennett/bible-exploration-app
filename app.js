@@ -2111,17 +2111,17 @@ var LABEL_STYLE = {
 // Where a History topic lives: its section of the Traditions page, with the panel open.
 var hxTarget = function (id) {
   var h = HISTORY.filter(function (x) { return x.id === id; })[0] || HISTORY[0];
-  if (h.kind === 'b') return { tab: 'compare', cmpMode: 'trad', cmpReg: null, hxId: h.id };
-  if (h.kind === 'fw') return { tab: 'compare', cmpMode: 'fw', cmpFam: h.fam || null, cmpReg: null, hxId: h.id };
+  if (h.kind === 'b') return { tab: 'compare', cmpMode: 'trad', cmpView: 'hist', cmpReg: null, hxId: h.id };
+  if (h.kind === 'fw') return { tab: 'compare', cmpMode: 'fw', cmpView: 'hist', cmpFam: h.fam || null, cmpReg: null, hxId: h.id };
   if (h.pr) return { tab: 'practice', prMode: 'practice', prId: h.pr, hxId: h.id };
-  return { tab: 'compare', cmpMode: 'pr', cmpReg: null, hxId: h.id };
+  return { tab: 'compare', cmpMode: 'pr', cmpView: 'hist', cmpReg: null, hxId: h.id };
 };
 var HX_GROUPS = {
   b: [['God, sin and salvation', ['trinity', 'origsin', 'justif']], ['Scripture and authority', ['canon', 'papacy']], ['Mary and the saints', ['mary', 'saints']], ['Death and the last things', ['purg', 'endtimes']]],
   fw: [['Scripture and authority', ['sola', 'quad']], ['Salvation', ['predest', 'atone']], ['Reading the whole Bible', ['disp', 'covenant']], ['Sacraments', ['supper', 'bapt']], ['The Holy Spirit', ['tongues']]],
   pr: [['Prayer and devotion', ['rosary', 'jesusprayer', 'signcross', 'icons']], ['Seasons and the Lord’s Day', ['churchyear', 'lent', 'lordsday']], ['Church life', ['confession', 'clergy', 'monastic', 'music', 'tithe']]]
 };
-var HIST_KEYS = ['planDay', 'tab', 'book', 'chap', 'era', 'theme', 'tr', 'q', 'prMode', 'prId', 'prTrad', 'cmpMode', 'cmpFam', 'hxId', 'hxKind', 'testa', 'libCanon', 'srMode', 'topic'];
+var HIST_KEYS = ['planDay', 'cmpView', 'tab', 'book', 'chap', 'era', 'theme', 'tr', 'q', 'prMode', 'prId', 'prTrad', 'cmpMode', 'cmpFam', 'hxId', 'hxKind', 'testa', 'libCanon', 'srMode', 'topic'];
 var CH_URL = 'chapters.json';
 var HN_URL = 'henry.json';
 
@@ -2725,6 +2725,7 @@ class Component extends DCLogic {
     if (q.get('hxId') && HISTORY.some(function (h) { return h.id === q.get('hxId'); })) patch.hxId = q.get('hxId');
     if (['b', 'fw', 'pr'].indexOf(q.get('hxKind')) >= 0) patch.hxKind = q.get('hxKind');
     if (q.get('cmpFam') && FW_FAMILIES.some(function (f) { return f.id === q.get('cmpFam'); })) patch.cmpFam = q.get('cmpFam');
+    if (['venn', 'table', 'trads', 'hist'].indexOf(q.get('cmpView')) >= 0) patch.cmpView = q.get('cmpView');
     if (q.get('tab') === 'history') { var hxT = hxTarget(patch.hxId); Object.keys(hxT).forEach(function (k) { patch[k] = hxT[k]; }); }
     if (['all', 'OT', 'NT', 'AP'].indexOf(q.get('testa')) >= 0) patch.testa = q.get('testa');
     if (q.get('libCanon') && CANONS[q.get('libCanon')]) patch.libCanon = q.get('libCanon');
@@ -3994,9 +3995,9 @@ class Component extends DCLogic {
         hasLink: !!(hxSel.fw || hxSel.pr || hxSel.kind === 'b'),
         linkLabel: hxSel.fw ? 'Compare this with other views →' : hxSel.pr ? 'See this practice across traditions →' : 'Compare beliefs across traditions →',
         link: function () {
-          if (hxSel.fw) go({ tab: 'compare', cmpMode: 'fw', cmpFam: hxSel.fam, cmpReg: null, hxId: null });
+          if (hxSel.fw) go({ tab: 'compare', cmpMode: 'fw', cmpFam: hxSel.fam, cmpView: 'venn', cmpReg: null, hxId: null });
           else if (hxSel.pr) go({ tab: 'practice', prMode: 'practice', prId: hxSel.pr, hxId: null });
-          else go({ tab: 'compare', cmpMode: 'trad', cmpReg: null, hxId: null });
+          else go({ tab: 'compare', cmpMode: 'trad', cmpView: 'venn', cmpReg: null, hxId: null });
           window.scrollTo(0, 0);
         },
         steps: hxSteps.map(function (s, i) {
@@ -4026,10 +4027,10 @@ class Component extends DCLogic {
     var prHide = st.prHide || {};
     var prSrc = function (w) { return w && w[2] ? [{ label: w[2][0], url: w[2][1] }] : []; };
     var pr = {
-      modes: [['venn', 'Venn diagram'], ['table', 'Side by side'], ['practice', 'By practice'], ['trad', 'By tradition']].map(function (m) {
+      modes: [['venn', 'Venn diagram'], ['table', 'Side by side'], ['practice', 'By practice'], ['trad', 'By tradition'], ['hist', 'History']].map(function (m) {
         var on = m[0] === prMode;
         return { label: m[1], pressed: on, bg: on ? INK : 'transparent', fg: on ? PAPER : '#4A3F35',
-          pick: function () { if (m[0] === 'venn' || m[0] === 'table') go({ tab: 'compare', cmpMode: 'pr', cmpView: m[0], cmpReg: null }); else go({ tab: 'practice', prMode: m[0] }); } };
+          pick: function () { if (m[0] === 'venn' || m[0] === 'table' || m[0] === 'hist') go({ tab: 'compare', cmpMode: 'pr', cmpView: m[0], cmpReg: null }); else go({ tab: 'practice', prMode: m[0] }); } };
       }),
       isPractice: prMode === 'practice', isTrad: prMode === 'trad',
       practices: PRACTICES.map(function (q) {
@@ -4159,9 +4160,9 @@ class Component extends DCLogic {
       },
       showVenn: nSel >= 2 || (cTable && nSel >= 1),
       view: st.cmpView === 'table' ? 'table' : 'venn',
-      views: [['venn', 'Venn diagram'], ['table', 'Side by side']].concat(cmpMode === 'fw' ? [['trads', 'By tradition']] : cmpMode === 'pr' ? [['bypr', 'By practice'], ['bytr', 'By tradition']] : []).map(function (v) {
+      views: [['venn', 'Venn diagram'], ['table', 'Side by side']].concat(cmpMode === 'fw' ? [['trads', 'By tradition']] : cmpMode === 'pr' ? [['bypr', 'By practice'], ['bytr', 'By tradition']] : []).concat([['hist', 'History']]).map(function (v) {
         if (v[0] === 'bypr' || v[0] === 'bytr') return { label: v[1], pressed: false, bg: 'transparent', fg: '#4A3F35', pick: function () { go({ tab: 'practice', prMode: v[0] === 'bypr' ? 'practice' : 'trad', cmpReg: null }); } };
-        var curV = st.cmpView === 'table' ? 'table' : (st.cmpView === 'trads' && cmpMode === 'fw') ? 'trads' : 'venn';
+        var curV = st.cmpView === 'hist' ? 'hist' : st.cmpView === 'table' ? 'table' : (st.cmpView === 'trads' && cmpMode === 'fw') ? 'trads' : 'venn';
         var on = curV === v[0];
         return { label: v[1], pressed: on, bg: on ? INK : 'transparent', fg: on ? PAPER : '#4A3F35', pick: function () { go({ cmpView: v[0] }); } };
       }),
@@ -4222,6 +4223,12 @@ class Component extends DCLogic {
     cmp.sections.forEach(function (sec) { sec.items.forEach(function (it) { var h = HX_BY_POS[it.text]; it.hasHx = !!h; it.hxPick = function () { if (h) openHx(h.id); }; }); });
     cmp.cards.forEach(function (c, i) { var x = cSel[i]; var h = cmpMode === 'fw' && x ? HX_BY_FW[x.id] : null; c.hasHx = !!h; c.hxPick = function () { if (h) openHx(h.id); }; });
     var showTrads = cmpMode === 'fw' && st.cmpView === 'trads';
+    cmp.isHist = st.cmpView === 'hist'; cmp.notHist = !cmp.isHist;
+    if (cmp.isHist) {
+      cmp.eyebrow = 'Traditions · ' + (cmpMode === 'fw' ? 'Frameworks' : cmpMode === 'pr' ? 'Practice' : 'Beliefs') + ' · History';
+      cmp.h1 = 'How these ' + (cmpMode === 'fw' ? 'frameworks' : cmpMode === 'pr' ? 'practices' : 'beliefs') + ' developed';
+      cmp.intro = 'Some of this is spelled out in Scripture; some grew over centuries through councils, teachers and devotion. Pick a topic to see where it started, who shaped it, how each tradition sees it, and the Bible passages behind it.';
+    }
     cmp.showTradsView = showTrads;
     cmp.showPicker = !showTrads;
     cmp.view = showTrads ? 'trads' : cmp.view;
@@ -4242,9 +4249,9 @@ class Component extends DCLogic {
     cmp.showTableView = cmp.showVenn && cmp.view === 'table' && !showTrads;
     var trKind = tab === 'practice' || cmpMode === 'pr' ? 'pr' : cmpMode === 'fw' ? 'fw' : 'b';
     var trItems = [];
-    if (tab === 'compare' && cmp.showVennView) trItems.push({ label: 'Download these overlap lists (CSV)', pick: function () { go({ trMenu: false }); cmp.exportLists(); } });
-    if (tab === 'compare' && cmp.showTableView) trItems.push({ label: 'Download this side-by-side table (CSV)', pick: function () { go({ trMenu: false }); cmp.exportTable(); } });
-    if (tab === 'compare' && showTrads) trItems.push({ label: 'Download this tradition chart (CSV)', pick: function () { go({ trMenu: false }); cmp.exportTrads(); } });
+    if (tab === 'compare' && cmp.notHist && cmp.showVennView) trItems.push({ label: 'Download these overlap lists (CSV)', pick: function () { go({ trMenu: false }); cmp.exportLists(); } });
+    if (tab === 'compare' && cmp.notHist && cmp.showTableView) trItems.push({ label: 'Download this side-by-side table (CSV)', pick: function () { go({ trMenu: false }); cmp.exportTable(); } });
+    if (tab === 'compare' && cmp.notHist && showTrads) trItems.push({ label: 'Download this tradition chart (CSV)', pick: function () { go({ trMenu: false }); cmp.exportTrads(); } });
     if (trKind === 'pr') trItems.push({ label: 'Download all practices (CSV)', pick: function () { go({ trMenu: false }); pr.exportAll(); } });
     trItems.push({ label: 'Download all history timelines (CSV)', pick: function () { go({ trMenu: false }); hx.exportAll(); } });
     var trMenu = { open: !!st.trMenu, toggle: function () { go({ trMenu: !st.trMenu }); }, items: trItems };
@@ -4267,7 +4274,7 @@ class Component extends DCLogic {
       onPick: function (e) { openHx(e.target.value); },
       groups: [['b', 'Beliefs'], ['fw', 'Frameworks'], ['pr', 'Practices']].map(function (k) { return { label: k[1], items: HISTORY.filter(function (h) { return h.kind === k[0]; }).map(function (h) { return { id: h.id, name: h.name }; }) }; }),
       nViews: (hxSel.views || []).length, nSteps: hxSel.steps.length, nPeople: hxSel.people.length,
-      hasLink: hx.sel.hasLink && !(hxSel.fw ? (tab === 'compare' && cmpMode === 'fw' && (st.cmpFam || '') === (hxSel.fam || '')) : hxSel.pr ? (tab === 'practice' && prMode === 'practice' && prSel.id === hxSel.pr) : (tab === 'compare' && cmpMode === 'trad')) };
+      hasLink: hx.sel.hasLink && (st.cmpView === 'hist' || tab !== 'compare') && !(hxSel.fw ? (tab === 'compare' && cmpMode === 'fw' && (st.cmpFam || '') === (hxSel.fam || '')) : hxSel.pr ? (tab === 'practice' && prMode === 'practice' && prSel.id === hxSel.pr) : (tab === 'compare' && cmpMode === 'trad')) };
 
     var phoneScreen = this.isPhoneScreen();
     var shareInfo = function () {
@@ -4995,21 +5002,6 @@ ${(r.hasSrc) ? html`<div style="font-size: 13px">${(r.src || []).map((q, $index)
 </article>
 ` : null}
 <div style="font-size: 12px; color: #6B5F52; max-width: 820px">Summaries are written for this app from each tradition’s catechisms, prayer books and confessions, linked where used. Practice varies by country, parish and family; for guidance, talk with a pastor or priest in your own tradition.</div>
-<section aria-labelledby=${V.hxs.headId} style="display: flex; flex-direction: column; gap: 14px; border-top: 2px solid #E2D8C6; padding-top: 22px; margin-top: 6px">
-<div>
-<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #7A3B1E">Traditions · History</div>
-<h2 id=${V.hxs.headId} style="margin: 4px 0 6px; font-family: Fraunces, Georgia, serif; font-size: 28px; line-height: 1.15">${V.hxs.title}</h2>
-<p style="margin: 0; color: #4A3F35; max-width: 780px">Some of this is spelled out in Scripture; some grew over centuries through councils, teachers and devotion. Pick a topic to see where it started, who shaped it, how each tradition sees it, and the Bible passages behind it.</p>
-</div>
-${(V.hxs.groups || []).map((g, $index) => html`
-<div style="display: flex; flex-direction: column; gap: 8px">
-<h3 style="margin: 0; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52">${g.label}</h3>
-<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px">
-${(g.items || []).map((o, $index) => html`<button type="button" onClick=${o.pick} style="cursor: pointer; text-align: left; border: 1px solid #E2D8C6; background: #FFFDF8; border-radius: 14px; padding: 12px 14px; min-height: 44px; display: flex; flex-direction: column; gap: 6px; color: #231E19"><span style="display: flex; align-items: flex-start; gap: 8px"><span style="flex: 1 1 auto; font-family: Fraunces, Georgia, serif; font-size: 17px; font-weight: 700; line-height: 1.25">${o.name}</span><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7A3B1E" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex: none; margin-top: 3px"><path d="M9 6l6 6-6 6"></path></svg></span><span style="align-self: flex-start; font-size: 11px; font-weight: 700; border-radius: 999px; padding: 2px 9px; background: ${o.basisBg}; color: ${o.basisFg}">${o.basis}</span><span style="font-size: 14px; line-height: 1.5; color: #4A3F35; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden">${o.sum}</span></button>`)}
-</div>
-</div>
-`)}
-</section>
 </section>
 ` : null}
 ${(V.isCompare) ? html`
@@ -5024,6 +5016,7 @@ ${(V.trMenu.open) ? html`<div role="menu" style="position: absolute; right: 0; t
 <div class="be-seg" role="group" aria-label="View" style="display: flex; gap: 4px; background: #EAE1D0; padding: 4px; border-radius: 999px; align-self: flex-start">
 ${(V.cmp.views || []).map((v, $index) => html`<button type="button" onClick=${v.pick} aria-pressed=${v.pressed} style="border: none; cursor: pointer; padding: 8px 16px; min-height: 44px; border-radius: 999px; font-size: 14px; font-weight: 700; background: ${v.bg}; color: ${v.fg}">${v.label}</button>`)}
 </div>
+${(V.cmp.notHist) ? html`
 ${(V.cmp.isFw) ? html`
 <div style="display: flex; flex-direction: column; gap: 6px">
 <label for="fw-topic" style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52">Topic</label>
@@ -5132,12 +5125,9 @@ ${(c.canLive) ? html`<button type="button" onClick=${c.live} style="align-self: 
 `)}
 </div>
 <div style="font-size: 12px; color: #6B5F52">In the side-by-side view, “—” means a view does not hold or emphasize that point, not necessarily that it denies it. Summaries are written for this app and checked against Encyclopaedia Britannica. Positions are simplified; individual churches and members within a tradition often differ.</div>
-<section aria-labelledby=${V.hxs.headId} style="display: flex; flex-direction: column; gap: 14px; border-top: 2px solid #E2D8C6; padding-top: 22px; margin-top: 6px">
-<div>
-<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #7A3B1E">Traditions · History</div>
-<h2 id=${V.hxs.headId} style="margin: 4px 0 6px; font-family: Fraunces, Georgia, serif; font-size: 28px; line-height: 1.15">${V.hxs.title}</h2>
-<p style="margin: 0; color: #4A3F35; max-width: 780px">Some of this is spelled out in Scripture; some grew over centuries through councils, teachers and devotion. Pick a topic to see where it started, who shaped it, how each tradition sees it, and the Bible passages behind it.</p>
-</div>
+` : null}
+${(V.cmp.isHist) ? html`
+<section aria-label=${V.hxs.title} style="display: flex; flex-direction: column; gap: 14px; padding-top: 4px">
 ${(V.hxs.groups || []).map((g, $index) => html`
 <div style="display: flex; flex-direction: column; gap: 8px">
 <h3 style="margin: 0; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52">${g.label}</h3>
@@ -5147,6 +5137,7 @@ ${(g.items || []).map((o, $index) => html`<button type="button" onClick=${o.pick
 </div>
 `)}
 </section>
+` : null}
 </section>
 ` : null}
 
