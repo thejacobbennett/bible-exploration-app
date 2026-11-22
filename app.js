@@ -2382,8 +2382,8 @@ class Component extends DCLogic {
     // Remember a phone visitor's choice of desktop view.
     var saved = false;
     try { saved = window.localStorage.getItem('bibleExplorer.desktopView') === '1'; } catch (err) {}
-    if (saved && this.isPhoneScreen()) this.setDesktopView(true);
-    window.addEventListener('orientationchange', function () { if (self.state && self.state.desktopView) setTimeout(function () { self.setDesktopView(true); }, 250); });
+    if (saved && this.isPhoneScreen()) this.setDesktopView(true, true);
+    window.addEventListener('orientationchange', function () { if (self.state && self.state.desktopView) setTimeout(function () { self.setDesktopView(true, true); }, 250); });
     this.readLink();
     window.addEventListener('popstate', function (e) { self.histPop(e); });
     try { var hs0 = window.history.state; if (hs0 && hs0.be) this._histDepth = hs0.depth || 0; } catch (err) {}
@@ -2850,7 +2850,8 @@ class Component extends DCLogic {
   }
 
   // Desktop view on a phone: lay the page out at desktop width and let the browser zoom it to fit.
-  setDesktopView(on) {
+  setDesktopView(on, keep) {
+    if (!keep) { try { window.localStorage.setItem('bibleExplorer.desktopView', on ? '1' : '0'); try { window.history.scrollRestoration = 'manual'; } catch (e2) {} window.scrollTo(0, 0); window.location.reload(); return; } catch (err) {} }
     var meta = document.querySelector('meta[name="viewport"]');
     if (!meta) { meta = document.createElement('meta'); meta.setAttribute('name', 'viewport'); document.head.appendChild(meta); }
     // Scale the 1280px desktop layout to the phone's width. Pinning minimum and maximum scale for a moment makes
@@ -4330,7 +4331,7 @@ class Component extends DCLogic {
           searchOpen: searchOpen, searchBg: searchOpen ? '#231E19' : '#FFFDF8', searchFg: searchOpen ? '#FBF7EF' : '#231E19',
           toggleMenu: function () { go({ navOpen: !menuOpen, hdrSearch: false }); },
           toggleSearch: function () { go({ hdrSearch: !searchOpen, navOpen: false }); if (!searchOpen) setTimeout(function () { var el = document.getElementById('book-search'); if (el) el.focus(); }, 60); },
-          home: function () { go({ tab: 'overview', navOpen: false, hdrSearch: false }); window.scrollTo(0, 0); },
+          home: function (e) { if (e && e.preventDefault) e.preventDefault(); if (/(^|\.)exploreyourbible\.com$/.test(window.location.hostname)) { window.location.assign('/'); return; } go({ tab: 'overview', navOpen: false, hdrSearch: false }); window.scrollTo(0, 0); },
           items: tabs.map(function (t) {
             return { label: t.label, sub: SUBS[t.id] || '', pressed: t.pressed, bg: t.pressed ? INK : '#FFFDF8', fg: t.pressed ? PAPER : INK, border: t.pressed ? INK : '#E2D8C6',
               pick: function () { go(t.id === 'compare' ? { tab: 'compare', cmpMode: 'trad', cmpReg: null, navOpen: false, hdrSearch: false } : { tab: t.id, navOpen: false, hdrSearch: false }); window.scrollTo(0, 0); } };
@@ -4380,13 +4381,13 @@ ${(V.showDesktopBtn) ? html`
 ` : null}
 ${(V.hdr.full) ? html`
 <div style="max-width: 1360px; margin: 0 auto; padding: 16px 32px; display: flex; flex-wrap: wrap; align-items: center; gap: 14px 32px">
-<div style="display: flex; align-items: center; gap: 12px; min-width: 0; padding-right: ${V.brandPad}">
+<a href="/" onClick=${V.hdr.home} aria-label="Explore Your Bible: home" style="display: flex; align-items: center; gap: 12px; min-width: 0; padding-right: ${V.brandPad}; color: #231E19; text-decoration: none">
 <svg aria-hidden="true" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#7A3B1E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5c3-1.5 6.5-1.5 10 1 3.5-2.5 7-2.5 10-1v14c-3-1.5-6.5-1.5-10 1-3.5-2.5-7-2.5-10-1z"></path><path d="M12 6v14"></path></svg>
 <div>
 <div style="font-family: Fraunces, Georgia, serif; font-size: 24px; font-weight: 700; line-height: 1.1">Explore Your Bible</div>
 <div style="font-size: 13px; color: #6B5F52">Scripture, story and traditions</div>
 </div>
-</div>
+</a>
 <nav aria-label="Sections" style="display: flex; flex-wrap: wrap; gap: 6px; flex: 1 1 auto">
 ${(V.tabs || []).map((t, $index) => html`
 <button type="button" onClick=${t.pick} aria-pressed=${t.pressed} style="border: none; cursor: pointer; padding: 10px 18px; min-height: 44px; border-radius: 999px; font-size: 15px; font-weight: 600; background: ${t.bg}; color: ${t.fg}">${t.label}</button>
