@@ -2265,11 +2265,12 @@ class Component extends DCLogic {
     }
   }
 
-  tourStart(key, steps, card) {
+  tourStart(key, steps, card, at) {
     this.tourStop(false);
     this._tour = { key: key, steps: steps, i: 0, paused: false, card: card };
     if (card && !card.classList.contains('be-focused')) this.focusEnter(card, card.querySelector('.be-fbtn'));
-    this.tourGo(0);
+    this.tourGo(at || 0);
+    if (at) { var self = this; setTimeout(function () { var c = document.querySelector('[data-tour-cap]'), f = document.querySelector('.be-focused [data-fit]'); if (f && f.scrollIntoView) f.scrollIntoView({ block: 'start' }); }, 50); }
   }
   tourDur(i) {
     var s = this._tour && this._tour.steps[i]; if (!s) return 5000;
@@ -3256,6 +3257,13 @@ class Component extends DCLogic {
         var card = e && e.currentTarget && e.currentTarget.closest ? e.currentTarget.closest('[data-focus]') : null;
         self.tourStart(key, steps, card);
       };
+      // Tapping a place in the list under the map opens Follow along at that place.
+      if (M.canPlay && M.list && M.list.length === steps.length) M.list.forEach(function (it, j) {
+        it.pick = function (e) {
+          var card = e && e.currentTarget && e.currentTarget.closest ? e.currentTarget.closest('[data-focus]') : null;
+          self.tourStart(key, steps, card, j);
+        };
+      });
       M.tourOn = !!T;
       if (!T) return;
       var i = Math.min(T.i, steps.length - 1), cur = steps[i];
