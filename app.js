@@ -350,7 +350,7 @@ function buildMap(def, aspect, aspectCss, wide, pin, zoom, go, mapKey, mapId, pa
       return {
         x: pct(p.ux / MAP_FW * 100), y: pct(p.uy / MAP_FH * 100), num: p.num, name: P[0],
         aria: p.num + '. ' + P[0] + ': ' + p.note,
-        bg: on ? '#231E19' : '#7A3B1E', z: on ? 6 : 2,
+        bg: on ? '#231E19' : '#7A3B1E', z: on ? 6 : 2, on: on ? 'true' : 'false', side: side,
         showLabel: on || !many,
         lx: side === 'l' ? '-16px' : side === 'b' ? '0px' : '16px',
         ly: side === 'b' ? '14px' : '-10px',
@@ -1473,6 +1473,360 @@ var PRAC_POS = [
 
 // ----- Where to turn: passages for particular situations, like the topical index in many printed Bibles -----
 // Each passage: [book, chapter, first verse, last verse, why it speaks to this]. Catholic and Orthodox books are marked in the app.
+// ----- History: how a belief, framework or practice developed -----
+// basis: s = taught directly in Scripture, d = developed from Scripture over time, t = mainly church tradition (often with biblical roots)
+// k (step kind): b = Bible, c = council or official church decision, p = a person's teaching or a movement, r = Reformation or split, d = devotion taking shape
+// r (refs): [book, chapter, verse, label]; tr: tradition id the step belongs to; ap: date is approximate or traditional
+var HX_WIKI = 'https://en.wikipedia.org/wiki/';
+var HX_BRIT = 'https://www.britannica.com/search?query=';
+var HISTORY = [
+  { id: 'rosary', name: "The Rosary", kind: 'pr', basis: 't', trads: 'C', pr: 'pray', pos: ["Pray the Rosary"],
+    sum: "A string of beads used to pray the Our Father, Hail Mary and Glory Be while meditating on events in the lives of Jesus and Mary. It grew slowly, over about a thousand years, from monks counting prayers.",
+    note: "Its words come from Scripture: the Lord's Prayer and the greetings of the angel Gabriel and Elizabeth to Mary. The form of the Rosary, its beads and its mysteries are church tradition, fixed by popes in 1569 and 2002.",
+    refs: [['luk', 1, 28, "Luke 1:28"], ['luk', 1, 42, "Luke 1:42"], ['mat', 6, 9, "Matthew 6:9–13"], ['luk', 2, 19, "Luke 2:19"]],
+    people: [["St. Dominic", "1170–1221", "Founder of the Dominicans; tradition credits him with the Rosary"], ["Dominic of Prussia", "1384–1460", "Carthusian monk who joined meditations to the Hail Marys"], ["Alan de la Roche", "c. 1428–1475", "Dominican preacher who spread the devotion"], ["Pius V", "1504–1572", "Pope who fixed the 15 mysteries"], ["Leo XIII", "1810–1903", "The “Rosary Pope”"], ["John Paul II", "1920–2005", "Pope who added the Luminous Mysteries"]],
+    steps: [
+      { w: "1st century", y: 30, k: 'b', t: "The words of the Hail Mary", d: "Gabriel greets Mary (“Hail, full of grace, the Lord is with you”) and Elizabeth blesses her and the child she carries. These two greetings later become the first half of the Hail Mary. Jesus teaches the Our Father.", r: [['luk', 1, 28, "Luke 1:28"], ['luk', 1, 42, "Luke 1:42"], ['mat', 6, 9, "Matthew 6:9"]] },
+      { w: "c. 400", y: 400, ap: 1, k: 'p', t: "Monks count their prayers", d: "Desert monks in Egypt kept count of repeated prayers. Palladius tells of Abba Paul of Pherme, who said 300 prayers a day and dropped a pebble from his lap for each one." },
+      { w: "c. 800s–1100s", y: 900, ap: 1, k: 'd', t: "The “poor man's Psalter”", d: "Monks prayed all 150 psalms. Lay people who could not read them said 150 Our Fathers instead, counted on strings of beads called paternosters. Later, 150 Hail Marys were said in three sets of fifty." },
+      { w: "1100s–1200s", y: 1150, ap: 1, k: 'd', t: "The Hail Mary takes shape", d: "The two Gospel greetings come into common use as a prayer in Western Europe, and by the 1200s the name “Jesus” is added at the end." },
+      { w: "1214 (traditional)", y: 1214, ap: 1, k: 'p', t: "The story of St. Dominic", d: "A later tradition says Mary gave the Rosary to St. Dominic. Historians find no record of it in his lifetime; the story was spread in the 1400s by Alan de la Roche. The Dominicans did become the Rosary's great promoters." },
+      { w: "c. 1409", y: 1409, k: 'p', t: "Meditating on Christ's life", d: "Dominic of Prussia, a Carthusian monk, attached a short phrase about Jesus's life to each of 50 Hail Marys, turning repetition into meditation on the Gospel." },
+      { w: "c. 1470", y: 1470, k: 'p', t: "The first Rosary confraternity", d: "The Dominican Alan de la Roche preached the “Psalter of Mary” across northern Europe and founded a Rosary confraternity at Douai. Groups of mysteries begin to take shape." },
+      { w: "1520s", y: 1522, k: 'r', tr: 'L', t: "The Reformers set it aside", d: "Luther and the other Reformers kept honoring Mary but taught that prayer goes to God alone through Christ, and criticized counted prayers as a work of merit. The Rosary dropped out of Protestant practice." },
+      { w: "1568–1569", y: 1569, k: 'c', tr: 'C', t: "Pius V fixes the form", d: "The second half of the Hail Mary (“Holy Mary, Mother of God, pray for us sinners…”) appears in the Roman Breviary of 1568. In 1569 Pope Pius V sets the 15 mysteries: Joyful, Sorrowful and Glorious." },
+      { w: "1571–1573", y: 1571, k: 'c', tr: 'C', t: "Lepanto and the feast", d: "Pius V credited the Rosary prayers of the faithful for the Christian fleet's victory over the Ottomans at Lepanto on 7 October 1571. The feast he set became Our Lady of the Rosary under Gregory XIII in 1573." },
+      { w: "1883–1902", y: 1883, k: 'c', tr: 'C', t: "The “Rosary Pope”", d: "Leo XIII writes more than ten encyclicals on the Rosary and dedicates the month of October to it." },
+      { w: "1917", y: 1917, k: 'd', tr: 'C', t: "Fátima", d: "Three children in Fátima, Portugal, say Mary asked them to pray the Rosary daily for peace. The local bishop approved the apparitions as worthy of belief in 1930." },
+      { w: "1980s", y: 1985, ap: 1, k: 'd', tr: 'A', t: "Prayer beads beyond Rome", d: "Some Anglicans and Lutherans begin using prayer beads of their own design, such as the 33-bead Anglican rosary. Orthodox Christians use the prayer rope for the Jesus Prayer instead." },
+      { w: "2002", y: 2002, k: 'c', tr: 'C', t: "The Luminous Mysteries", d: "John Paul II adds five Mysteries of Light from Jesus's public ministry, from his baptism to the Last Supper, in his letter Rosarium Virginis Mariae.", r: [['mat', 3, 13, "Matthew 3:13–17"], ['jhn', 2, 1, "John 2:1–11"]] }
+    ],
+    src: [["Rosary (Britannica)", HX_BRIT + 'rosary'], ["Rosary (Wikipedia)", HX_WIKI + 'Rosary'], ["Rosarium Virginis Mariae (2002)", 'https://www.vatican.va/content/john-paul-ii/en/apost_letters/2002/documents/hf_jp-ii_apl_20021016_rosarium-virginis-mariae.html']] },
+
+  { id: 'mary', name: "Mary: Mother of God and her honor", kind: 'b', basis: 'd', trads: 'CO', pos: ["Mary honored as Theotokos (“God-bearer”); the saints’ prayers are asked for", "Immaculate Conception and Assumption of Mary defined as dogma", "Ask Mary and the saints to pray for you"],
+    sum: "Every tradition honors Mary as the mother of Jesus and a model of faith. Catholic and Orthodox Christians also ask for her prayers and celebrate her with feasts, and Catholics hold two dogmas about her defined in 1854 and 1950.",
+    note: "Mary's faith and role are in Scripture. The title Theotokos (“God-bearer”) was defined at an early council to protect a truth about Jesus. Her perpetual virginity, the Immaculate Conception and the Assumption come from Tradition, and Protestants do not accept the last two.",
+    refs: [['luk', 1, 28, "Luke 1:28"], ['luk', 1, 43, "Luke 1:43"], ['luk', 1, 48, "Luke 1:48"], ['jhn', 19, 26, "John 19:26–27"], ['act', 1, 14, "Acts 1:14"]],
+    people: [["Justin Martyr", "c. 100–165", "First to call Mary the “new Eve”"], ["Irenaeus of Lyon", "c. 130–202", "Developed the Eve–Mary parallel"], ["Nestorius", "c. 386–451", "Archbishop who objected to “Theotokos”"], ["Cyril of Alexandria", "c. 376–444", "Led the case for “Theotokos” at Ephesus"], ["Martin Luther", "1483–1546", "Praised Mary while rejecting prayer to her"], ["Pius IX", "1792–1878", "Defined the Immaculate Conception"], ["Pius XII", "1876–1958", "Defined the Assumption"]],
+    steps: [
+      { w: "1st century", y: 30, k: 'b', t: "Mother of the Lord", d: "Gabriel greets Mary as favored by God; Elizabeth calls her “the mother of my Lord”; Mary says all generations will call her blessed. At the cross Jesus entrusts her to the beloved disciple, and she prays with the first believers.", r: [['luk', 1, 28, "Luke 1:28"], ['luk', 1, 43, "Luke 1:43"], ['luk', 1, 48, "Luke 1:48"], ['jhn', 19, 26, "John 19:26"], ['act', 1, 14, "Acts 1:14"]] },
+      { w: "c. 150", y: 150, ap: 1, k: 'd', t: "Stories of her early life", d: "The Protoevangelium of James, which is not in any Bible, tells of Mary's parents, Joachim and Anne, and her childhood. It shaped later feasts and art." },
+      { w: "c. 155–180", y: 160, k: 'p', t: "The new Eve", d: "Justin Martyr and Irenaeus contrast Mary's trusting “yes” to God with Eve's disobedience, the first reflection on Mary after the New Testament.", r: [['gen', 3, 15, "Genesis 3:15"]] },
+      { w: "3rd–4th century", y: 275, ap: 1, k: 'd', t: "The earliest prayer to Mary", d: "The Sub tuum praesidium (“Beneath your protection we take refuge, O Theotokos”) survives on an Egyptian papyrus, usually dated to the 200s or 300s." },
+      { w: "431", y: 431, k: 'c', t: "Council of Ephesus: “Theotokos”", d: "Against Nestorius, who preferred “Christ-bearer,” the council confirms Mary as Theotokos, “God-bearer.” The point was about Jesus: the one born of Mary is truly God." },
+      { w: "553", y: 553, k: 'c', t: "“Ever-virgin”", d: "The Second Council of Constantinople calls Mary ever-virgin. Luther and Zwingli still held this view; many later Protestants read Jesus's “brothers” as Mary's other children.", r: [['mrk', 6, 3, "Mark 6:3"]] },
+      { w: "c. 600", y: 600, ap: 1, k: 'd', t: "The Dormition feast", d: "Emperor Maurice sets 15 August as the feast of Mary's “falling asleep,” kept in East and West. In the West it becomes the Assumption." },
+      { w: "1520s", y: 1521, k: 'r', tr: 'L', t: "Honor without invocation", d: "Luther praised Mary as a model of humble faith in his commentary on the Magnificat (1521), but the Reformers taught that prayer is addressed to God alone through Christ. Lutherans and Anglicans keep some Marian feasts.", r: [['luk', 1, 46, "Luke 1:46–55"], ['1ti', 2, 5, "1 Timothy 2:5"]] },
+      { w: "1854", y: 1854, k: 'c', tr: 'C', t: "The Immaculate Conception", d: "Pius IX defines that Mary was kept free from original sin from her conception. The Orthodox call her all-holy but do not accept this definition." },
+      { w: "1950", y: 1950, k: 'c', tr: 'C', t: "The Assumption", d: "Pius XII defines that Mary was taken body and soul into heavenly glory, the only time a pope has used the infallibility defined in 1870." },
+      { w: "1964", y: 1964, k: 'c', tr: 'C', t: "Vatican II", d: "Lumen Gentium presents Mary as the first and model member of the Church and warns against both exaggeration and neglect in devotion to her." }
+    ],
+    src: [["Mary (Britannica)", HX_BRIT + 'Virgin+Mary'], ["Theotokos (Wikipedia)", HX_WIKI + 'Theotokos'], ["Marian dogmas (Wikipedia)", HX_WIKI + 'Catholic_Mariology']] },
+
+  { id: 'trinity', name: "The Trinity", kind: 'b', basis: 'd', trads: 'COLARMBPN', pos: ["Believe in one God as Trinity: Father, Son and Holy Spirit", "Nicene Creed regularly used in worship"],
+    sum: "Christians confess one God in three persons: Father, Son and Holy Spirit. The word “Trinity” is not in the Bible; the creeds that define it were hammered out in the 300s.",
+    note: "Scripture insists that God is one and speaks of the Father, the Son and the Spirit as God. The word “Trinity” and the creeds' technical terms come from the early church, which every tradition here accepts.",
+    refs: [['deu', 6, 4, "Deuteronomy 6:4"], ['mat', 28, 19, "Matthew 28:19"], ['jhn', 1, 1, "John 1:1"], ['2co', 13, 14, "2 Corinthians 13:14"]],
+    people: [["Tertullian", "c. 155–220", "First to use the Latin “trinitas”"], ["Arius", "c. 256–336", "Taught that the Son was created"], ["Athanasius", "c. 296–373", "Defender of Nicaea"], ["The Cappadocian Fathers", "300s", "Basil, Gregory of Nazianzus and Gregory of Nyssa"], ["Augustine", "354–430", "Wrote On the Trinity"]],
+    steps: [
+      { w: "Old Testament", y: -1000, ap: 1, k: 'b', t: "The Lord is one", d: "Israel confesses that the Lord alone is God, a belief Christians never gave up.", r: [['deu', 6, 4, "Deuteronomy 6:4"], ['isa', 45, 5, "Isaiah 45:5"]] },
+      { w: "1st century", y: 50, k: 'b', t: "Father, Son and Spirit", d: "Jesus sends his disciples to baptize in the one name of the Father, Son and Holy Spirit. John calls the Word God, and Paul blesses churches in the name of all three.", r: [['mat', 28, 19, "Matthew 28:19"], ['jhn', 1, 1, "John 1:1"], ['2co', 13, 14, "2 Corinthians 13:14"]] },
+      { w: "c. 213", y: 213, ap: 1, k: 'p', t: "Tertullian names it", d: "In Against Praxeas, Tertullian uses the Latin trinitas and speaks of one substance in three persons." },
+      { w: "c. 318", y: 318, ap: 1, k: 'p', t: "Arius", d: "Arius, a priest in Alexandria, teaches that the Son was created by the Father: “there was when he was not.”" },
+      { w: "325", y: 325, k: 'c', t: "Council of Nicaea", d: "Bishops called by Emperor Constantine declare the Son “of one substance” with the Father. Athanasius defends this for decades and is exiled five times." },
+      { w: "381", y: 381, k: 'c', t: "Constantinople: the Holy Spirit", d: "The council expands the creed into the Nicene Creed used today, confessing the Spirit as “the Lord, the giver of life,” worshiped with the Father and the Son. The Cappadocians supply the language of one essence in three persons." },
+      { w: "c. 400–416", y: 410, ap: 1, k: 'p', t: "Augustine's On the Trinity", d: "Augustine's long study shapes Western thinking, including the idea that the Spirit proceeds from the Father and the Son." },
+      { w: "589–1054", y: 589, k: 'r', t: "The filioque", d: "A council at Toledo adds to the creed that the Spirit proceeds from the Father “and the Son” (filioque); Rome adopts it in 1014. The East rejects the change, one cause of the split of 1054." },
+      { w: "1500s", y: 1530, k: 'r', t: "Kept by the Reformers", d: "The Reformers keep the Nicene and Athanasian creeds. Small anti-Trinitarian groups, such as the Socinians, break away." }
+    ],
+    src: [["Trinity (Britannica)", HX_BRIT + 'Trinity+Christianity'], ["Nicene Creed (Wikipedia)", HX_WIKI + 'Nicene_Creed']] },
+
+  { id: 'canon', name: "Which books are in the Bible", kind: 'b', basis: 'd', trads: 'COLARMBPN', pos: ["Old Testament includes the deuterocanonical books (Tobit, Judith, Maccabees, Wisdom, Sirach, Baruch)", "Old Testament has the 39 books of the Hebrew Bible", "Apocrypha may be read for example and instruction, but not to set doctrine"],
+    sum: "All Christians share the 27 books of the New Testament. They differ on the Old Testament: Catholic and Orthodox Bibles include books that Protestants call the Apocrypha.",
+    note: "The Bible contains no list of its own books. The church recognized them over several centuries, and the deuterocanonical books were finally settled for each tradition only in the 1500s and 1600s.",
+    refs: [['luk', 24, 44, "Luke 24:44"], ['2ti', 3, 16, "2 Timothy 3:16"], ['2pe', 3, 16, "2 Peter 3:16"]],
+    people: [["Marcion", "c. 85–160", "Cut the Bible down, forcing the question"], ["Athanasius", "c. 296–373", "First to list the 27 NT books"], ["Jerome", "c. 347–420", "Translator of the Vulgate"], ["Martin Luther", "1483–1546", "Placed the Apocrypha between the Testaments"]],
+    steps: [
+      { w: "3rd–1st century BC", y: -250, ap: 1, k: 'd', t: "The Septuagint", d: "Jews in Alexandria translate the Scriptures into Greek. The copies later used by Christians include Tobit, Judith, Wisdom, Sirach and Maccabees." },
+      { w: "1st century", y: 60, k: 'b', t: "Scripture in the New Testament", d: "Jesus speaks of the Law of Moses, the Prophets and the Psalms. Peter already counts Paul's letters with “the other Scriptures.”", r: [['luk', 24, 44, "Luke 24:44"], ['2pe', 3, 16, "2 Peter 3:16"]] },
+      { w: "c. 140", y: 140, ap: 1, k: 'p', t: "Marcion", d: "Marcion accepts only an edited Gospel of Luke and ten of Paul's letters, pressing the church to say which books are Scripture." },
+      { w: "367", y: 367, k: 'p', t: "Athanasius's list", d: "Athanasius's Easter letter is the first known list of exactly the 27 New Testament books." },
+      { w: "393–397", y: 393, k: 'c', t: "Hippo and Carthage", d: "North African councils list the Old Testament with the deuterocanonical books, and the 27 New Testament books." },
+      { w: "c. 405", y: 405, k: 'p', t: "Jerome's Vulgate", d: "Jerome translates from the Hebrew and prefers the Hebrew canon, calling the other books useful but not for doctrine. The Western church keeps them." },
+      { w: "1534", y: 1534, k: 'r', tr: 'L', t: "Luther's Bible", d: "Luther's German Bible gathers these books between the Testaments as Apocrypha: “not held equal to Holy Scripture, but useful and good to read.”" },
+      { w: "1546", y: 1546, k: 'c', tr: 'C', t: "Council of Trent", d: "Trent defines the canon, including the deuterocanonical books." },
+      { w: "1563–1646", y: 1563, k: 'r', tr: 'R', t: "The Protestant confessions", d: "The Anglican Thirty-Nine Articles allow the Apocrypha to be read for example of life but not to set doctrine. The Westminster Confession (1646) leaves them out entirely." },
+      { w: "1672", y: 1672, k: 'c', tr: 'O', t: "Synod of Jerusalem", d: "The Orthodox synod affirms Tobit, Judith, Wisdom, Sirach and Maccabees as Scripture. Orthodox Bibles also include books such as 3 Maccabees and Psalm 151." }
+    ],
+    src: [["Biblical canon (Wikipedia)", HX_WIKI + 'Biblical_canon'], ["Biblical literature (Britannica)", HX_BRIT + 'biblical+canon']] },
+
+  { id: 'purg', name: "Purgatory and prayer for the dead", kind: 'b', basis: 'd', trads: 'C', pos: ["Purgatory: purification after death for those saved", "Prayer for the departed, without a defined doctrine of purgatory", "No purgatory"],
+    sum: "Catholics teach that some who die in God's grace are purified before entering heaven, and that the prayers of the living help them. The Orthodox pray for the dead without defining purgatory; Protestants reject it.",
+    note: "Catholics point to 2 Maccabees (which Protestants do not count as Scripture) and to Paul's image of being saved “as through fire.” Prayer for the dead is very ancient; purgatory as a defined doctrine dates from the Middle Ages.",
+    refs: [['2ma', 12, 43, "2 Maccabees 12:43–46"], ['1co', 3, 13, "1 Corinthians 3:13–15"], ['mat', 12, 32, "Matthew 12:32"]],
+    people: [["Perpetua", "d. 203", "Martyr who prayed for her dead brother"], ["Augustine", "354–430", "Asked prayers for his mother Monica"], ["Gregory the Great", "c. 540–604", "Pope whose stories spread the belief"], ["Martin Luther", "1483–1546", "Attacked indulgences for the dead"]],
+    steps: [
+      { w: "2nd century BC", y: -160, k: 'b', t: "Judas Maccabeus", d: "After a battle, Judas has an offering sent to Jerusalem for fallen soldiers, that they might be freed from their sin.", r: [['2ma', 12, 43, "2 Maccabees 12:43–46"]] },
+      { w: "c. AD 55", y: 55, k: 'b', t: "“As through fire”", d: "Paul says each person's work will be tested by fire; some will be saved, “but only as through fire.” Catholics read this as purification; Protestants as judgment of a believer's work.", r: [['1co', 3, 13, "1 Corinthians 3:13–15"]] },
+      { w: "c. 203–211", y: 205, k: 'd', t: "Prayer for the departed", d: "The martyr Perpetua prays in prison for her dead brother, and Tertullian mentions offerings for the dead on the anniversary of their death." },
+      { w: "c. 400", y: 400, ap: 1, k: 'p', t: "Augustine and Monica", d: "In his Confessions, Augustine asks readers to remember his mother at the altar, and he speaks elsewhere of a purifying fire after death for some." },
+      { w: "593", y: 593, k: 'p', t: "Gregory the Great", d: "Pope Gregory's Dialogues tell of souls helped by Masses offered for them, spreading the belief across the West." },
+      { w: "c. 1170", y: 1170, ap: 1, k: 'p', t: "A name: purgatorium", d: "The noun “purgatory” comes into use in Latin theology, describing a state (often pictured as a place) of purification." },
+      { w: "1274 and 1439", y: 1274, k: 'c', tr: 'C', t: "Councils of Lyon and Florence", d: "Western councils define purification after death. At Florence the Greek delegates accept a formula, but the Orthodox churches never receive the council." },
+      { w: "1517", y: 1517, k: 'r', tr: 'L', t: "Indulgences and the Reformation", d: "Luther's 95 Theses attack the sale of indulgences for souls in purgatory. The Protestant churches reject purgatory." },
+      { w: "1563", y: 1563, k: 'c', tr: 'C', t: "Council of Trent", d: "Trent affirms purgatory and that the prayers of the faithful help the souls there, while warning against superstition and profit." },
+      { w: "Today", y: 2000, k: 'd', tr: 'O', t: "Orthodox memorials", d: "The Orthodox pray for the departed in memorial services and on “Soul Saturdays,” trusting God's mercy without defining what happens." }
+    ],
+    src: [["Purgatory (Britannica)", HX_BRIT + 'purgatory'], ["Purgatory (Wikipedia)", HX_WIKI + 'Purgatory']] },
+
+  { id: 'sola', name: "Sola Scriptura", kind: 'fw', basis: 'd', trads: 'LRBPN', fw: 'sola', fam: 'auth', pos: ["Scripture is the supreme authority; church tradition is subject to it"],
+    sum: "The Reformation principle that Scripture alone is the final authority for faith and life, with creeds and tradition valued but tested by it.",
+    note: "Supporters point to passages where teaching is tested against Scripture. The principle as a slogan comes from the Reformation, and Catholic and Orthodox Christians answer that Scripture itself was handed on within Tradition.",
+    refs: [['act', 17, 11, "Acts 17:11"], ['mrk', 7, 8, "Mark 7:8–9"], ['2ti', 3, 16, "2 Timothy 3:16–17"]],
+    people: [["John Wycliffe", "c. 1328–1384", "Oxford scholar; English Bible"], ["Jan Hus", "c. 1372–1415", "Czech reformer, burned at Constance"], ["Martin Luther", "1483–1546", "Leader of the German Reformation"], ["John Calvin", "1509–1564", "Reformer of Geneva"]],
+    steps: [
+      { w: "1st century", y: 50, k: 'b', t: "Testing by Scripture", d: "The Bereans check Paul's preaching against the Scriptures, Jesus criticizes traditions that set aside God's command, and Paul calls Scripture God-breathed.", r: [['act', 17, 11, "Acts 17:11"], ['mrk', 7, 8, "Mark 7:8"], ['2ti', 3, 16, "2 Timothy 3:16"]] },
+      { w: "c. 350", y: 350, ap: 1, k: 'p', t: "Church Fathers on Scripture", d: "Cyril of Jerusalem tells new believers not to accept even his teaching unless it is proved from Scripture. Protestants cite such passages; Catholics and Orthodox note that the same Fathers also appealed to Tradition." },
+      { w: "c. 1378", y: 1378, k: 'p', t: "Wycliffe", d: "John Wycliffe argues in On the Truth of Holy Scripture that the Bible is the highest authority, and his followers translate it into English." },
+      { w: "1415", y: 1415, k: 'p', t: "Jan Hus", d: "The Czech reformer, influenced by Wycliffe, is burned at the Council of Constance after refusing to recant." },
+      { w: "1519–1521", y: 1521, k: 'r', tr: 'L', t: "Luther at Leipzig and Worms", d: "At Leipzig (1519) Luther says councils can err. At Worms (1521) he refuses to recant unless convinced “by the testimony of the Scriptures or by clear reason.”" },
+      { w: "1546", y: 1546, k: 'c', tr: 'C', t: "Trent: Scripture and Tradition", d: "The Council of Trent receives Scripture and the unwritten apostolic traditions with equal reverence." },
+      { w: "1561–1646", y: 1600, k: 'r', tr: 'R', t: "The Reformed confessions", d: "The Belgic Confession (1561) and Westminster Confession (1646) set out Scripture as the supreme judge of all controversies." },
+      { w: "1965", y: 1965, k: 'c', tr: 'C', t: "Vatican II: Dei Verbum", d: "The Catholic Church describes Scripture and Tradition as flowing from one divine source, with the Magisterium serving, not standing above, the Word of God." },
+      { w: "1978", y: 1978, k: 'p', t: "The Chicago Statement", d: "Evangelical scholars issue the Chicago Statement on Biblical Inerrancy, a widely used modern summary of the high view of Scripture." }
+    ],
+    src: [["Sola scriptura (Wikipedia)", HX_WIKI + 'Sola_scriptura'], ["Protestantism (Britannica)", HX_BRIT + 'Protestantism']] },
+
+  { id: 'quad', name: "The Wesleyan Quadrilateral", kind: 'fw', basis: 'd', trads: 'M', fw: 'quad', fam: 'auth', pos: ["Scripture first, read with tradition, reason and experience (the “Wesleyan Quadrilateral”)"],
+    sum: "A summary of how John Wesley did theology: Scripture first, interpreted with the help of tradition, reason and Christian experience. Wesley never used the term; it was coined in 1964.",
+    note: "Scripture is the primary source; the other three are tools for understanding and applying it. The name and diagram are a 20th-century description of Wesley's practice.",
+    refs: [['2ti', 3, 16, "2 Timothy 3:16"], ['isa', 1, 18, "Isaiah 1:18"], ['rom', 8, 16, "Romans 8:16"]],
+    people: [["John Wesley", "1703–1791", "Founder of Methodism"], ["Charles Wesley", "1707–1788", "Hymn writer"], ["Albert Outler", "1908–1989", "Methodist scholar who coined the term"]],
+    steps: [
+      { w: "Scripture", y: 50, k: 'b', t: "The sources in the Bible", d: "Wesley called himself “a man of one book.” He cited God's invitation to reason together and the Spirit's witness with our spirit as grounds for using reason and experience.", r: [['2ti', 3, 16, "2 Timothy 3:16"], ['isa', 1, 18, "Isaiah 1:18"], ['rom', 8, 16, "Romans 8:16"]] },
+      { w: "1729", y: 1729, k: 'p', t: "The Holy Club", d: "At Oxford, John and Charles Wesley lead a group known for methodical prayer, study and service, which earns them the name “Methodists.”" },
+      { w: "1738", y: 1738, k: 'p', t: "Aldersgate", d: "On 24 May, hearing Luther's preface to Romans read, Wesley feels his heart “strangely warmed” and receives assurance of salvation, an experience central to his theology." },
+      { w: "1739–1791", y: 1739, k: 'p', t: "Field preaching and sermons", d: "Wesley preaches in the open air across Britain; his published sermons and notes on the New Testament become Methodist doctrinal standards." },
+      { w: "1784", y: 1784, k: 'c', tr: 'M', t: "American Methodism", d: "Wesley sends the Twenty-five Articles of Religion to America, and the Methodist Episcopal Church is founded at the Christmas Conference in Baltimore." },
+      { w: "1964", y: 1964, k: 'p', t: "Outler names it", d: "Albert Outler uses “quadrilateral” to describe Wesley's method. He later regretted the term because it suggested four equal sources." },
+      { w: "1972 and 1988", y: 1972, k: 'c', tr: 'M', t: "In the Book of Discipline", d: "The United Methodist Church adopts the summary in 1972 and revises it in 1988 to stress that Scripture is primary." }
+    ],
+    src: [["Wesleyan Quadrilateral (Wikipedia)", HX_WIKI + 'Wesleyan_Quadrilateral'], ["Methodism (Britannica)", HX_BRIT + 'Methodism']] },
+
+  { id: 'predest', name: "Predestination: Augustine, Calvin and Arminius", kind: 'fw', basis: 'd', trads: 'RM', fw: 'calv', fam: 'salv', pos: ["Unconditional election: God chooses whom he will save (Calvinist)", "God’s grace goes before and enables a free response that can be resisted (Arminian)", "Human freedom cooperates with God’s grace (synergy)"],
+    sum: "How God's choosing relates to human freedom has divided Christians since the 400s, from Augustine and Pelagius to the Calvinist and Arminian debate that still shapes Protestant churches.",
+    note: "Both sides build on Scripture: passages on God's choosing and predestining, and passages on God wanting all to be saved. The named systems come from later teachers and synods.",
+    refs: [['rom', 8, 29, "Romans 8:29–30"], ['eph', 1, 4, "Ephesians 1:4–5"], ['rom', 9, 16, "Romans 9:16"], ['jhn', 3, 16, "John 3:16"], ['1ti', 2, 4, "1 Timothy 2:4"]],
+    people: [["Augustine", "354–430", "Bishop of Hippo"], ["Pelagius", "c. 354–418", "British monk who stressed free will"], ["John Calvin", "1509–1564", "Reformer of Geneva"], ["Luis de Molina", "1535–1600", "Jesuit; “middle knowledge”"], ["Jacobus Arminius", "1560–1609", "Dutch theologian"], ["John Wesley", "1703–1791", "Arminian evangelist"], ["George Whitefield", "1714–1770", "Calvinist evangelist"]],
+    steps: [
+      { w: "1st century", y: 55, k: 'b', t: "Chosen, and whosoever", d: "Paul writes of those God foreknew and predestined, chosen before the foundation of the world. The same Scriptures say God loved the world and wants all people to be saved.", r: [['rom', 8, 29, "Romans 8:29"], ['eph', 1, 4, "Ephesians 1:4"], ['jhn', 3, 16, "John 3:16"], ['1ti', 2, 4, "1 Timothy 2:4"]] },
+      { w: "411–418", y: 415, k: 'p', t: "Augustine against Pelagius", d: "Pelagius teaches that people can choose good without special grace. Augustine answers that grace must come first, and a council at Carthage (418) condemns Pelagius." },
+      { w: "529", y: 529, k: 'c', t: "Council of Orange", d: "This regional council teaches that even the beginning of faith is a gift of grace, and rejects any predestination to evil." },
+      { w: "1524–1525", y: 1525, k: 'r', tr: 'L', t: "Erasmus and Luther", d: "Erasmus defends free will; Luther replies with The Bondage of the Will." },
+      { w: "1536–1559", y: 1559, k: 'p', tr: 'R', t: "Calvin's Institutes", d: "Calvin teaches that God chooses some for salvation by his free decree, not because of foreseen faith." },
+      { w: "1588", y: 1588, k: 'p', tr: 'C', t: "Molina's “middle knowledge”", d: "The Jesuit Luis de Molina proposes that God knows what free creatures would choose in every situation, a view revived by some Protestant philosophers today." },
+      { w: "1610", y: 1610, k: 'p', t: "The Remonstrance", d: "After Arminius's death, his followers set out five points: election based on foreseen faith, Christ dying for all, and grace that can be resisted." },
+      { w: "1618–1619", y: 1618, k: 'c', tr: 'R', t: "Synod of Dort", d: "The Dutch Reformed synod rejects the Remonstrants. Its five answers were later nicknamed TULIP (a label that became popular around 1900)." },
+      { w: "1739–1740", y: 1740, k: 'p', tr: 'M', t: "Wesley and Whitefield", d: "John Wesley's sermon “Free Grace” attacks predestination, and the two great evangelists of the revival part ways over it, while staying friends." }
+    ],
+    src: [["Predestination (Britannica)", HX_BRIT + 'predestination'], ["Synod of Dort (Wikipedia)", HX_WIKI + 'Synod_of_Dort'], ["Arminianism (Wikipedia)", HX_WIKI + 'Arminianism']] },
+
+  { id: 'disp', name: "Dispensationalism", kind: 'fw', basis: 'd', trads: 'BP', fw: 'disp', fam: 'story',
+    sum: "A way of reading the Bible's story as a series of distinct eras (“dispensations”), which keeps God's promises to Israel separate from the church and usually expects a rapture before a future tribulation.",
+    note: "It draws on prophecy in Daniel, Paul and Revelation. As a system it was developed in the 1830s and spread through study Bibles and Bible schools.",
+    refs: [['1th', 4, 16, "1 Thessalonians 4:16–17"], ['dan', 9, 24, "Daniel 9:24–27"], ['rom', 11, 25, "Romans 11:25–26"], ['rev', 20, 1, "Revelation 20:1–6"]],
+    people: [["John Nelson Darby", "1800–1882", "Brethren leader who developed the system"], ["C. I. Scofield", "1843–1921", "Editor of the Scofield Reference Bible"], ["Lewis Sperry Chafer", "1871–1952", "Founder of Dallas Theological Seminary"], ["Charles Ryrie", "1925–2016", "Scholar and study-Bible editor"]],
+    steps: [
+      { w: "Scripture", y: 50, k: 'b', t: "Prophecy and Israel", d: "Readers draw on Daniel's seventy weeks, Paul's hope that “all Israel will be saved,” believers caught up to meet the Lord, and the thousand years in Revelation.", r: [['dan', 9, 24, "Daniel 9:24"], ['rom', 11, 25, "Romans 11:25"], ['1th', 4, 16, "1 Thessalonians 4:16"], ['rev', 20, 1, "Revelation 20:1"]] },
+      { w: "1830s", y: 1831, k: 'p', t: "Darby and the Brethren", d: "John Nelson Darby, a leader of the Plymouth Brethren, develops the scheme of dispensations and a rapture before the tribulation, discussed at the Powerscourt conferences in Ireland." },
+      { w: "1862–1877", y: 1870, k: 'p', t: "Darby in North America", d: "Darby's repeated visits to the United States and Canada win over many evangelical pastors." },
+      { w: "1878–1897", y: 1878, k: 'p', t: "Niagara Bible Conferences", d: "Annual summer conferences spread premillennial and dispensational teaching among American Presbyterians and Baptists." },
+      { w: "1909", y: 1909, k: 'p', t: "The Scofield Reference Bible", d: "Scofield's notes put the system on the same page as the biblical text; it sells millions of copies." },
+      { w: "1924", y: 1924, k: 'p', t: "Dallas Theological Seminary", d: "Lewis Sperry Chafer founds the seminary that becomes the movement's academic center." },
+      { w: "1970–1995", y: 1970, k: 'd', t: "Popular prophecy", d: "Hal Lindsey's The Late Great Planet Earth (1970) and the Left Behind novels (from 1995) bring rapture expectations to a mass audience." },
+      { w: "1990s", y: 1993, k: 'p', t: "Progressive dispensationalism", d: "Scholars such as Craig Blaising and Darrell Bock soften the line between Israel and the church, moving closer to other views." }
+    ],
+    src: [["Dispensationalism (Britannica)", HX_BRIT + 'dispensationalism'], ["Dispensationalism (Wikipedia)", HX_WIKI + 'Dispensationalism']] },
+
+  { id: 'atone', name: "Theories of the atonement", kind: 'fw', basis: 'd', trads: 'COLARMBPN', fw: 'psub', fam: 'atone',
+    sum: "Every tradition confesses that Christ died for our sins. How the cross saves has been explained with different pictures: ransom and victory, satisfaction, penal substitution and moral example.",
+    note: "Scripture uses many images for the cross: ransom, sacrifice, victory over evil powers, an example to follow. The named theories are later attempts to explain them; the creeds never defined one.",
+    refs: [['isa', 53, 5, "Isaiah 53:5"], ['mrk', 10, 45, "Mark 10:45"], ['rom', 3, 25, "Romans 3:25"], ['col', 2, 15, "Colossians 2:15"], ['1pe', 2, 21, "1 Peter 2:21–24"]],
+    people: [["Irenaeus", "c. 130–202", "Christ “recapitulates” humanity"], ["Gregory of Nyssa", "c. 335–395", "Ransom imagery"], ["Anselm of Canterbury", "1033–1109", "Satisfaction theory"], ["Peter Abelard", "1079–1142", "Moral influence"], ["John Calvin", "1509–1564", "Penal substitution"], ["Gustaf Aulén", "1879–1977", "Named “Christus Victor”"]],
+    steps: [
+      { w: "Scripture", y: 50, k: 'b', t: "Many pictures", d: "The suffering servant is pierced for our transgressions; Jesus gives his life as a ransom; God presents him as a sacrifice of atonement; he disarms the powers; he leaves us an example.", r: [['isa', 53, 5, "Isaiah 53:5"], ['mrk', 10, 45, "Mark 10:45"], ['rom', 3, 25, "Romans 3:25"], ['col', 2, 15, "Colossians 2:15"], ['1pe', 2, 21, "1 Peter 2:21"]] },
+      { w: "c. 180", y: 180, k: 'p', t: "Recapitulation", d: "Irenaeus teaches that Christ relives the human story faithfully where Adam failed, undoing the fall." },
+      { w: "300s", y: 380, ap: 1, k: 'p', t: "Ransom and victory", d: "Gregory of Nyssa and others picture Christ as a ransom that defeats the devil, death and sin. This remains the main Orthodox emphasis." },
+      { w: "1098", y: 1098, k: 'p', t: "Anselm's satisfaction", d: "In Why God Became Man, Anselm argues that sin dishonors God and only the God-man can make satisfaction for it." },
+      { w: "c. 1130", y: 1130, ap: 1, k: 'p', t: "Abelard's moral influence", d: "Abelard stresses that the cross shows God's love and moves sinners to love him in return." },
+      { w: "1559", y: 1559, k: 'r', tr: 'R', t: "Penal substitution", d: "Calvin's Institutes teach that Christ bore the penalty of sin in our place, a view that becomes central for many Reformed and evangelical Christians." },
+      { w: "1617", y: 1617, k: 'p', t: "The governmental view", d: "Hugo Grotius argues that the cross upholds God's moral order rather than paying an exact penalty; it was taken up by some Arminians." },
+      { w: "1931", y: 1931, k: 'p', t: "“Christus Victor”", d: "The Lutheran bishop Gustaf Aulén names the ancient victory view and argues it is the classic one, sparking renewed interest." }
+    ],
+    src: [["Atonement (Britannica)", HX_BRIT + 'atonement'], ["Atonement in Christianity (Wikipedia)", HX_WIKI + 'Atonement_in_Christianity']] },
+
+  { id: 'supper', name: "The Lord's Supper: how Christ is present", kind: 'fw', basis: 'd', trads: 'COLARMBPN', fw: 'trans', fam: 'supper', pr: 'worship', pos: ["Bread and wine become Christ’s body and blood in substance (transubstantiation)", "Christ’s body and blood truly present “in, with and under” the bread and wine", "Christ is truly but spiritually present, received by faith", "Mainly a memorial of Christ’s death and a declaration of faith"],
+    sum: "Jesus told his disciples to eat bread and drink wine in memory of him. Every tradition keeps this meal, but they have explained his words “This is my body” in very different ways since the Middle Ages.",
+    note: "The meal is commanded in Scripture. The explanations of how Christ is present (transubstantiation, sacramental union, spiritual presence, memorial) came out of debates from the 800s to the 1500s.",
+    refs: [['mat', 26, 26, "Matthew 26:26–28"], ['jhn', 6, 53, "John 6:53–56"], ['1co', 10, 16, "1 Corinthians 10:16"], ['1co', 11, 23, "1 Corinthians 11:23–29"]],
+    people: [["Ignatius of Antioch", "c. 35–107", "Bishop and martyr"], ["Justin Martyr", "c. 100–165", "Described early Sunday worship"], ["Paschasius Radbertus", "c. 790–865", "Monk of Corbie"], ["Ratramnus", "d. c. 870", "Monk of Corbie"], ["Thomas Aquinas", "1225–1274", "Explained transubstantiation"], ["Ulrich Zwingli", "1484–1531", "Reformer of Zürich"], ["Martin Luther", "1483–1546", ""], ["John Calvin", "1509–1564", ""]],
+    steps: [
+      { w: "1st century", y: 30, k: 'b', t: "“Do this in remembrance of me”", d: "At the Last Supper Jesus says, “This is my body… this is my blood of the covenant.” Paul hands on the same words and calls the cup a sharing in Christ's blood.", r: [['mat', 26, 26, "Matthew 26:26"], ['jhn', 6, 53, "John 6:53"], ['1co', 10, 16, "1 Corinthians 10:16"], ['1co', 11, 23, "1 Corinthians 11:23"]] },
+      { w: "c. 100–155", y: 110, k: 'p', t: "The early church", d: "The Didache gives thanksgiving prayers for the meal; Ignatius calls it the flesh of our Savior and “the medicine of immortality”; Justin says it is “not common bread.”" },
+      { w: "c. 831–850", y: 840, k: 'p', t: "The first controversy", d: "At the monastery of Corbie, Paschasius Radbertus teaches that the bread is the very body born of Mary; Ratramnus argues it is Christ's body in a spiritual, figurative way." },
+      { w: "1059–1079", y: 1059, k: 'p', t: "Berengar", d: "Berengar of Tours denies a physical change and is twice made to recant before Roman synods." },
+      { w: "1215", y: 1215, k: 'c', tr: 'C', t: "Fourth Lateran Council", d: "The council teaches that the bread and wine are “transubstantiated” into Christ's body and blood." },
+      { w: "1264–1274", y: 1264, k: 'p', tr: 'C', t: "Corpus Christi and Aquinas", d: "Urban IV extends the feast of Corpus Christi to the whole Church, and Thomas Aquinas explains transubstantiation using Aristotle's distinction between substance and appearance." },
+      { w: "1529", y: 1529, k: 'r', t: "The Marburg Colloquy", d: "Luther and Zwingli agree on 14 of 15 articles but split over the Supper: Luther insists Christ's body is truly present, Zwingli that “is” means “signifies.”" },
+      { w: "1551", y: 1551, k: 'c', tr: 'C', t: "Council of Trent", d: "Trent reaffirms transubstantiation as “fitting and proper.”" },
+      { w: "1559", y: 1559, k: 'r', tr: 'R', t: "Calvin's middle way", d: "Calvin teaches that believers truly feed on Christ by the Spirit, who lifts them to him, without a change in the bread." },
+      { w: "Anabaptists and Baptists", y: 1600, k: 'r', tr: 'B', t: "A memorial meal", d: "Anabaptist and later Baptist churches follow Zwingli's emphasis, treating the Supper as an ordinance of remembrance and fellowship." }
+    ],
+    src: [["Eucharist (Britannica)", HX_BRIT + 'Eucharist'], ["Marburg Colloquy (Wikipedia)", HX_WIKI + 'Marburg_Colloquy']] },
+
+  { id: 'bapt', name: "Believer's baptism and infant baptism", kind: 'fw', basis: 's', trads: 'COLARMBPN', fw: 'cred', fam: 'bapt', pos: ["Infants of believing families are baptized", "Only believers who profess faith are baptized", "Baptism by immersion is the norm"],
+    sum: "All Christians baptize, as Jesus commanded. For 1,500 years infants of believers were baptized; in 1525 the Anabaptists began baptizing only those who could profess faith, and Baptists followed.",
+    note: "Baptism is commanded in Scripture. Who should be baptized is disputed: the New Testament records believers being baptized and also whole households, and does not say directly whether infants were included.",
+    refs: [['mat', 28, 19, "Matthew 28:19"], ['act', 2, 38, "Acts 2:38–39"], ['act', 16, 33, "Acts 16:33"], ['rom', 6, 4, "Romans 6:3–4"], ['col', 2, 12, "Colossians 2:11–12"]],
+    people: [["Tertullian", "c. 155–220", "Advised delaying baptism"], ["Augustine", "354–430", "Linked infant baptism to original sin"], ["Conrad Grebel", "c. 1498–1526", "Led the first rebaptisms"], ["Felix Manz", "c. 1498–1527", "First Anabaptist martyr in Zürich"], ["Menno Simons", "1496–1561", "Dutch leader of the Mennonites"], ["John Smyth", "c. 1570–1612", "Founder of the first Baptist church"]],
+    steps: [
+      { w: "1st century", y: 33, k: 'b', t: "Repent and be baptized", d: "Jesus commands baptism. Peter calls hearers to repent and be baptized, “for the promise is for you and your children”; the jailer is baptized with his whole household; Paul links baptism to burial and rising with Christ.", r: [['mat', 28, 19, "Matthew 28:19"], ['act', 2, 38, "Acts 2:38"], ['act', 16, 33, "Acts 16:33"], ['rom', 6, 4, "Romans 6:4"]] },
+      { w: "c. 100", y: 100, ap: 1, k: 'd', t: "The Didache", d: "This early church manual says to baptize in running water, or pour water three times on the head if there is not enough." },
+      { w: "c. 200–215", y: 205, ap: 1, k: 'p', t: "Infants and delay", d: "Tertullian advises delaying baptism, including for children, which shows infant baptism was happening. The Apostolic Tradition tells parents to answer for children who cannot speak." },
+      { w: "c. 400", y: 400, ap: 1, k: 'p', t: "Augustine and original sin", d: "Augustine argues that infants need baptism because they share Adam's sin. Infant baptism becomes the universal norm." },
+      { w: "21 January 1525", y: 1525, k: 'r', tr: 'N', t: "The first rebaptisms in Zürich", d: "Conrad Grebel baptizes George Blaurock in a Zürich home, launching the Anabaptist (“re-baptizer”) movement." },
+      { w: "1527", y: 1527, k: 'r', tr: 'N', t: "Schleitheim and martyrdom", d: "The Schleitheim Confession limits baptism to believers. Felix Manz is drowned in Zürich, the first of thousands of Anabaptists killed by Catholics and Protestants alike." },
+      { w: "1609–1612", y: 1609, k: 'r', tr: 'B', t: "The first Baptists", d: "English exile John Smyth baptizes believers in Amsterdam (1609); Thomas Helwys brings the first Baptist church back to London (1612)." },
+      { w: "1640s–1689", y: 1689, k: 'c', tr: 'B', t: "Immersion and confession", d: "English Baptists adopt full immersion as the proper form, and the Second London Baptist Confession (1689) sets out their beliefs." }
+    ],
+    src: [["Baptism (Britannica)", HX_BRIT + 'baptism'], ["Anabaptism (Wikipedia)", HX_WIKI + 'Anabaptism']] },
+
+  { id: 'tongues', name: "Tongues and the gifts of the Spirit", kind: 'fw', basis: 's', trads: 'P', fw: 'cont', fam: 'gifts', pos: ["Baptism in the Holy Spirit, speaking in tongues and healing expected today", "Pray in tongues"],
+    sum: "Speaking in tongues, prophecy and healing appear throughout the New Testament. Pentecostals, beginning in 1901, teach that they are for today; others believe these gifts ended with the apostles.",
+    note: "The gifts are described in Scripture. Whether they continue today, and whether “baptism in the Spirit” is a second experience after conversion, are questions of interpretation.",
+    refs: [['joe', 2, 28, "Joel 2:28–29"], ['act', 2, 4, "Acts 2:1–4"], ['1co', 12, 7, "1 Corinthians 12:7–11"], ['1co', 14, 39, "1 Corinthians 14:39"]],
+    people: [["John Chrysostom", "c. 347–407", "Said the gifts had ceased"], ["Charles Parham", "1873–1929", "Bible school leader in Topeka"], ["Agnes Ozman", "1870–1937", "First to speak in tongues at Topeka"], ["William J. Seymour", "1870–1922", "Leader of the Azusa Street revival"], ["B. B. Warfield", "1851–1921", "Princeton theologian; cessationist"], ["Dennis Bennett", "1917–1991", "Episcopal priest; charismatic renewal"]],
+    steps: [
+      { w: "1st century", y: 33, k: 'b', t: "Pentecost and the gifts", d: "Joel foresees the Spirit poured on all people. At Pentecost the disciples speak in other languages, and Paul lists tongues, prophecy and healing among the Spirit's gifts.", r: [['joe', 2, 28, "Joel 2:28"], ['act', 2, 4, "Acts 2:4"], ['1co', 12, 7, "1 Corinthians 12:7"], ['1co', 14, 39, "1 Corinthians 14:39"]] },
+      { w: "c. 160–180", y: 170, k: 'p', t: "Montanism and Irenaeus", d: "The Montanists claim new prophecy and are rejected by the wider church. Irenaeus says he has heard believers speaking in tongues." },
+      { w: "c. 390s", y: 395, k: 'p', t: "Chrysostom: the gifts have ceased", d: "John Chrysostom writes that the gifts in 1 Corinthians no longer happen in his day, a view many later theologians share." },
+      { w: "1 January 1901", y: 1901, k: 'p', tr: 'P', t: "Topeka, Kansas", d: "At Charles Parham's Bethel Bible School, Agnes Ozman speaks in tongues. Parham teaches that tongues are the evidence of baptism in the Spirit." },
+      { w: "1906–1909", y: 1906, k: 'p', tr: 'P', t: "Azusa Street", d: "William J. Seymour, a Black preacher, leads a multiracial revival in Los Angeles that sends Pentecostal missionaries around the world." },
+      { w: "1914", y: 1914, k: 'c', tr: 'P', t: "Assemblies of God", d: "Pentecostal ministers meet at Hot Springs, Arkansas, and form the Assemblies of God, now one of the largest Pentecostal bodies." },
+      { w: "1918", y: 1918, k: 'p', tr: 'R', t: "Cessationism defended", d: "B. B. Warfield's Counterfeit Miracles argues the miraculous gifts ended with the apostles." },
+      { w: "1960–1967", y: 1960, k: 'd', t: "The charismatic renewal", d: "Episcopal priest Dennis Bennett's announcement in Van Nuys (1960) and a Catholic retreat at Duquesne University (1967) bring tongues into older churches." },
+      { w: "Today", y: 2011, k: 'd', t: "A worldwide movement", d: "Pew Research estimated in 2011 that Pentecostal and charismatic Christians make up about a quarter of all Christians." }
+    ],
+    src: [["Pentecostalism (Britannica)", HX_BRIT + 'Pentecostalism'], ["Azusa Street Revival (Wikipedia)", HX_WIKI + 'Azusa_Street_Revival'], ["Pew Research Center: Global Christianity", 'https://www.pewresearch.org/religion/2011/12/19/global-christianity-exec/']] },
+
+  { id: 'jesusprayer', name: "The Jesus Prayer and prayer rope", kind: 'pr', basis: 't', trads: 'O', pr: 'pray', pos: ["Pray the Jesus Prayer, often with a prayer rope"],
+    sum: "“Lord Jesus Christ, Son of God, have mercy on me, a sinner,” prayed slowly and repeatedly, often with a knotted prayer rope. It is the heart of Orthodox personal prayer.",
+    note: "Its words echo the tax collector and the blind beggar in the Gospels, and Paul's call to pray without ceasing. The practice of repeating it, and the rope, developed among monks from the 300s onward.",
+    refs: [['luk', 18, 13, "Luke 18:13"], ['luk', 18, 38, "Luke 18:38"], ['php', 2, 10, "Philippians 2:10–11"], ['1th', 5, 17, "1 Thessalonians 5:17"]],
+    people: [["Diadochos of Photiki", "5th century", "Taught calling on the name of Jesus"], ["John Climacus", "c. 579–649", "Author of The Ladder of Divine Ascent"], ["Gregory Palamas", "1296–1359", "Defender of hesychasm"], ["Nikodemos the Hagiorite", "1749–1809", "Compiled the Philokalia"], ["Paisius Velichkovsky", "1722–1794", "Translated it into Slavonic"]],
+    steps: [
+      { w: "1st century", y: 30, k: 'b', t: "“Have mercy on me”", d: "The tax collector prays, “God, have mercy on me, a sinner,” and a blind man cries, “Jesus, Son of David, have mercy on me!” Paul urges believers to pray without ceasing.", r: [['luk', 18, 13, "Luke 18:13"], ['luk', 18, 38, "Luke 18:38"], ['1th', 5, 17, "1 Thessalonians 5:17"]] },
+      { w: "300s", y: 330, ap: 1, k: 'd', t: "Desert monks and the rope", d: "Monks in Egypt repeat short prayers through the day. Tradition credits St. Pachomius with the knotted prayer rope, tied so that no knot can be undone." },
+      { w: "400s", y: 450, ap: 1, k: 'p', t: "Calling on the name", d: "Diadochos of Photiki teaches monks to keep the mind on God by repeating “Lord Jesus.”" },
+      { w: "c. 600", y: 600, ap: 1, k: 'p', t: "The Ladder of Divine Ascent", d: "John Climacus of Sinai writes: “let the remembrance of Jesus be present with each breath.”" },
+      { w: "1330s–1351", y: 1341, k: 'c', tr: 'O', t: "Hesychasm upheld", d: "Gregory Palamas defends the monks of Mount Athos who pray the Jesus Prayer in stillness (hesychia). Councils in Constantinople (1341, 1351) support him." },
+      { w: "1782", y: 1782, k: 'p', tr: 'O', t: "The Philokalia", d: "Nikodemos the Hagiorite and Makarios of Corinth publish a collection of writings on prayer in Venice." },
+      { w: "1793", y: 1793, k: 'p', tr: 'O', t: "Into Russia", d: "Paisius Velichkovsky's Slavonic translation spreads the practice through Russian monasteries and among lay people." },
+      { w: "1884", y: 1884, k: 'd', tr: 'O', t: "The Way of a Pilgrim", d: "An anonymous Russian tale of a wanderer learning to pray without ceasing makes the Jesus Prayer known worldwide." }
+    ],
+    src: [["Jesus Prayer (Britannica)", HX_BRIT + 'Jesus+Prayer'], ["Jesus Prayer (Wikipedia)", HX_WIKI + 'Jesus_Prayer'], ["Philokalia (Wikipedia)", HX_WIKI + 'Philokalia']] },
+
+  { id: 'lent', name: "Lent and the fasting seasons", kind: 'pr', basis: 't', trads: 'COLAM', pr: 'fast', pos: ["Keep Lent as a season of fasting and repentance", "Fasts set by the Church’s calendar", "No meat on Fridays in Lent; fast on Ash Wednesday and Good Friday", "Fast from meat, dairy, wine and oil on most Wednesdays and Fridays"],
+    sum: "Forty days of prayer, fasting and almsgiving before Easter, kept by Catholic, Orthodox and many Protestant churches.",
+    note: "Fasting is taught in Scripture, and Jesus fasted forty days. Lent as a fixed season with set rules is church tradition, settled between the 300s and 600s.",
+    refs: [['mat', 4, 2, "Matthew 4:1–2"], ['mat', 6, 16, "Matthew 6:16–18"], ['mrk', 2, 20, "Mark 2:20"], ['act', 13, 2, "Acts 13:2–3"]],
+    people: [["Irenaeus", "c. 130–202", "Noted early differences in the Easter fast"], ["Athanasius", "c. 296–373", "Urged the forty-day fast"], ["Gregory the Great", "c. 540–604", "Shaped the Western Lent"], ["Ulrich Zwingli", "1484–1531", "Defended breaking the Lenten fast"], ["Paul VI", "1897–1978", "Reformed Catholic fasting rules"]],
+    steps: [
+      { w: "1st century", y: 30, k: 'b', t: "Jesus fasts", d: "Jesus fasts forty days in the wilderness and teaches his followers how to fast, saying they will fast once he is taken away. The church in Antioch fasts before sending out missionaries.", r: [['mat', 4, 2, "Matthew 4:2"], ['mat', 6, 16, "Matthew 6:16"], ['mrk', 2, 20, "Mark 2:20"], ['act', 13, 2, "Acts 13:2"]] },
+      { w: "c. 100", y: 100, ap: 1, k: 'd', t: "Wednesdays and Fridays", d: "The Didache tells Christians to fast on Wednesdays and Fridays, a custom the Orthodox still keep." },
+      { w: "c. 190", y: 190, ap: 1, k: 'p', t: "A short fast before Easter", d: "Irenaeus notes that churches fast before Easter for one day, two days or forty hours: the length was not yet fixed." },
+      { w: "325–330s", y: 325, k: 'c', t: "Forty days", d: "The Council of Nicaea refers to the forty-day season, and Athanasius urges his churches to keep it." },
+      { w: "c. 600", y: 600, ap: 1, k: 'd', t: "Ash Wednesday", d: "In Rome under Gregory the Great, Lent begins on a Wednesday so that there are forty fasting days, not counting Sundays. By 1091 a council orders ashes for all the faithful." },
+      { w: "1522", y: 1522, k: 'r', tr: 'R', t: "The Zürich sausage affair", d: "The printer Froschauer serves sausages to workers during Lent; Zwingli defends the meal, starting the Swiss Reformation. Most Reformed churches drop Lent." },
+      { w: "1500s–1600s", y: 1549, k: 'r', tr: 'A', t: "Kept by Lutherans and Anglicans", d: "Lutheran and Anglican churches keep Lent in their calendars, with less strict rules about food." },
+      { w: "1966", y: 1966, k: 'c', tr: 'C', t: "Paenitemini", d: "Paul VI reduces the Catholic days of required fasting to Ash Wednesday and Good Friday, keeping abstinence from meat on Lenten Fridays." },
+      { w: "Late 1900s", y: 1980, ap: 1, k: 'd', t: "Protestants return to Lent", d: "Many Methodist, Presbyterian and evangelical churches take up Ash Wednesday and Lent again." }
+    ],
+    src: [["Lent (Britannica)", HX_BRIT + 'Lent'], ["Lent (Wikipedia)", HX_WIKI + 'Lent']] },
+
+  { id: 'icons', name: "Icons and images in worship", kind: 'pr', basis: 't', trads: 'CO', pos: ["Icons are venerated as windows to heaven", "Icons or statues, incense and vestments in worship", "Icons, a crucifix or a prayer corner in the home"],
+    sum: "Catholic and Orthodox Christians honor icons and statues of Christ and the saints; many Protestants avoid images in worship. A century of fighting over icons in the 700s and 800s settled the question for the East.",
+    note: "Scripture forbids making images to worship, yet God commanded images of cherubim for the tabernacle, and Christ is called “the image of the invisible God.” Veneration of icons was defined by an ecumenical council in 787.",
+    refs: [['exo', 20, 4, "Exodus 20:4–5"], ['exo', 25, 18, "Exodus 25:18–20"], ['jhn', 1, 14, "John 1:14"], ['col', 1, 15, "Colossians 1:15"]],
+    people: [["John of Damascus", "c. 675–749", "Leading defender of icons"], ["Leo III the Isaurian", "c. 685–741", "Emperor who began iconoclasm"], ["Empress Irene", "c. 752–803", "Convened the Second Council of Nicaea"], ["Empress Theodora", "c. 815–867", "Restored icons in 843"], ["Andreas Karlstadt", "1486–1541", "Led image removal in Wittenberg"]],
+    steps: [
+      { w: "Old and New Testament", y: -1000, ap: 1, k: 'b', t: "No idols, but images", d: "God forbids carving images to bow down to, yet commands golden cherubim for the ark. In Christ the Word becomes flesh, “the image of the invisible God.”", r: [['exo', 20, 4, "Exodus 20:4"], ['exo', 25, 18, "Exodus 25:18"], ['jhn', 1, 14, "John 1:14"], ['col', 1, 15, "Colossians 1:15"]] },
+      { w: "c. 240", y: 240, k: 'd', t: "The earliest church art", d: "A house church at Dura-Europos in Syria is painted with Bible scenes, including Jesus healing and walking on water; the catacombs of Rome are decorated too." },
+      { w: "726–730", y: 726, k: 'c', t: "Iconoclasm begins", d: "Byzantine Emperor Leo III orders icons removed and destroyed as idols." },
+      { w: "c. 730", y: 730, k: 'p', t: "John of Damascus", d: "John argues that because God became visible in Christ, Christ can be depicted, and that honor shown to an image passes to the person it shows." },
+      { w: "787", y: 787, k: 'c', t: "Second Council of Nicaea", d: "The seventh ecumenical council distinguishes veneration of icons from worship, which is due to God alone." },
+      { w: "843", y: 843, k: 'c', tr: 'O', t: "The Triumph of Orthodoxy", d: "After a second wave of iconoclasm, Empress Theodora restores icons for good. The Orthodox still celebrate it on the first Sunday of Lent." },
+      { w: "1522–1524", y: 1522, k: 'r', tr: 'R', t: "Reformation iconoclasm", d: "Images are removed from churches in Wittenberg under Karlstadt and in Zürich under Zwingli. Luther opposes destroying them, and Lutheran churches keep crucifixes and art." },
+      { w: "1563", y: 1563, k: 'r', tr: 'R', t: "The Heidelberg Catechism", d: "The Reformed catechism teaches that God is not to be represented in any way, and that images should not be used to teach the faith in church." }
+    ],
+    src: [["Icon (Britannica)", HX_BRIT + 'icon+religious+art'], ["Byzantine Iconoclasm (Wikipedia)", HX_WIKI + 'Byzantine_Iconoclasm']] },
+
+  { id: 'lordsday', name: "Sunday as the Lord's Day", kind: 'pr', basis: 'd', trads: 'COLARMBPN', pr: 'rest',
+    sum: "Christians gather on Sunday, the day of the resurrection, rather than the Jewish Sabbath on Saturday. Traditions differ on whether Sunday is a “Christian Sabbath” of rest.",
+    note: "The Sabbath is commanded in the Old Testament, and the New Testament shows believers meeting on the first day of the week. Sunday rest laws and the idea of a Christian Sabbath came later.",
+    refs: [['gen', 2, 2, "Genesis 2:2–3"], ['exo', 20, 8, "Exodus 20:8–11"], ['mrk', 2, 27, "Mark 2:27"], ['act', 20, 7, "Acts 20:7"], ['rev', 1, 10, "Revelation 1:10"]],
+    people: [["Ignatius of Antioch", "c. 35–107", "Contrasted the Sabbath and the Lord's Day"], ["Justin Martyr", "c. 100–165", "Described Sunday worship"], ["Constantine", "c. 272–337", "Made Sunday a day of rest by law"], ["John Paul II", "1920–2005", "Wrote Dies Domini on Sunday"]],
+    steps: [
+      { w: "Old Testament", y: -1000, ap: 1, k: 'b', t: "The Sabbath", d: "God rests on the seventh day, and Israel is commanded to keep the Sabbath holy.", r: [['gen', 2, 2, "Genesis 2:2"], ['exo', 20, 8, "Exodus 20:8"]] },
+      { w: "1st century", y: 50, k: 'b', t: "The first day of the week", d: "Jesus rises on the first day of the week and says the Sabbath was made for people. Believers break bread and set aside gifts on that day, and John is “in the Spirit on the Lord's day.”", r: [['mrk', 16, 2, "Mark 16:2"], ['mrk', 2, 27, "Mark 2:27"], ['act', 20, 7, "Acts 20:7"], ['1co', 16, 2, "1 Corinthians 16:2"], ['rev', 1, 10, "Revelation 1:10"]] },
+      { w: "c. 100–155", y: 110, k: 'p', t: "The early church gathers on Sunday", d: "The Didache tells believers to gather on the Lord's day; Ignatius speaks of “no longer keeping the Sabbath but living by the Lord's day”; Justin describes Sunday readings and the Eucharist." },
+      { w: "321", y: 321, k: 'c', t: "Constantine's Sunday law", d: "The emperor makes Sunday a day of rest for courts and city workers, though farmers may still work." },
+      { w: "c. 363", y: 363, ap: 1, k: 'c', t: "Council of Laodicea", d: "A regional council tells Christians to rest on Sunday, if they can, rather than on Saturday." },
+      { w: "1600s", y: 1646, k: 'r', tr: 'R', t: "The Christian Sabbath", d: "English Puritans and the Westminster Confession (1646) teach that the Sabbath command now applies to Sunday, with a full day of rest and worship." },
+      { w: "1998", y: 1998, k: 'c', tr: 'C', t: "Dies Domini", d: "John Paul II's letter calls Sunday both the day of the resurrection and the fulfillment of the Sabbath's rest." }
+    ],
+    src: [["Sabbath (Britannica)", HX_BRIT + 'Sabbath'], ["Lord's Day (Wikipedia)", HX_WIKI + 'Lord%27s_Day']] },
+
+  { id: 'confession', name: "Confession to a priest", kind: 'pr', basis: 'd', trads: 'CO', pr: 'confess', pos: ["Confession to a priest is a sacrament", "Private confession to a pastor is offered, but not required"],
+    sum: "Catholic and Orthodox Christians confess their sins to a priest and receive absolution. The practice changed a great deal, from rare public penance in the early church to private, repeatable confession.",
+    note: "Scripture tells believers to confess sins to one another and gives the apostles authority to forgive sins. The private sacrament as practiced today took shape in the early Middle Ages.",
+    refs: [['jas', 5, 16, "James 5:16"], ['jhn', 20, 22, "John 20:22–23"], ['mat', 16, 19, "Matthew 16:19"], ['1jn', 1, 9, "1 John 1:9"]],
+    people: [["Cyprian of Carthage", "c. 210–258", "Bishop who restored the lapsed"], ["Columbanus", "543–615", "Irish monk who spread private penance"], ["Martin Luther", "1483–1546", "Kept private confession"], ["Charles Borromeo", "1538–1584", "Introduced the confessional box"]],
+    steps: [
+      { w: "1st century", y: 30, k: 'b', t: "Authority to forgive", d: "The risen Jesus breathes on the disciples and says, “If you forgive anyone's sins, they are forgiven.” James tells believers to confess their sins to one another.", r: [['jhn', 20, 22, "John 20:22"], ['mat', 16, 19, "Matthew 16:19"], ['jas', 5, 16, "James 5:16"], ['1jn', 1, 9, "1 John 1:9"]] },
+      { w: "c. 140", y: 140, ap: 1, k: 'p', t: "One second chance", d: "The Shepherd of Hermas teaches that there is one opportunity for repentance after baptism for serious sins." },
+      { w: "200s", y: 251, k: 'p', t: "Public penance", d: "After persecution, Cyprian and other bishops restore Christians who had denied the faith through a long, public order of penitents." },
+      { w: "500s–600s", y: 590, k: 'd', t: "Irish private penance", d: "Irish monks practice private, repeatable confession with set penances listed in books called penitentials. Columbanus brings it to the Continent around 590." },
+      { w: "1215", y: 1215, k: 'c', tr: 'C', t: "Fourth Lateran Council", d: "Every Catholic is required to confess at least once a year." },
+      { w: "1520s", y: 1529, k: 'r', tr: 'L', t: "Luther keeps confession", d: "Luther rejects the requirement to list every sin but keeps private confession and absolution, included in his Small Catechism (1529). Most Reformed churches drop it." },
+      { w: "1551", y: 1551, k: 'c', tr: 'C', t: "Council of Trent", d: "Trent affirms penance as a sacrament instituted by Christ." },
+      { w: "1570s", y: 1576, k: 'd', tr: 'C', t: "The confessional box", d: "Charles Borromeo, archbishop of Milan, introduces the enclosed confessional with a screen." },
+      { w: "Today", y: 2000, k: 'd', tr: 'O', t: "Orthodox practice", d: "Orthodox Christians usually confess standing before an icon of Christ, with the priest beside them as a witness rather than in a booth." }
+    ],
+    src: [["Penance (Britannica)", HX_BRIT + 'penance'], ["Sacrament of Penance (Wikipedia)", HX_WIKI + 'Sacrament_of_Penance']] },
+
+  { id: 'tithe', name: "The tithe", kind: 'pr', basis: 'd', trads: 'BP', pr: 'give', pos: ["The tithe (10%) taught as the standard"],
+    sum: "Giving a tenth of one's income to God. It was a law in Israel and, for centuries, a compulsory church tax in Europe; today many Baptist and Pentecostal churches teach it as a voluntary standard.",
+    note: "The tithe is commanded in the Old Testament and mentioned by Jesus. The New Testament teaches generous, cheerful giving without naming a percentage, so traditions differ on whether the tithe still binds Christians.",
+    refs: [['gen', 14, 20, "Genesis 14:20"], ['lev', 27, 30, "Leviticus 27:30"], ['mal', 3, 10, "Malachi 3:10"], ['mat', 23, 23, "Matthew 23:23"], ['2co', 9, 7, "2 Corinthians 9:7"]],
+    people: [["Irenaeus", "c. 130–202", "Taught that Christians give more than a tenth"], ["Charlemagne", "c. 747–814", "Made the tithe a law"]],
+    steps: [
+      { w: "Old Testament", y: -1000, ap: 1, k: 'b', t: "A tenth to the Lord", d: "Abraham gives a tenth to Melchizedek. The Law sets aside a tenth for the Levites and the poor, and Malachi calls Israel to bring the whole tithe.", r: [['gen', 14, 20, "Genesis 14:20"], ['lev', 27, 30, "Leviticus 27:30"], ['mal', 3, 10, "Malachi 3:10"]] },
+      { w: "1st century", y: 50, k: 'b', t: "Cheerful giving", d: "Jesus says the Pharisees should tithe without neglecting justice and mercy. Paul asks each to give as they have decided in their heart, “not reluctantly or under compulsion.”", r: [['mat', 23, 23, "Matthew 23:23"], ['2co', 9, 7, "2 Corinthians 9:7"]] },
+      { w: "c. 155–180", y: 170, k: 'p', t: "Freewill offerings", d: "Justin describes a Sunday collection for orphans, widows and the sick. Irenaeus says Christians, being free, give all they have, not just a tenth." },
+      { w: "585", y: 585, k: 'c', t: "Council of Mâcon", d: "A council in Gaul orders tithes on pain of excommunication." },
+      { w: "779", y: 779, k: 'c', t: "Charlemagne's law", d: "Charlemagne makes the tithe a legal tax throughout his empire; church tithes become standard across medieval Europe." },
+      { w: "1836–1936", y: 1936, k: 'c', tr: 'A', t: "The end of tithe taxes in England", d: "English tithes paid in produce are turned into money payments in 1836 and phased out after the Tithe Act of 1936." },
+      { w: "1800s–today", y: 1880, ap: 1, k: 'd', tr: 'B', t: "A voluntary standard", d: "American churches, without state support, promote the tithe as a voluntary standard. Many Baptist and Pentecostal churches teach it today; others teach proportional giving." }
+    ],
+    src: [["Tithe (Britannica)", HX_BRIT + 'tithe'], ["Tithe (Wikipedia)", HX_WIKI + 'Tithe']] }
+];
+var HX_BY_POS = {}, HX_BY_FW = {};
+HISTORY.forEach(function (h) { (h.pos || []).forEach(function (p) { HX_BY_POS[p] = h; }); if (h.fw) HX_BY_FW[h.fw] = h; });
+HISTORY.forEach(function (h) { if (!h.fam || h.fam === 'auth' || h.fam === 'story') return; FW_FAMILIES.forEach(function (f) { if (f.id === h.fam) f.fws.forEach(function (w) { if (!HX_BY_FW[w.id]) HX_BY_FW[w.id] = h; }); }); });
+var HX_KIND = { b: 'Belief', fw: 'Framework', pr: 'Practice' };
+var HX_BASIS = { s: ['Commanded in Scripture', '#E3EEE6', '#1F5446'], d: ['Developed from Scripture', '#E6ECF6', '#2E4A8A'], t: ['Mainly church tradition', '#F6E7DC', '#7A3B1E'] };
+var HX_STEP = { b: ['Bible', '#7A3B1E'], c: ['Council or church decision', '#2E4A8A'], p: ['Teacher or movement', '#1F6656'], r: ['Reformation or split', '#8A2E4A'], d: ['Devotion and practice', '#9A6A12'] };
 var TOPICS = [
   { id: 'grief', name: 'Grief and loss', icon: 'M12 21s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.6-7 10-7 10z', practice: 'pray',
     intro: 'Scripture does not hurry grief. It gives words for lament and the hope that death is not the end.',
@@ -1652,7 +2006,7 @@ var LABEL_STYLE = {
 };
 
 // ----- Chapter-by-chapter people, places and events (Theographic Bible Metadata, CC BY-SA 4.0) -----
-var HIST_KEYS = ['tab', 'book', 'chap', 'era', 'theme', 'tr', 'q', 'prMode', 'prId', 'prTrad', 'cmpMode', 'cmpFam', 'testa', 'libCanon', 'srMode', 'topic'];
+var HIST_KEYS = ['tab', 'book', 'chap', 'era', 'theme', 'tr', 'q', 'prMode', 'prId', 'prTrad', 'cmpMode', 'cmpFam', 'hxId', 'hxKind', 'testa', 'libCanon', 'srMode', 'topic'];
 var CH_URL = 'chapters.json';
 var HN_URL = 'henry.json';
 
@@ -1767,8 +2121,73 @@ class Component extends DCLogic {
     }
     if (el) { var self = this; setTimeout(function () { try { el.scrollIntoView({ block: 'nearest' }); } catch (err) {} self.forceUpdate(); }, 30); }
   }
+  // Keep map text from overlapping: place names try right, left, below, then above their pin, and are hidden
+  // (the numbered pin stays tappable) if no spot is free; region and sea names give way to place names.
+  mapDeclutter() {
+    var SIDES = { r: ['16px', '-10px', '0%'], l: ['-16px', '-10px', '-100%'], b: ['0px', '14px', '-50%'], t: ['0px', '-34px', '-50%'] };
+    var hit = function (a, b) { return a.left < b.right + 2 && a.right > b.left - 2 && a.top < b.bottom + 1 && a.bottom > b.top - 1; };
+    var maps = document.querySelectorAll('[data-fit]');
+    for (var m = 0; m < maps.length; m++) {
+      var box = maps[m], pins = box.querySelectorAll('[data-ml="pin"]'), bgs = box.querySelectorAll('[data-ml="bg"]');
+      if (!pins.length && !bgs.length) continue;
+      var cr = box.getBoundingClientRect();
+      if (!cr.width) continue;
+      var inside = function (r) { return r.left >= cr.left + 2 && r.right <= cr.right - 2 && r.top >= cr.top + 2 && r.bottom <= cr.bottom - 2; };
+      var placed = [];
+      var dots = box.querySelectorAll('button[aria-label]');
+      for (var d = 0; d < dots.length; d++) { var dr = dots[d].getBoundingClientRect(); if (dr.width && dr.width < 40) placed.push(dr); }
+      var list = Array.prototype.slice.call(pins).sort(function (a, b) { return (b.getAttribute('data-on') === 'true') - (a.getAttribute('data-on') === 'true'); });
+      list.forEach(function (el) {
+        el.style.visibility = '';
+        var pref = el.getAttribute('data-side') || 'r';
+        var order = [pref].concat(['r', 'l', 'b', 't'].filter(function (x) { return x !== pref; }));
+        var ok = null;
+        for (var i = 0; i < order.length && !ok; i++) {
+          var S = SIDES[order[i]];
+          el.style.left = S[0]; el.style.top = S[1]; el.style.transform = 'translateX(' + S[2] + ')';
+          var r = el.getBoundingClientRect();
+          if (inside(r) && !placed.some(function (q) { return hit(r, q); })) ok = r;
+        }
+        if (!ok) {
+          var S0 = SIDES[pref]; el.style.left = S0[0]; el.style.top = S0[1]; el.style.transform = 'translateX(' + S0[2] + ')';
+          if (el.getAttribute('data-on') === 'true') ok = el.getBoundingClientRect(); else el.style.visibility = 'hidden';
+        }
+        if (ok) placed.push(ok);
+      });
+      Array.prototype.forEach.call(bgs, function (el) {
+        el.style.visibility = '';
+        var r = el.getBoundingClientRect();
+        if (r.right < cr.left || r.left > cr.right || r.bottom < cr.top || r.top > cr.bottom) return;
+        if (!inside(r)) { el.style.visibility = 'hidden'; return; }
+        if (placed.some(function (q) { return hit(r, q); })) { el.style.visibility = 'hidden'; return; }
+        placed.push(r);
+      });
+    }
+  }
+
+  watchMaps() {
+    var self = this, queued = false, late = null;
+    var obs = new MutationObserver(function () { schedule(); });
+    var run = function () {
+      queued = false;
+      obs.disconnect();
+      try { self.mapDeclutter(); } catch (err) {}
+      obs.takeRecords();
+      obs.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['style', 'data-on'] });
+    };
+    var schedule = function () {
+      if (queued) return; queued = true;
+      requestAnimationFrame(run);
+      clearTimeout(late); late = setTimeout(function () { requestAnimationFrame(run); }, 700); // after the map's slide animation
+    };
+    obs.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['style', 'data-on'] });
+    window.addEventListener('resize', schedule);
+    schedule();
+  }
+
   componentDidMount() {
     var self = this;
+    if (window.MutationObserver) this.watchMaps();
     this.loadText('bsb');
     this.loadChapters();
     this.loadHenry();
@@ -2102,7 +2521,7 @@ class Component extends DCLogic {
     var q;
     try { q = new URLSearchParams(window.location.search); } catch (err) { return; }
     var patch = {};
-    var tabs = ['overview', 'library', 'story', 'timeline', 'themes', 'compare', 'practice', 'read', 'search', 'about'];
+    var tabs = ['overview', 'library', 'story', 'timeline', 'themes', 'compare', 'practice', 'history', 'read', 'search', 'about'];
     var tab = q.get('tab');
     if (tab && tabs.indexOf(tab) >= 0) patch.tab = tab;
     var book = q.get('book');
@@ -2120,6 +2539,8 @@ class Component extends DCLogic {
     if (q.get('prId') && PRACTICES.some(function (x) { return x.id === q.get('prId'); })) patch.prId = q.get('prId');
     if (q.get('prTrad') && TRAD_NAME[q.get('prTrad')]) patch.prTrad = q.get('prTrad');
     if (q.get('cmpMode') === 'fw' || q.get('cmpMode') === 'trad' || q.get('cmpMode') === 'pr') patch.cmpMode = q.get('cmpMode');
+    if (q.get('hxId') && HISTORY.some(function (h) { return h.id === q.get('hxId'); })) patch.hxId = q.get('hxId');
+    if (['b', 'fw', 'pr'].indexOf(q.get('hxKind')) >= 0) patch.hxKind = q.get('hxKind');
     if (q.get('cmpFam') && FW_FAMILIES.some(function (f) { return f.id === q.get('cmpFam'); })) patch.cmpFam = q.get('cmpFam');
     if (['all', 'OT', 'NT', 'AP'].indexOf(q.get('testa')) >= 0) patch.testa = q.get('testa');
     if (q.get('libCanon') && CANONS[q.get('libCanon')]) patch.libCanon = q.get('libCanon');
@@ -2311,11 +2732,11 @@ class Component extends DCLogic {
     });
 
     // Story = Storyline + Timeline; Traditions = beliefs, frameworks and practice.
-    var TAB_GROUPS = { story: ['story', 'timeline'], compare: ['compare', 'practice'] };
+    var TAB_GROUPS = { story: ['story', 'timeline'], compare: ['compare', 'practice', 'history'] };
     var tabs = [['overview','Overview'],['library','Library'],['story','Story'],['themes','Themes'],['compare','Traditions'],['read','Read'],['search','Search'],['about','About']].map(function (t) {
       var grp = TAB_GROUPS[t[0]] || [t[0]];
       var on = grp.indexOf(tab) >= 0;
-      return { id: t[0], label: t[1], pressed: on, bg: on ? INK : 'transparent', fg: on ? PAPER : '#4A3F35', pick: function () { go({ tab: t[0] }); window.scrollTo(0, 0); } };
+      return { id: t[0], label: t[1], pressed: on, bg: on ? INK : 'transparent', fg: on ? PAPER : '#4A3F35', pick: function () { go(t[0] === 'compare' ? { tab: 'compare', cmpMode: 'trad', cmpReg: null } : { tab: t[0] }); window.scrollTo(0, 0); } };
     });
     var seg = function (items, cur) {
       return items.map(function (it) {
@@ -2324,8 +2745,8 @@ class Component extends DCLogic {
       });
     };
     var storyViews = seg([['story', 'Storyline', { tab: 'story' }], ['timeline', 'Timeline', { tab: 'timeline' }]], tab);
-    var tradView = tab === 'practice' || st.cmpMode === 'pr' ? 'practice' : (st.cmpMode === 'fw' ? 'fw' : 'trad');
-    var tradViews = seg([['trad', 'Beliefs', { tab: 'compare', cmpMode: 'trad', cmpReg: null }], ['fw', 'Frameworks', { tab: 'compare', cmpMode: 'fw', cmpReg: null }], ['practice', 'Practice', { tab: 'compare', cmpMode: 'pr', cmpReg: null }]], tradView);
+    var tradView = tab === 'history' ? 'history' : tab === 'practice' || st.cmpMode === 'pr' ? 'practice' : (st.cmpMode === 'fw' ? 'fw' : 'trad');
+    var tradViews = seg([['trad', 'Beliefs', { tab: 'compare', cmpMode: 'trad', cmpReg: null }], ['fw', 'Frameworks', { tab: 'compare', cmpMode: 'fw', cmpReg: null }], ['practice', 'Practice', { tab: 'compare', cmpMode: 'pr', cmpReg: null }], ['history', 'History', { tab: 'history' }]], tradView);
 
     var ring = function (b) { return b.id === bookId ? '3px solid ' + INK : '3px solid transparent'; };
     // On phones the book card sits below the content, so bring it into view when a book is picked.
@@ -2671,6 +3092,33 @@ class Component extends DCLogic {
       }),
       r: showRoute ? [['Route in the order the chapter mentions each place', routeIds]] : null
     };
+    // Play: step through a map's places in order, panning to each pin while a voice narrates.
+    var addPlay = function (M, key, steps) {
+      var mp = self._mapPlay;
+      var playing = !!(mp && mp.key === key && mp.gen === self._seqGen);
+      M.canPlay = steps.length >= 2;
+      M.playing = playing; M.notPlaying = !playing;
+      M.playLabel = playing ? 'Stop' : 'Play';
+      M.playAria = playing ? 'Stop the narrated tour' : 'Play a narrated tour of the places on this map';
+      M.playBg = playing ? '#231E19' : '#FFFDF8'; M.playFg = playing ? '#FBF7EF' : '#231E19';
+      M.play = function () {
+        if (playing) { self.seqStop(); self._mapPlay = null; self.forceUpdate(); return; }
+        self.pageStop(true); self.ttsStop(true);
+        self.speakSeq(steps.map(function (x) { return x.say; }), 0, {
+          onItem: function (i) { steps[i].apply(); },
+          onDone: function () { self._mapPlay = null; self.forceUpdate(); }
+        });
+        self._mapPlay = { key: key, gen: self._seqGen };
+        self.forceUpdate();
+      };
+    };
+    var placeName = function (id) { return PLACES[id][0].replace(/ \(.*$/, ''); };
+    var noteSteps = function (M, def) {
+      return (def && def.p ? def.p : []).map(function (e, i, all) {
+        return { say: (i === 0 ? 'First, ' : i === all.length - 1 ? 'Finally, ' : '') + placeName(e[0]) + '. ' + e[1] + '.',
+          apply: function () { var patch = M.centerOn(e[0]); patch.pin = e[0]; if ((st.mapZoom || 0) < 1 && !st.mapWide) patch.mapZoom = 1; go(patch); } };
+      });
+    };
     var chMap = buildMap(chDef, 4 / 3, '4 / 3', !!st.mapWide, st.pin, st.mapZoom || 0, go, 'chPan', 'ch' + B.id + C + (chWhole ? 'b' : ''), st.chPan, st.dragging, 'chListClosed', !st.chListClosed);
     var stopIdx = -1;
     stops.forEach(function (o, i) { if (o.id === st.pin && st.chStop === i) stopIdx = i; });
@@ -2681,6 +3129,12 @@ class Component extends DCLogic {
       if ((st.mapZoom || 0) < 2 && !st.mapWide) patch.mapZoom = 2;
       go(patch);
     };
+    if (chWhole) addPlay(chMap, 'chb' + B.id, noteSteps(chMap, chDef));
+    else addPlay(chMap, 'ch' + B.id + C, stops.map(function (o, i) {
+      var v = (rawVerses[o.vv[0] - 1] || '').replace(/[\[\]]/g, '');
+      var same = i > 0 && stops[i - 1].vv[0] === o.vv[0];
+      return { say: placeName(o.id) + (same ? ', in the same verse.' : '. ' + (v ? 'Verse ' + o.vv[0] + '. ' + v : '')), apply: function () { goStop(i); } };
+    }));
     chMap.journey = {
       has: !chWhole && stops.length >= 2,
       hasRoute: routeIds.length >= 2, routeOn: showRoute,
@@ -2835,6 +3289,8 @@ class Component extends DCLogic {
     var narrow = !!this._narrow;
     var eraMap = buildMap(ERA_MAPS[eraN], narrow ? 4 / 3 : 16 / 9, narrow ? '4 / 3' : '16 / 9', !!st.mapWide, st.pin, st.mapZoom || 0, go, 'eraPan', 'era' + eraN, st.eraPan, st.dragging, 'eraListClosed', !st.eraListClosed);
     var bookMap = buildMap(BOOK_MAPS[B.id], 4 / 3, '4 / 3', !!st.mapWide, st.pin, st.mapZoom || 0, go, 'bookPan', 'book' + B.id, st.bookPan, st.dragging, 'bookListClosed', !st.bookListClosed);
+    addPlay(eraMap, 'era' + eraN, noteSteps(eraMap, ERA_MAPS[eraN]));
+    addPlay(bookMap, 'book' + B.id, noteSteps(bookMap, BOOK_MAPS[B.id]));
 
 
     // Timeline
@@ -3192,6 +3648,58 @@ class Component extends DCLogic {
     tp.practiceLabel = tp.practice ? 'Related practice: ' + tp.practice.name + ' →' : '';
     tp.openPractice = function () { if (tp.practice) { go({ tab: 'practice', prMode: 'practice', prId: tp.practice.id }); window.scrollTo(0, 0); } };
 
+    // History: how a belief, framework or practice developed
+    var openHx = function (id) { go({ tab: 'history', hxId: id }); window.scrollTo(0, 0); };
+    var hxKind = ['b', 'fw', 'pr'].indexOf(st.hxKind) >= 0 ? st.hxKind : 'all';
+    var hxSel = HISTORY.filter(function (h) { return h.id === st.hxId; })[0] || HISTORY[0];
+    var hxRef = function (r) { return { label: r[3], pick: function () { openChap(r[0], r[1], r[2]); window.scrollTo(0, 0); } }; };
+    var hxBasis = HX_BASIS[hxSel.basis];
+    var hxTrads = hxSel.trads.split('').map(function (id) { return TRAD_NAME[id]; });
+    var hxSteps = hxSel.steps.slice().sort(function (a, b) { return a.y - b.y; });
+    var hx = {
+      kinds: [['all', 'All'], ['b', 'Beliefs'], ['fw', 'Frameworks'], ['pr', 'Practices']].map(function (m) {
+        var on = m[0] === hxKind;
+        return { label: m[1], pressed: on, bg: on ? INK : 'transparent', fg: on ? PAPER : '#4A3F35', pick: function () { go({ hxKind: m[0] }); } };
+      }),
+      list: HISTORY.filter(function (h) { return hxKind === 'all' || h.kind === hxKind; }).map(function (h) {
+        var on = h === hxSel;
+        return { label: h.name, pressed: on, bg: on ? INK : '#FFFDF8', fg: on ? PAPER : INK, pick: function () { go({ hxId: h.id }); } };
+      }),
+      legend: ['b', 'c', 'p', 'r', 'd'].map(function (k) { return { label: HX_STEP[k][0], color: HX_STEP[k][1] }; }),
+      sel: {
+        name: hxSel.name, sum: hxSel.sum, note: hxSel.note, kindLabel: HX_KIND[hxSel.kind],
+        basisLabel: hxBasis[0], basisBg: hxBasis[1], basisFg: hxBasis[2],
+        refs: hxSel.refs.map(hxRef),
+        heldLabel: hxTrads.length === TRADS.length ? 'Shared by all nine traditions:' : hxSel.kind === 'fw' ? 'Mainly held by:' : 'Mainly found in:',
+        trads: hxTrads.map(function (t) { return { label: t.name, color: t.color }; }),
+        hasLink: !!(hxSel.fw || hxSel.pr || hxSel.kind === 'b'),
+        linkLabel: hxSel.fw ? 'Compare this with other views →' : hxSel.pr ? 'See this practice across traditions →' : 'Compare beliefs across traditions →',
+        link: function () {
+          if (hxSel.fw) go({ tab: 'compare', cmpMode: 'fw', cmpFam: hxSel.fam, cmpReg: null });
+          else if (hxSel.pr) go({ tab: 'practice', prMode: 'practice', prId: hxSel.pr });
+          else go({ tab: 'compare', cmpMode: 'trad', cmpReg: null });
+          window.scrollTo(0, 0);
+        },
+        steps: hxSteps.map(function (s, i) {
+          var k = HX_STEP[s.k] || HX_STEP.p, t = s.tr ? TRAD_NAME[s.tr] : null;
+          return { when: s.w, title: s.t, text: s.d, kindLabel: k[0], color: k[1], lineTop: i === 0 ? '8px' : '0',
+            hasTrad: !!t, tradLabel: t ? t.name : '', tradColor: t ? t.color : INK,
+            hasRefs: !!(s.r && s.r.length), refs: (s.r || []).map(hxRef) };
+        }),
+        people: hxSel.people.map(function (p) { return { name: p[0], dates: p[1], role: p[2], hasRole: !!p[2] }; }),
+        src: hxSel.src.map(function (q) { return { label: q[0], url: q[1] }; })
+      },
+      exportAll: function () {
+        var rows = [['Topic', 'Kind', 'Scripture or tradition', 'When', 'Event', 'What happened', 'Type', 'Tradition', 'Scripture']];
+        HISTORY.forEach(function (h) {
+          h.steps.slice().sort(function (a, b) { return a.y - b.y; }).forEach(function (s) {
+            rows.push([h.name, HX_KIND[h.kind], HX_BASIS[h.basis][0], s.w, s.t, s.d, (HX_STEP[s.k] || HX_STEP.p)[0], s.tr ? TRAD_NAME[s.tr].name : '', (s.r || []).map(function (r) { return r[3]; }).join('; ')]);
+          });
+        });
+        self.exportCSV('how-it-developed', rows);
+      }
+    };
+
     // Practice: living the faith, by practice or by tradition
     var prMode = st.prMode === 'trad' ? 'trad' : 'practice';
     var prSel = PRACTICES.filter(function (q) { return q.id === st.prId; })[0] || PRACTICES[0];
@@ -3245,6 +3753,8 @@ class Component extends DCLogic {
         self.exportCSV('living-the-faith-by-tradition', rows);
       }
     };
+    pr.sel.hist = HISTORY.filter(function (h) { return h.pr === prSel.id; }).map(function (h) { return { label: 'How it developed: ' + h.name + ' →', pick: function () { openHx(h.id); } }; });
+    pr.sel.hasHist = pr.sel.hist.length > 0;
 
     // Compare traditions and frameworks
     var cmpMode = st.cmpMode === 'fw' ? 'fw' : st.cmpMode === 'pr' ? 'pr' : 'trad';
@@ -3386,6 +3896,8 @@ class Component extends DCLogic {
       }),
       famName: cmpFam.name
     };
+    cmp.sections.forEach(function (sec) { sec.items.forEach(function (it) { var h = HX_BY_POS[it.text]; it.hasHx = !!h; it.hxPick = function () { if (h) openHx(h.id); }; }); });
+    cmp.cards.forEach(function (c, i) { var x = cSel[i]; var h = cmpMode === 'fw' && x ? HX_BY_FW[x.id] : null; c.hasHx = !!h; c.hxPick = function () { if (h) openHx(h.id); }; });
     var showTrads = cmpMode === 'fw' && st.cmpView === 'trads';
     cmp.showTradsView = showTrads;
     cmp.showPicker = !showTrads;
@@ -3460,7 +3972,7 @@ class Component extends DCLogic {
         var menuOpen = compact && !!st.navOpen, searchOpen = compact && !!st.hdrSearch;
         var SUBS = { overview: 'Start here', library: 'Every book', story: 'Storyline and timeline', themes: 'Threads through Scripture', compare: 'Beliefs and practice', read: 'Full text', search: 'Words and topics', about: 'Why this site, FAQ' };
         var cur = tabs.filter(function (t) { return t.pressed; })[0];
-        var sub = { story: 'Storyline', timeline: 'Timeline', compare: st.cmpMode === 'fw' ? 'Frameworks' : st.cmpMode === 'pr' ? 'Practice' : 'Beliefs', practice: 'Practice' }[tab];
+        var sub = { story: 'Storyline', timeline: 'Timeline', compare: st.cmpMode === 'fw' ? 'Frameworks' : st.cmpMode === 'pr' ? 'Practice' : 'Beliefs', practice: 'Practice', history: 'History' }[tab];
         return {
           compact: compact, full: !compact, pos: compact ? 'sticky' : 'relative', shadow: compact ? '0 2px 10px rgba(35,30,25,0.08)' : 'none',
           current: cur ? cur.label + (sub ? ' · ' + sub : '') : '',
@@ -3471,7 +3983,7 @@ class Component extends DCLogic {
           home: function () { go({ tab: 'overview', navOpen: false, hdrSearch: false }); window.scrollTo(0, 0); },
           items: tabs.map(function (t) {
             return { label: t.label, sub: SUBS[t.id] || '', pressed: t.pressed, bg: t.pressed ? INK : '#FFFDF8', fg: t.pressed ? PAPER : INK, border: t.pressed ? INK : '#E2D8C6',
-              pick: function () { go({ tab: t.id, navOpen: false, hdrSearch: false }); window.scrollTo(0, 0); } };
+              pick: function () { go(t.id === 'compare' ? { tab: 'compare', cmpMode: 'trad', cmpReg: null, navOpen: false, hdrSearch: false } : { tab: t.id, navOpen: false, hdrSearch: false }); window.scrollTo(0, 0); } };
           }),
           listen: function () { go({ navOpen: false }); listen.pick(); },
           share: function () { go({ navOpen: false }); share(); },
@@ -3502,7 +4014,7 @@ class Component extends DCLogic {
       segments: segments, legend: legend,
       filters: filters, divisions: divisions, libCanons: libCanons, libArr: libArr || { groups: [] }, libIsArr: !!libArr, libIsShelves: !libArr,
       eras: eras, era: era, arc: arc, arcSel: arcSel, future: future, tl: tl, isTimeline: tab === 'timeline', cp: cp, chMap: chMap, listen: listen, player: player, cmp: cmp, isCompare: tab === 'compare', parts: parts, part: part, aside: (function () { var off = !asideOpen; var nar = self._narrow; return { open: !off, closed: off, flex: off ? (nar ? '1 1 100%' : '0 0 52px') : '1 1 340px', toggle: function () { var am = Object.assign({}, asideMap); am[tab] = off; go({ asideOpenMap: am }); }, hideRot: nar ? 90 : 0, showRot: nar ? -90 : 0, railDir: nar ? 'row' : 'column', railPad: nar ? '10px 14px' : '16px 6px', railWrite: nar ? 'horizontal-tb' : 'vertical-rl', railLabel: tab === 'read' ? 'Show chapter notes' : 'Show book details' }; })(),
-      showAside: tab !== 'compare' && tab !== 'timeline' && tab !== 'practice' && tab !== 'about', isAbout: tab === 'about', pr: pr, isPractice: tab === 'practice',
+      showAside: tab !== 'compare' && tab !== 'timeline' && tab !== 'practice' && tab !== 'history' && tab !== 'about', isAbout: tab === 'about', pr: pr, isPractice: tab === 'practice', hx: hx, isHistory: tab === 'history',
       themeBtns: themeBtns, strip: strip, theme: theme,
       sel: sel
     };
@@ -3843,7 +4355,7 @@ ${(V.era.noBooks) ? html`
 <span aria-hidden="true" style="width: 1px; background: #D9CDB8"></span>
 <button type="button" onClick=${V.eraMap.zoomIn} disabled=${V.eraMap.noIn} aria-label="Zoom in" style="cursor: pointer; width: 40px; height: 40px; border: none; background: transparent; color: ${V.eraMap.inColor}; display: flex; align-items: center; justify-content: center; padding: 0"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
 </div>
-<button type="button" onClick=${V.eraMap.toggle} style="cursor: pointer; min-height: 40px; padding: 6px 14px; border-radius: 999px; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; font-size: 13px; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.15)">${V.eraMap.toggleLabel}</button>
+${(V.eraMap.canPlay) ? html`<button type="button" onClick=${V.eraMap.play} aria-label=${V.eraMap.playAria} title=${V.eraMap.playAria} style="cursor: pointer; display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 6px 14px; border-radius: 999px; border: 1px solid #D9CDB8; background: ${V.eraMap.playBg}; color: ${V.eraMap.playFg}; font-size: 13px; font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,0.15)">${(V.eraMap.notPlaying) ? html`<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"></path></svg>` : null}${(V.eraMap.playing) ? html`<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="1.5"></rect></svg>` : null}${V.eraMap.playLabel}</button>` : null}<button type="button" onClick=${V.eraMap.toggle} style="cursor: pointer; min-height: 40px; padding: 6px 14px; border-radius: 999px; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; font-size: 13px; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.15)">${V.eraMap.toggleLabel}</button>
 </div>
 <div onPointerDown=${V.eraMap.down} onPointerMove=${V.eraMap.move} onPointerUp=${V.eraMap.up} onPointerCancel=${V.eraMap.up} onWheel=${V.eraMap.wheel} data-fit="1" data-noread="1" style="position: relative; width: 100%; aspect-ratio: ${V.eraMap.aspect}; overflow: hidden; border-radius: 12px; background: #C7DADB; border: 1px solid #D9CDB8; touch-action: none; user-select: none; cursor: ${V.eraMap.cursor}">
 <div style="position: absolute; left: ${V.eraMap.left}%; top: ${V.eraMap.top}%; width: ${V.eraMap.width}%; height: ${V.eraMap.height}%; transition: ${V.eraMap.transition}">
@@ -3854,13 +4366,13 @@ ${(V.eraMap.routes || []).map((r, $index) => html`
 `)}
 </svg>
 ${(V.eraMap.labels || []).map((l, $index) => html`
-<div aria-hidden="true" style="position: absolute; left: ${l.x}%; top: ${l.y}%; transform: translate(${l.tx}, -50%) rotate(${l.rot}deg); white-space: nowrap; pointer-events: none; font-size: ${l.size}px; font-weight: ${l.fw}; font-family: ${l.font}; font-style: ${l.fstyle}; letter-spacing: ${l.ls}; color: ${l.color}; text-shadow: 0 0 3px rgba(239,228,203,0.9)">${l.name}</div>
+<div aria-hidden="true" data-ml="bg" style="position: absolute; left: ${l.x}%; top: ${l.y}%; transform: translate(${l.tx}, -50%) rotate(${l.rot}deg); white-space: nowrap; pointer-events: none; font-size: ${l.size}px; font-weight: ${l.fw}; font-family: ${l.font}; font-style: ${l.fstyle}; letter-spacing: ${l.ls}; color: ${l.color}; text-shadow: 0 0 3px rgba(239,228,203,0.9)">${l.name}</div>
 `)}
 ${(V.eraMap.pins || []).map((p, $index) => html`
 <div style="position: absolute; width: 0; height: 0; left: ${p.x}%; top: ${p.y}%; z-index: ${p.z}">
 <button type="button" onClick=${p.pick} aria-label=${p.aria} style="position: absolute; left: -12px; top: -12px; width: 24px; height: 24px; border-radius: 50%; border: 2px solid #FFFDF8; padding: 0; cursor: pointer; font-size: 11px; font-weight: 700; color: #FFFFFF; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.35); background: ${p.bg}">${p.num}</button>
 ${(p.showLabel) ? html`
-<span style="position: absolute; white-space: nowrap; font-size: 12px; font-weight: 700; color: #231E19; background: rgba(255,253,248,0.9); padding: 1px 6px; border-radius: 4px; pointer-events: none; left: ${p.lx}; top: ${p.ly}; transform: translateX(${p.tx})">${p.name}</span>
+<span data-ml="pin" data-on=${p.on} data-side=${p.side} style="position: absolute; white-space: nowrap; font-size: 12px; font-weight: 700; color: #231E19; background: rgba(255,253,248,0.9); padding: 1px 6px; border-radius: 4px; pointer-events: none; left: ${p.lx}; top: ${p.ly}; transform: translateX(${p.tx})">${p.name}</span>
 ` : null}
 </div>
 `)}
@@ -4064,7 +4576,7 @@ ${(V.tl.detail.hasRead) ? html`
 
 ${(V.isPractice) ? html`
 <section style="display: flex; flex-direction: column; gap: 18px">
-<div role="group" aria-label="Traditions view" style="display: flex; flex-wrap: wrap; gap: 4px; background: #EAE1D0; padding: 4px; border-radius: 999px; align-self: flex-start">${(V.tradViews || []).map((v, $index) => html`<button type="button" onClick=${v.pick} aria-pressed=${v.pressed} style="border: none; cursor: pointer; padding: 8px 18px; min-height: 44px; border-radius: 999px; font-size: 14px; font-weight: 700; background: ${v.bg}; color: ${v.fg}">${v.label}</button>`)}</div>
+<div class="be-seg" role="group" aria-label="Traditions view" style="display: flex; flex-wrap: wrap; gap: 4px; background: #EAE1D0; padding: 4px; border-radius: 999px; align-self: flex-start">${(V.tradViews || []).map((v, $index) => html`<button type="button" onClick=${v.pick} aria-pressed=${v.pressed} style="border: none; cursor: pointer; padding: 8px 18px; min-height: 44px; border-radius: 999px; font-size: 14px; font-weight: 700; background: ${v.bg}; color: ${v.fg}">${v.label}</button>`)}</div>
 <div>
 <div style="font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #7A3B1E">Traditions · Practice</div>
 <h1 style="margin: 4px 0 8px; font-family: Fraunces, Georgia, serif; font-size: 36px; line-height: 1.1">Living it out, day to day</h1>
@@ -4072,7 +4584,7 @@ ${(V.isPractice) ? html`
 <p style="margin: 0; font-size: 13px; color: #6B5F52; max-width: 800px">Every tradition teaches that these practices respond to God’s grace rather than earn it, though they explain that link differently (see Beliefs). Descriptions follow each tradition’s official teaching or common practice; individual churches vary.</p>
 </div>
 <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px">
-<div role="group" aria-label="View" style="display: flex; gap: 4px; background: #EAE1D0; padding: 4px; border-radius: 999px">
+<div class="be-seg" role="group" aria-label="View" style="display: flex; gap: 4px; background: #EAE1D0; padding: 4px; border-radius: 999px">
 ${(V.pr.modes || []).map((m, $index) => html`<button type="button" onClick=${m.pick} aria-pressed=${m.pressed} style="border: none; cursor: pointer; padding: 8px 16px; min-height: 44px; border-radius: 999px; font-size: 14px; font-weight: 700; background: ${m.bg}; color: ${m.fg}">${m.label}</button>`)}
 </div>
 
@@ -4090,6 +4602,7 @@ ${(V.pr.practices || []).map((q, $index) => html`<button type="button" onClick=$
 <div><div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52; margin-bottom: 4px">Why Christians do this</div><p style="margin: 0; font-size: 16px; line-height: 1.6; color: #31291F; max-width: 820px">${V.pr.sel.why}</p></div>
 <div style="display: flex; flex-wrap: wrap; gap: 6px">${(V.pr.sel.refs || []).map((r, $index) => html`<button type="button" onClick=${r.pick} title="Read this passage" style="cursor: pointer; border: 1px solid #D9CDB8; background: #F5EFE3; color: #7A3B1E; border-radius: 999px; padding: 6px 12px; min-height: 36px; font-size: 13px; font-weight: 700">${r.label}</button>`)}</div>
 <div style="background: #F5EFE3; border-radius: 12px; padding: 12px 14px"><div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52; margin-bottom: 4px">Common ground</div><p style="margin: 0; font-size: 15px; line-height: 1.55; color: #31291F">${V.pr.sel.shared}</p></div>
+${(V.pr.sel.hasHist) ? html`<div style="display: flex; flex-wrap: wrap; gap: 8px">${(V.pr.sel.hist || []).map((h, $index) => html`<button type="button" onClick=${h.pick} style="cursor: pointer; border: 1px solid #231E19; background: #FFFDF8; color: #231E19; border-radius: 999px; padding: 6px 14px; min-height: 38px; font-size: 13px; font-weight: 700">${h.label}</button>`)}</div>` : null}
 </article>
 <div>
 <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52; margin-bottom: 8px">Traditions shown (tap to hide or show)</div>
@@ -4131,16 +4644,93 @@ ${(r.hasSrc) ? html`<div style="font-size: 13px">${(r.src || []).map((q, $index)
 <div style="font-size: 12px; color: #6B5F52; max-width: 820px">Summaries are written for this app from each tradition’s catechisms, prayer books and confessions, linked where used. Practice varies by country, parish and family; for guidance, talk with a pastor or priest in your own tradition.</div>
 </section>
 ` : null}
+${(V.isHistory) ? html`
+<section style="display: flex; flex-direction: column; gap: 18px">
+<div class="be-seg" role="group" aria-label="Traditions view" style="display: flex; flex-wrap: wrap; gap: 4px; background: #EAE1D0; padding: 4px; border-radius: 999px; align-self: flex-start">${(V.tradViews || []).map((v, $index) => html`<button type="button" onClick=${v.pick} aria-pressed=${v.pressed} style="border: none; cursor: pointer; padding: 8px 18px; min-height: 44px; border-radius: 999px; font-size: 14px; font-weight: 700; background: ${v.bg}; color: ${v.fg}">${v.label}</button>`)}</div>
+<div>
+<div style="font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #7A3B1E">Traditions · History</div>
+<h1 style="margin: 4px 0 8px; font-family: Fraunces, Georgia, serif; font-size: 36px; line-height: 1.1">How it developed</h1>
+<p style="margin: 0; color: #4A3F35; max-width: 800px">Some of what Christians believe and do is spelled out in Scripture; some grew over centuries through councils, teachers and devotion. Pick a belief, framework or practice to see where it started, who shaped it, and the Bible passages behind it.</p>
+</div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px">
+<div class="be-seg" role="group" aria-label="Show" style="display: flex; flex-wrap: wrap; gap: 4px; background: #EAE1D0; padding: 4px; border-radius: 999px">
+${(V.hx.kinds || []).map((m, $index) => html`<button type="button" onClick=${m.pick} aria-pressed=${m.pressed} style="border: none; cursor: pointer; padding: 8px 16px; min-height: 44px; border-radius: 999px; font-size: 14px; font-weight: 700; background: ${m.bg}; color: ${m.fg}">${m.label}</button>`)}
+</div>
+<button type="button" onClick=${V.hx.exportAll} style="cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; border-radius: 999px; padding: 8px 14px; min-height: 40px; font-size: 13px; font-weight: 700"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M5 21h14"></path></svg>Export all timelines (CSV)</button>
+</div>
+<div>
+<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52; margin-bottom: 8px">Topic</div>
+<div role="group" aria-label="Topic" style="display: flex; flex-wrap: wrap; gap: 6px">
+${(V.hx.list || []).map((q, $index) => html`<button type="button" onClick=${q.pick} aria-pressed=${q.pressed} style="cursor: pointer; border: 1px solid #D9CDB8; border-radius: 999px; padding: 6px 12px; min-height: 38px; font-size: 13px; font-weight: 600; background: ${q.bg}; color: ${q.fg}">${q.label}</button>`)}
+</div>
+</div>
+<article id="hx-top" data-focus="card" style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 18px; padding: 22px 24px; display: flex; flex-direction: column; gap: 14px"><button type="button" class="be-fbtn" onClick=${V.focusToggle} aria-label="Focus mode: show this section full screen" title="Focus mode (full screen)"><svg class="be-fi-in" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg><svg class="be-fi-out" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"></path><path d="M15 4v5h5"></path><path d="M9 20v-5H4"></path><path d="M15 20v-5h5"></path></svg></button>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding-right: 80px">
+<span style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52">${V.hx.sel.kindLabel}</span>
+<span style="font-size: 12px; font-weight: 700; border-radius: 999px; padding: 3px 10px; background: ${V.hx.sel.basisBg}; color: ${V.hx.sel.basisFg}">${V.hx.sel.basisLabel}</span>
+</div>
+<h2 style="margin: -4px 0 0; font-family: Fraunces, Georgia, serif; font-size: 30px; line-height: 1.15">${V.hx.sel.name}</h2>
+<p style="margin: 0; font-size: 16px; line-height: 1.6; color: #31291F; max-width: 840px">${V.hx.sel.sum}</p>
+<div style="background: #F5EFE3; border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px">
+<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52">Scripture or tradition?</div>
+<p style="margin: 0; font-size: 15px; line-height: 1.55; color: #31291F; max-width: 820px">${V.hx.sel.note}</p>
+<div style="display: flex; flex-wrap: wrap; gap: 6px">${(V.hx.sel.refs || []).map((r, $index) => html`<button type="button" onClick=${r.pick} title="Read this passage" style="cursor: pointer; border: 1px solid #D9CDB8; background: #FFFDF8; color: #7A3B1E; border-radius: 999px; padding: 6px 12px; min-height: 36px; font-size: 13px; font-weight: 700">${r.label}</button>`)}</div>
+</div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px">
+<span style="font-size: 13px; font-weight: 700; color: #4A3F35; margin-right: 4px">${V.hx.sel.heldLabel}</span>
+${(V.hx.sel.trads || []).map((t, $index) => html`<span style="font-size: 12px; font-weight: 700; border-radius: 999px; padding: 3px 9px; background: ${t.color}; color: #FFFFFF">${t.label}</span>`)}
+</div>
+${(V.hx.sel.hasLink) ? html`<button type="button" onClick=${V.hx.sel.link} style="align-self: flex-start; cursor: pointer; border: 1px solid #231E19; background: #FFFDF8; color: #231E19; border-radius: 999px; padding: 6px 14px; min-height: 38px; font-size: 13px; font-weight: 700">${V.hx.sel.linkLabel}</button>` : null}
+</article>
+<div style="display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: #4A3F35" aria-label="Timeline key">
+${(V.hx.legend || []).map((g, $index) => html`<span style="display: inline-flex; align-items: center; gap: 6px"><span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 50%; background: ${g.color}"></span>${g.label}</span>`)}
+</div>
+<div data-focus="card" style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 18px; padding: 22px 20px 6px"><button type="button" class="be-fbtn" onClick=${V.focusToggle} aria-label="Focus mode: show this section full screen" title="Focus mode (full screen)"><svg class="be-fi-in" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg><svg class="be-fi-out" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"></path><path d="M15 4v5h5"></path><path d="M9 20v-5H4"></path><path d="M15 20v-5h5"></path></svg></button>
+<h2 style="margin: 0 0 16px; font-family: Fraunces, Georgia, serif; font-size: 22px; padding-right: 80px">Timeline</h2>
+<ol style="list-style: none; margin: 0; padding: 0">
+${(V.hx.sel.steps || []).map((s, $index) => html`
+<li style="display: grid; grid-template-columns: minmax(78px, 132px) 24px minmax(0, 1fr); column-gap: 10px">
+<div style="text-align: right; padding-top: 2px; font-size: 13px; font-weight: 800; line-height: 1.3; color: #231E19">${s.when}</div>
+<div aria-hidden="true" style="position: relative">
+<div style="position: absolute; left: 11px; top: ${s.lineTop}; bottom: 0; width: 2px; background: #E2D8C6"></div>
+<div style="position: relative; margin: 3px 0 0 4px; width: 12px; height: 12px; border-radius: 50%; background: ${s.color}; box-shadow: 0 0 0 3px #FFFDF8, 0 0 0 5px ${s.color}"></div>
+</div>
+<div style="padding: 0 0 22px; display: flex; flex-direction: column; gap: 5px; min-width: 0">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px"><span style="font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52">${s.kindLabel}</span>${(s.hasTrad) ? html`<span style="font-size: 11px; font-weight: 700; border-radius: 999px; padding: 2px 8px; border: 1.5px solid ${s.tradColor}; color: ${s.tradColor}">${s.tradLabel}</span>` : null}</div>
+<h3 style="margin: 0; font-family: Fraunces, Georgia, serif; font-size: 18px; line-height: 1.25">${s.title}</h3>
+<p style="margin: 0; font-size: 15px; line-height: 1.55; color: #31291F; max-width: 760px">${s.text}</p>
+${(s.hasRefs) ? html`<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px">${(s.refs || []).map((r, $index) => html`<button type="button" onClick=${r.pick} title="Read this passage" style="cursor: pointer; border: 1px solid #D9CDB8; background: #F5EFE3; color: #7A3B1E; border-radius: 999px; padding: 4px 10px; min-height: 32px; font-size: 12px; font-weight: 700">${r.label}</button>`)}</div>` : null}
+</div>
+</li>
+`)}
+</ol>
+</div>
+<div>
+<h2 style="margin: 0 0 10px; font-family: Fraunces, Georgia, serif; font-size: 22px">Key people</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px">
+${(V.hx.sel.people || []).map((p, $index) => html`
+<div style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px">
+<div style="font-family: Fraunces, Georgia, serif; font-size: 16px; font-weight: 700; color: #231E19">${p.name}</div>
+<div style="font-size: 13px; color: #6B5F52">${p.dates}</div>
+${(p.hasRole) ? html`<div style="font-size: 14px; line-height: 1.45; color: #31291F">${p.role}</div>` : null}
+</div>
+`)}
+</div>
+</div>
+<div style="font-size: 13px">Read more: ${(V.hx.sel.src || []).map((q, $index) => html`<a href=${q.url} target="_blank" rel="noopener noreferrer" title="Opens in a new tab" style="color: #2E4A8A; font-weight: 600; margin-right: 10px">${q.label} ↗</a>`)}</div>
+<div style="font-size: 12px; color: #6B5F52; max-width: 820px">Dates before about AD 400 are often approximate, and some events (marked “traditional”) are handed down by tradition rather than recorded at the time. Summaries are written for this app; each tradition tells parts of this story in its own way.</div>
+</section>
+` : null}
 ${(V.isCompare) ? html`
 <section style="display: flex; flex-direction: column; gap: 18px">
-<div role="group" aria-label="Traditions view" style="display: flex; flex-wrap: wrap; gap: 4px; background: #EAE1D0; padding: 4px; border-radius: 999px; align-self: flex-start">${(V.tradViews || []).map((v, $index) => html`<button type="button" onClick=${v.pick} aria-pressed=${v.pressed} style="border: none; cursor: pointer; padding: 8px 18px; min-height: 44px; border-radius: 999px; font-size: 14px; font-weight: 700; background: ${v.bg}; color: ${v.fg}">${v.label}</button>`)}</div>
+<div class="be-seg" role="group" aria-label="Traditions view" style="display: flex; flex-wrap: wrap; gap: 4px; background: #EAE1D0; padding: 4px; border-radius: 999px; align-self: flex-start">${(V.tradViews || []).map((v, $index) => html`<button type="button" onClick=${v.pick} aria-pressed=${v.pressed} style="border: none; cursor: pointer; padding: 8px 18px; min-height: 44px; border-radius: 999px; font-size: 14px; font-weight: 700; background: ${v.bg}; color: ${v.fg}">${v.label}</button>`)}</div>
 <div>
 <div style="font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #7A3B1E">${V.cmp.eyebrow}</div>
 <h1 style="margin: 4px 0 8px; font-family: Fraunces, Georgia, serif; font-size: 36px; line-height: 1.1">${V.cmp.h1}</h1>
 <p style="margin: 0; color: #4A3F35; max-width: 780px">${V.cmp.intro}</p>
 </div>
 ${(V.cmp.isPr) ? html`
-<div role="group" aria-label="View" style="display: flex; gap: 4px; background: #EAE1D0; padding: 4px; border-radius: 999px; align-self: flex-start">
+<div class="be-seg" role="group" aria-label="View" style="display: flex; gap: 4px; background: #EAE1D0; padding: 4px; border-radius: 999px; align-self: flex-start">
 ${(V.cmp.prModes || []).map((m, $index) => html`<button type="button" onClick=${m.pick} aria-pressed=${m.pressed} style="border: none; cursor: pointer; padding: 8px 16px; min-height: 44px; border-radius: 999px; font-size: 14px; font-weight: 700; background: ${m.bg}; color: ${m.fg}">${m.label}</button>`)}
 </div>
 ` : null}
@@ -4166,7 +4756,7 @@ ${(V.cmp.chips || []).map((c, $index) => html`
 </div>
 ` : null}
 ${(V.cmp.showVenn) ? html`
-<div role="group" aria-label="View" style="display: flex; gap: 4px; background: #EAE1D0; padding: 4px; border-radius: 999px; align-self: flex-start">
+<div class="be-seg" role="group" aria-label="View" style="display: flex; gap: 4px; background: #EAE1D0; padding: 4px; border-radius: 999px; align-self: flex-start">
 ${(V.cmp.views || []).map((v, $index) => html`
 <button type="button" onClick=${v.pick} aria-pressed=${v.pressed} style="border: none; cursor: pointer; padding: 6px 14px; min-height: 38px; border-radius: 999px; font-size: 13px; font-weight: 700; background: ${v.bg}; color: ${v.fg}">${v.label}</button>
 `)}
@@ -4199,7 +4789,7 @@ ${(V.cmp.sections || []).map((sec, $index) => html`
 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px"><span style="display: inline-flex; gap: 3px">${(sec.dots || []).map((d, $index) => html`<span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 50%; background: ${d.color}"></span>`)}</span><h2 style="margin: 0; font-family: Fraunces, Georgia, serif; font-size: 19px">${sec.title}</h2><span style="font-size: 13px; color: #6B5F52">${sec.count}</span></div>
 <ul style="margin: 0; padding: 0 0 0 18px; display: flex; flex-direction: column; gap: 5px">
 ${(sec.items || []).map((it, $index) => html`
-<li style="font-size: 15px; line-height: 1.5; color: #31291F">${(it.hasTopic) ? html`<span style="font-weight: 700; color: #6B5F52">${it.topic}: </span>` : null}${it.text}</li>
+<li style="font-size: 15px; line-height: 1.5; color: #31291F">${(it.hasTopic) ? html`<span style="font-weight: 700; color: #6B5F52">${it.topic}: </span>` : null}${it.text}${(it.hasHx) ? html` <button type="button" onClick=${it.hxPick} style="cursor: pointer; border: none; background: transparent; padding: 0 2px; color: #2E4A8A; font-weight: 700; font-size: 13px; text-decoration: underline">How it developed →</button>` : null}</li>
 `)}
 </ul>
 </div>
@@ -4256,6 +4846,7 @@ ${(c.noFound) ? html`<div style="font-size: 12px; color: #6B5F52">Not the offici
 ${(c.hasTypical) ? html`
 <div><div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52; margin-bottom: 6px">Typical frameworks (loosely)</div><ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 3px">${(c.typical || []).map((r, $index) => html`<li style="font-size: 13px; line-height: 1.4"><button type="button" onClick=${r.pick} title="Compare these frameworks" style="cursor: pointer; border: none; background: transparent; padding: 0; color: #2E4A8A; font-weight: 700; font-size: 13px; text-decoration: underline">${r.topic}</button>: ${r.main} <span style="color: #6B5F52">${r.some}</span></li>`)}</ul></div>
 ` : null}
+${(c.hasHx) ? html`<button type="button" onClick=${c.hxPick} style="align-self: flex-start; cursor: pointer; border: 1px solid ${c.color}; background: #FFFDF8; color: ${c.color}; border-radius: 999px; padding: 6px 14px; min-height: 38px; font-size: 13px; font-weight: 700">How this view developed →</button>` : null}
 ${(c.canLive) ? html`<button type="button" onClick=${c.live} style="align-self: flex-start; cursor: pointer; border: 1px solid ${c.color}; background: #FFFDF8; color: ${c.color}; border-radius: 999px; padding: 6px 14px; min-height: 38px; font-size: 13px; font-weight: 700">How ${c.name} Christians live it out →</button>` : null}
 <div style="font-size: 13px">Read more: ${(c.src || []).map((q, $index) => html`<a href=${q.url} target="_blank" rel="noopener noreferrer" title="Opens in a new tab" style="color: #2E4A8A; font-weight: 600; margin-right: 8px">${q.label} ↗</a>`)}</div>
 </article>
@@ -4571,7 +5162,7 @@ ${(V.cp.noThemes) ? html`<div style="font-size: 14px; color: #6B5F52">Not tagged
 <span aria-hidden="true" style="width: 1px; background: #D9CDB8"></span>
 <button type="button" onClick=${V.chMap.zoomIn} disabled=${V.chMap.noIn} aria-label="Zoom in" style="cursor: pointer; width: 40px; height: 40px; border: none; background: transparent; color: ${V.chMap.inColor}; display: flex; align-items: center; justify-content: center; padding: 0"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
 </div>
-<button type="button" onClick=${V.chMap.toggle} style="cursor: pointer; min-height: 40px; padding: 6px 14px; border-radius: 999px; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; font-size: 13px; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.15)">${V.chMap.toggleLabel}</button>
+${(V.chMap.canPlay) ? html`<button type="button" onClick=${V.chMap.play} aria-label=${V.chMap.playAria} title=${V.chMap.playAria} style="cursor: pointer; display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 6px 14px; border-radius: 999px; border: 1px solid #D9CDB8; background: ${V.chMap.playBg}; color: ${V.chMap.playFg}; font-size: 13px; font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,0.15)">${(V.chMap.notPlaying) ? html`<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"></path></svg>` : null}${(V.chMap.playing) ? html`<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="1.5"></rect></svg>` : null}${V.chMap.playLabel}</button>` : null}<button type="button" onClick=${V.chMap.toggle} style="cursor: pointer; min-height: 40px; padding: 6px 14px; border-radius: 999px; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; font-size: 13px; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.15)">${V.chMap.toggleLabel}</button>
 </div>
 <div onPointerDown=${V.chMap.down} onPointerMove=${V.chMap.move} onPointerUp=${V.chMap.up} onPointerCancel=${V.chMap.up} onWheel=${V.chMap.wheel} data-fit="1" data-noread="1" style="position: relative; width: 100%; aspect-ratio: ${V.chMap.aspect}; overflow: hidden; border-radius: 12px; background: #C7DADB; border: 1px solid #D9CDB8; touch-action: none; user-select: none; cursor: ${V.chMap.cursor}">
 <div style="position: absolute; left: ${V.chMap.left}%; top: ${V.chMap.top}%; width: ${V.chMap.width}%; height: ${V.chMap.height}%; transition: ${V.chMap.transition}">
@@ -4582,13 +5173,13 @@ ${(V.chMap.routes || []).map((r, $index) => html`
 `)}
 </svg>
 ${(V.chMap.labels || []).map((l, $index) => html`
-<div aria-hidden="true" style="position: absolute; left: ${l.x}%; top: ${l.y}%; transform: translate(${l.tx}, -50%) rotate(${l.rot}deg); white-space: nowrap; pointer-events: none; font-size: ${l.size}px; font-weight: ${l.fw}; font-family: ${l.font}; font-style: ${l.fstyle}; letter-spacing: ${l.ls}; color: ${l.color}; text-shadow: 0 0 3px rgba(239,228,203,0.9)">${l.name}</div>
+<div aria-hidden="true" data-ml="bg" style="position: absolute; left: ${l.x}%; top: ${l.y}%; transform: translate(${l.tx}, -50%) rotate(${l.rot}deg); white-space: nowrap; pointer-events: none; font-size: ${l.size}px; font-weight: ${l.fw}; font-family: ${l.font}; font-style: ${l.fstyle}; letter-spacing: ${l.ls}; color: ${l.color}; text-shadow: 0 0 3px rgba(239,228,203,0.9)">${l.name}</div>
 `)}
 ${(V.chMap.pins || []).map((p, $index) => html`
 <div style="position: absolute; width: 0; height: 0; left: ${p.x}%; top: ${p.y}%; z-index: ${p.z}">
 <button type="button" onClick=${p.pick} aria-label=${p.aria} style="position: absolute; left: -12px; top: -12px; width: 24px; height: 24px; border-radius: 50%; border: 2px solid #FFFDF8; padding: 0; cursor: pointer; font-size: 11px; font-weight: 700; color: #FFFFFF; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.35); background: ${p.bg}">${p.num}</button>
 ${(p.showLabel) ? html`
-<span style="position: absolute; white-space: nowrap; font-size: 12px; font-weight: 700; color: #231E19; background: rgba(255,253,248,0.9); padding: 1px 6px; border-radius: 4px; pointer-events: none; left: ${p.lx}; top: ${p.ly}; transform: translateX(${p.tx})">${p.name}</span>
+<span data-ml="pin" data-on=${p.on} data-side=${p.side} style="position: absolute; white-space: nowrap; font-size: 12px; font-weight: 700; color: #231E19; background: rgba(255,253,248,0.9); padding: 1px 6px; border-radius: 4px; pointer-events: none; left: ${p.lx}; top: ${p.ly}; transform: translateX(${p.tx})">${p.name}</span>
 ` : null}
 </div>
 `)}
@@ -4675,7 +5266,7 @@ ${(V.sel.showMap) ? html`
 <span aria-hidden="true" style="width: 1px; background: #D9CDB8"></span>
 <button type="button" onClick=${V.bookMap.zoomIn} disabled=${V.bookMap.noIn} aria-label="Zoom in" style="cursor: pointer; width: 40px; height: 40px; border: none; background: transparent; color: ${V.bookMap.inColor}; display: flex; align-items: center; justify-content: center; padding: 0"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
 </div>
-<button type="button" onClick=${V.bookMap.toggle} style="cursor: pointer; min-height: 40px; padding: 6px 14px; border-radius: 999px; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; font-size: 13px; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.15)">${V.bookMap.toggleLabel}</button>
+${(V.bookMap.canPlay) ? html`<button type="button" onClick=${V.bookMap.play} aria-label=${V.bookMap.playAria} title=${V.bookMap.playAria} style="cursor: pointer; display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 6px 14px; border-radius: 999px; border: 1px solid #D9CDB8; background: ${V.bookMap.playBg}; color: ${V.bookMap.playFg}; font-size: 13px; font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,0.15)">${(V.bookMap.notPlaying) ? html`<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"></path></svg>` : null}${(V.bookMap.playing) ? html`<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="1.5"></rect></svg>` : null}${V.bookMap.playLabel}</button>` : null}<button type="button" onClick=${V.bookMap.toggle} style="cursor: pointer; min-height: 40px; padding: 6px 14px; border-radius: 999px; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; font-size: 13px; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.15)">${V.bookMap.toggleLabel}</button>
 </div>
 <div onPointerDown=${V.bookMap.down} onPointerMove=${V.bookMap.move} onPointerUp=${V.bookMap.up} onPointerCancel=${V.bookMap.up} onWheel=${V.bookMap.wheel} data-fit="1" data-noread="1" style="position: relative; width: 100%; aspect-ratio: ${V.bookMap.aspect}; overflow: hidden; border-radius: 12px; background: #C7DADB; border: 1px solid #D9CDB8; touch-action: none; user-select: none; cursor: ${V.bookMap.cursor}">
 <div style="position: absolute; left: ${V.bookMap.left}%; top: ${V.bookMap.top}%; width: ${V.bookMap.width}%; height: ${V.bookMap.height}%; transition: ${V.bookMap.transition}">
@@ -4686,13 +5277,13 @@ ${(V.bookMap.routes || []).map((r, $index) => html`
 `)}
 </svg>
 ${(V.bookMap.labels || []).map((l, $index) => html`
-<div aria-hidden="true" style="position: absolute; left: ${l.x}%; top: ${l.y}%; transform: translate(${l.tx}, -50%) rotate(${l.rot}deg); white-space: nowrap; pointer-events: none; font-size: ${l.size}px; font-weight: ${l.fw}; font-family: ${l.font}; font-style: ${l.fstyle}; letter-spacing: ${l.ls}; color: ${l.color}; text-shadow: 0 0 3px rgba(239,228,203,0.9)">${l.name}</div>
+<div aria-hidden="true" data-ml="bg" style="position: absolute; left: ${l.x}%; top: ${l.y}%; transform: translate(${l.tx}, -50%) rotate(${l.rot}deg); white-space: nowrap; pointer-events: none; font-size: ${l.size}px; font-weight: ${l.fw}; font-family: ${l.font}; font-style: ${l.fstyle}; letter-spacing: ${l.ls}; color: ${l.color}; text-shadow: 0 0 3px rgba(239,228,203,0.9)">${l.name}</div>
 `)}
 ${(V.bookMap.pins || []).map((p, $index) => html`
 <div style="position: absolute; width: 0; height: 0; left: ${p.x}%; top: ${p.y}%; z-index: ${p.z}">
 <button type="button" onClick=${p.pick} aria-label=${p.aria} style="position: absolute; left: -12px; top: -12px; width: 24px; height: 24px; border-radius: 50%; border: 2px solid #FFFDF8; padding: 0; cursor: pointer; font-size: 11px; font-weight: 700; color: #FFFFFF; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.35); background: ${p.bg}">${p.num}</button>
 ${(p.showLabel) ? html`
-<span style="position: absolute; white-space: nowrap; font-size: 12px; font-weight: 700; color: #231E19; background: rgba(255,253,248,0.9); padding: 1px 6px; border-radius: 4px; pointer-events: none; left: ${p.lx}; top: ${p.ly}; transform: translateX(${p.tx})">${p.name}</span>
+<span data-ml="pin" data-on=${p.on} data-side=${p.side} style="position: absolute; white-space: nowrap; font-size: 12px; font-weight: 700; color: #231E19; background: rgba(255,253,248,0.9); padding: 1px 6px; border-radius: 4px; pointer-events: none; left: ${p.lx}; top: ${p.ly}; transform: translateX(${p.tx})">${p.name}</span>
 ` : null}
 </div>
 `)}
