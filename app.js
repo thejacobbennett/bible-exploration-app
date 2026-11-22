@@ -4248,15 +4248,16 @@ class Component extends DCLogic {
     if (trKind === 'pr') trItems.push({ label: 'Download all practices (CSV)', pick: function () { go({ trMenu: false }); pr.exportAll(); } });
     trItems.push({ label: 'Download all history timelines (CSV)', pick: function () { go({ trMenu: false }); hx.exportAll(); } });
     var trMenu = { open: !!st.trMenu, toggle: function () { go({ trMenu: !st.trMenu }); }, items: trItems };
-    var hxName = function (id) { var h = HISTORY.filter(function (x) { return x.id === id; })[0]; return h ? { id: h.id, name: h.name } : null; };
+    var hxItem = function (h) { var bs = HX_BASIS[h.basis]; return { id: h.id, name: h.name, sum: h.sum, basis: bs[0], basisBg: bs[1], basisFg: bs[2], pick: function () { openHx(h.id); } }; };
+    var hxName = function (id) { var h = HISTORY.filter(function (x) { return x.id === id; })[0]; return h ? hxItem(h) : null; };
     var hxGroupsFor = function (kind) {
       var used = {}, out = (HX_GROUPS[kind] || []).map(function (g) { var items = g[1].map(hxName).filter(Boolean); items.forEach(function (x) { used[x.id] = 1; }); return { label: g[0], items: items }; });
-      var rest = HISTORY.filter(function (h) { return h.kind === kind && !used[h.id]; }).map(function (h) { return { id: h.id, name: h.name }; });
+      var rest = HISTORY.filter(function (h) { return h.kind === kind && !used[h.id]; }).map(hxItem);
       if (rest.length) out.push({ label: 'More', items: rest });
       return out.filter(function (g) { return g.items.length; });
     };
     var hxsN = HISTORY.filter(function (h) { return h.kind === trKind; }).length;
-    var hxs = { selId: 'hx-pick-' + trKind, groups: hxGroupsFor(trKind),
+    var hxs = { headId: 'hx-list-' + trKind, title: 'How these ' + (trKind === 'b' ? 'beliefs' : trKind === 'fw' ? 'frameworks' : 'practices') + ' developed', groups: hxGroupsFor(trKind),
       placeholder: 'Choose a ' + (trKind === 'b' ? 'belief' : trKind === 'fw' ? 'framework' : 'practice') + '…',
       hint: hxsN + ' topics: where each began, who shaped it, and the Scripture behind it.',
       onPick: function (e) { var v = e.target.value; if (v) openHx(v); } };
@@ -4936,14 +4937,6 @@ ${(V.trMenu.open) ? html`<div role="menu" style="position: absolute; right: 0; t
 <p style="margin: 0 0 8px; color: #4A3F35; max-width: 800px">Beliefs shape a way of life. Here are twelve everyday practices, each with its basis in Scripture, the ground Christians share, and how each tradition typically lives it, drawing on Scripture and, for Catholic and Orthodox Christians, the Church’s Tradition. Each one ends with a small step to try this week.</p>
 <p style="margin: 0; font-size: 13px; color: #6B5F52; max-width: 800px">Every tradition teaches that these practices respond to God’s grace rather than earn it, though they explain that link differently (see Beliefs). Descriptions follow each tradition’s official teaching or common practice; individual churches vary.</p>
 </div>
-<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; background: #F5EFE3; border: 1px solid #E2D8C6; border-radius: 14px; padding: 10px 12px">
-<label for=${V.hxs.selId} style="display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: #231E19"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7A3B1E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>How it developed</label>
-<select id=${V.hxs.selId} value="" onChange=${V.hxs.onPick} style="flex: 1 1 220px; min-width: 0; width: 100%; max-width: 420px; min-height: 44px; border-radius: 10px; border: 1px solid #D9CDB8; background: #FFFFFF; padding: 0 10px; font-size: 15px; color: #231E19">
-<option value="">${V.hxs.placeholder}</option>
-${(V.hxs.groups || []).map((g, $index) => html`<optgroup label=${g.label}>${(g.items || []).map((o, $index) => html`<option value=${o.id}>${o.name}</option>`)}</optgroup>`)}
-</select>
-<span style="font-size: 13px; color: #6B5F52; flex: 1 1 200px">${V.hxs.hint}</span>
-</div>
 <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px">
 <div class="be-seg" role="group" aria-label="View" style="display: flex; gap: 4px; background: #EAE1D0; padding: 4px; border-radius: 999px">
 ${(V.pr.modes || []).map((m, $index) => html`<button type="button" onClick=${m.pick} aria-pressed=${m.pressed} style="border: none; cursor: pointer; padding: 8px 16px; min-height: 44px; border-radius: 999px; font-size: 14px; font-weight: 700; background: ${m.bg}; color: ${m.fg}">${m.label}</button>`)}
@@ -5002,6 +4995,21 @@ ${(r.hasSrc) ? html`<div style="font-size: 13px">${(r.src || []).map((q, $index)
 </article>
 ` : null}
 <div style="font-size: 12px; color: #6B5F52; max-width: 820px">Summaries are written for this app from each tradition’s catechisms, prayer books and confessions, linked where used. Practice varies by country, parish and family; for guidance, talk with a pastor or priest in your own tradition.</div>
+<section aria-labelledby=${V.hxs.headId} style="display: flex; flex-direction: column; gap: 14px; border-top: 2px solid #E2D8C6; padding-top: 22px; margin-top: 6px">
+<div>
+<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #7A3B1E">Traditions · History</div>
+<h2 id=${V.hxs.headId} style="margin: 4px 0 6px; font-family: Fraunces, Georgia, serif; font-size: 28px; line-height: 1.15">${V.hxs.title}</h2>
+<p style="margin: 0; color: #4A3F35; max-width: 780px">Some of this is spelled out in Scripture; some grew over centuries through councils, teachers and devotion. Pick a topic to see where it started, who shaped it, how each tradition sees it, and the Bible passages behind it.</p>
+</div>
+${(V.hxs.groups || []).map((g, $index) => html`
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h3 style="margin: 0; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52">${g.label}</h3>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px">
+${(g.items || []).map((o, $index) => html`<button type="button" onClick=${o.pick} style="cursor: pointer; text-align: left; border: 1px solid #E2D8C6; background: #FFFDF8; border-radius: 14px; padding: 12px 14px; min-height: 44px; display: flex; flex-direction: column; gap: 6px; color: #231E19"><span style="display: flex; align-items: flex-start; gap: 8px"><span style="flex: 1 1 auto; font-family: Fraunces, Georgia, serif; font-size: 17px; font-weight: 700; line-height: 1.25">${o.name}</span><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7A3B1E" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex: none; margin-top: 3px"><path d="M9 6l6 6-6 6"></path></svg></span><span style="align-self: flex-start; font-size: 11px; font-weight: 700; border-radius: 999px; padding: 2px 9px; background: ${o.basisBg}; color: ${o.basisFg}">${o.basis}</span><span style="font-size: 14px; line-height: 1.5; color: #4A3F35; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden">${o.sum}</span></button>`)}
+</div>
+</div>
+`)}
+</section>
 </section>
 ` : null}
 ${(V.isCompare) ? html`
@@ -5012,14 +5020,6 @@ ${(V.trMenu.open) ? html`<div role="menu" style="position: absolute; right: 0; t
 <div style="font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #7A3B1E">${V.cmp.eyebrow}</div>
 <h1 style="margin: 4px 0 8px; font-family: Fraunces, Georgia, serif; font-size: 36px; line-height: 1.1">${V.cmp.h1}</h1>
 <p style="margin: 0; color: #4A3F35; max-width: 780px">${V.cmp.intro}</p>
-</div>
-<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; background: #F5EFE3; border: 1px solid #E2D8C6; border-radius: 14px; padding: 10px 12px">
-<label for=${V.hxs.selId} style="display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: #231E19"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7A3B1E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>How it developed</label>
-<select id=${V.hxs.selId} value="" onChange=${V.hxs.onPick} style="flex: 1 1 220px; min-width: 0; width: 100%; max-width: 420px; min-height: 44px; border-radius: 10px; border: 1px solid #D9CDB8; background: #FFFFFF; padding: 0 10px; font-size: 15px; color: #231E19">
-<option value="">${V.hxs.placeholder}</option>
-${(V.hxs.groups || []).map((g, $index) => html`<optgroup label=${g.label}>${(g.items || []).map((o, $index) => html`<option value=${o.id}>${o.name}</option>`)}</optgroup>`)}
-</select>
-<span style="font-size: 13px; color: #6B5F52; flex: 1 1 200px">${V.hxs.hint}</span>
 </div>
 <div class="be-seg" role="group" aria-label="View" style="display: flex; gap: 4px; background: #EAE1D0; padding: 4px; border-radius: 999px; align-self: flex-start">
 ${(V.cmp.views || []).map((v, $index) => html`<button type="button" onClick=${v.pick} aria-pressed=${v.pressed} style="border: none; cursor: pointer; padding: 8px 16px; min-height: 44px; border-radius: 999px; font-size: 14px; font-weight: 700; background: ${v.bg}; color: ${v.fg}">${v.label}</button>`)}
@@ -5132,6 +5132,21 @@ ${(c.canLive) ? html`<button type="button" onClick=${c.live} style="align-self: 
 `)}
 </div>
 <div style="font-size: 12px; color: #6B5F52">In the side-by-side view, “—” means a view does not hold or emphasize that point, not necessarily that it denies it. Summaries are written for this app and checked against Encyclopaedia Britannica. Positions are simplified; individual churches and members within a tradition often differ.</div>
+<section aria-labelledby=${V.hxs.headId} style="display: flex; flex-direction: column; gap: 14px; border-top: 2px solid #E2D8C6; padding-top: 22px; margin-top: 6px">
+<div>
+<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #7A3B1E">Traditions · History</div>
+<h2 id=${V.hxs.headId} style="margin: 4px 0 6px; font-family: Fraunces, Georgia, serif; font-size: 28px; line-height: 1.15">${V.hxs.title}</h2>
+<p style="margin: 0; color: #4A3F35; max-width: 780px">Some of this is spelled out in Scripture; some grew over centuries through councils, teachers and devotion. Pick a topic to see where it started, who shaped it, how each tradition sees it, and the Bible passages behind it.</p>
+</div>
+${(V.hxs.groups || []).map((g, $index) => html`
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h3 style="margin: 0; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52">${g.label}</h3>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px">
+${(g.items || []).map((o, $index) => html`<button type="button" onClick=${o.pick} style="cursor: pointer; text-align: left; border: 1px solid #E2D8C6; background: #FFFDF8; border-radius: 14px; padding: 12px 14px; min-height: 44px; display: flex; flex-direction: column; gap: 6px; color: #231E19"><span style="display: flex; align-items: flex-start; gap: 8px"><span style="flex: 1 1 auto; font-family: Fraunces, Georgia, serif; font-size: 17px; font-weight: 700; line-height: 1.25">${o.name}</span><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7A3B1E" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex: none; margin-top: 3px"><path d="M9 6l6 6-6 6"></path></svg></span><span style="align-self: flex-start; font-size: 11px; font-weight: 700; border-radius: 999px; padding: 2px 9px; background: ${o.basisBg}; color: ${o.basisFg}">${o.basis}</span><span style="font-size: 14px; line-height: 1.5; color: #4A3F35; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden">${o.sum}</span></button>`)}
+</div>
+</div>
+`)}
+</section>
 </section>
 ` : null}
 
