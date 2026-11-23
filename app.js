@@ -2293,9 +2293,9 @@ CANONS.protestant.groups = DIVS.map(function (d) {
 });
 var CANON_CARDS = [
   ['protestant', '66', 'Protestant', 'The arrangement this app follows.'],
-  ['tanakh', '24', 'Jewish Tanakh', 'Same books as the Old Testament, counted and ordered as Torah, Prophets and Writings.'],
   ['catholic', '73', 'Catholic', 'Adds Tobit, Judith, 1\u20132 Maccabees, Wisdom, Sirach and Baruch.'],
-  ['orthodox', '73+', 'Eastern Orthodox', 'Adds a few more, such as 1 Esdras, 3 Maccabees and Psalm 151.']
+  ['orthodox', '73+', 'Eastern Orthodox', 'Adds a few more, such as 1 Esdras, 3 Maccabees and Psalm 151.'],
+  ['tanakh', '24', 'Jewish Tanakh', 'Same books as the Old Testament, counted and ordered as Torah, Prophets and Writings.']
 ];
 
 class Component extends DCLogic {
@@ -3155,6 +3155,20 @@ class Component extends DCLogic {
       var dayN = st.planDay >= 1 && st.planDay <= 365 ? +st.planDay : todayN;
       var P = PLAN[dayN - 1], doneN = Object.keys(PS.done).length, isDone = !!PS.done[dayN];
       var eraN = 1; for (var k = 0; k < dayN; k++) if (PLAN[k].era) eraN = PLAN[k].era[PLAN[k].era.length - 1];
+      var miniMap = function (pts) {
+        pts = pts.filter(function (q) { return q && isFinite(q.lat) && isFinite(q.lon); });
+        if (!pts.length) return { has: false, pins: [] };
+        var U = pts.map(function (q) { return { x: (q.lon - MAP_LON0) * MAP_CX, y: MAP_LAT1 - q.lat }; });
+        var x0 = Math.min.apply(null, U.map(function (u) { return u.x; })), x1 = Math.max.apply(null, U.map(function (u) { return u.x; }));
+        var y0 = Math.min.apply(null, U.map(function (u) { return u.y; })), y1 = Math.max.apply(null, U.map(function (u) { return u.y; }));
+        var cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, bw = Math.max(x1 - x0, 3.2) * 1.45, bh = Math.max(y1 - y0, 2) * 1.45;
+        if (bw / bh > 1.6) bh = bw / 1.6; else bw = bh * 1.6;
+        bw = Math.min(bw, MAP_FW); bh = Math.min(bh, MAP_FH);
+        var bx = Math.max(0, Math.min(MAP_FW - bw, cx - bw / 2)), by = Math.max(0, Math.min(MAP_FH - bh, cy - bh / 2));
+        return { has: true, l: (-bx / bw * 100).toFixed(2), t: (-by / bh * 100).toFixed(2), w: (MAP_FW / bw * 100).toFixed(2), h: (MAP_FH / bh * 100).toFixed(2),
+          pins: U.map(function (u, k) { return { n: pts[k].n || k + 1, label: pts[k].label, x: ((u.x - bx) / bw * 100).toFixed(2), y: ((u.y - by) / bh * 100).toFixed(2) }; }) };
+      };
+      var placePt = function (id, n, label) { var P = PLACES[id]; return P ? { lat: P[1], lon: P[2], n: n, label: label || P[0] } : null; };
       var bname = function (id) { var b = findBook(id); return b ? b.name : id; };
       var chaps = [], parts = [];
       P.r.forEach(function (r) {
@@ -3164,13 +3178,38 @@ class Component extends DCLogic {
       if (chaps.length === 1) chaps[0].label = parts[0];
       var cards = [];
       (P.era || []).forEach(function (n) {
-        var E = ERAS[n - 1];
-        cards.push({ kind: 'A new era begins', color: '#2E4A8A', title: n + '. ' + E.name + ' · ' + E.dates, text: E.sum, link: n === 9 ? 'See the years between the Testaments' : 'See this era’s story and map', pick: function () { if (n === 9) go({ tab: 'timeline' }); else go({ tab: 'story', era: n }); window.scrollTo(0, 0); } });
+        var E = ERAS[n - 1], em = ERA_MAPS[String(n)];
+        cards.push({ kind: 'A new era begins', color: '#2E4A8A', title: n + '. ' + E.name + ' · ' + E.dates, text: E.sum, moreLabel: 'More about this era',
+          paras: paras(MORE_ERAS[String(n)] || ''), facts: [{ label: 'Key people', text: E.people }, { label: 'Books', text: BOOKS.filter(function (b) { return (b.eras || []).indexOf(n) >= 0; }).map(function (b) { return b.name; }).join(', ') }],
+          map: miniMap(em ? em.p.map(function (pp, k) { return placePt(pp[0], k + 1); }) : []),
+          items: em ? em.p.map(function (pp, k) { var Pl = PLACES[pp[0]]; return { n: k + 1, bg: '#7A3B1E', title: (Pl ? Pl[0] : pp[0]) + ' · ' + pp[1], text: ((MAP_NARR['era' + n] || [])[k]) || '', hasText: !!((MAP_NARR['era' + n] || [])[k]) }; }) : [],
+          link: n === 9 ? 'Open the years between the Testaments' : 'Open this era on the Story page', pick: function () { if (n === 9) go({ tab: 'timeline' }); else go({ tab: 'story', era: n }); window.scrollTo(0, 0); } });
       });
-      if (P.j) cards.push({ kind: 'Follow the journey', color: '#1F5446', title: P.j[2], text: 'Open ' + bname(P.j[0]) + ' ' + P.j[1] + ' and tap Follow along under its map to trace each place as you read.', link: 'Open the chapter and map', pick: function () { openChap(P.j[0], P.j[1], 0); } });
-      if (P.th) { var T = THEMES.filter(function (t) { return t.id === P.th[0]; })[0]; if (T) cards.push({ kind: 'Unifying theme', color: '#7A3B1E', title: T.name + ': ' + T.short, text: P.th[1], link: 'Trace this theme through the Bible', pick: function () { go({ tab: 'themes', theme: T.id }); window.scrollTo(0, 0); } }); }
-      if (P.dx) { var H = HISTORY.filter(function (h) { return h.id === P.dx[0]; })[0]; if (H) cards.push({ kind: 'Where Christians differ · ' + bname(P.dx[2]) + ' ' + P.dx[3], color: '#5B3A74', title: H.name, text: P.dx[1], link: 'How each tradition sees it', pick: function () { go(hxTarget(H.id)); window.scrollTo(0, 0); } }); }
-      if (P.tp) { var TP = TOPICS.filter(function (t) { return t.id === P.tp[0]; })[0]; if (TP) cards.push({ kind: 'Where to turn', color: '#6B4A12', title: TP.name, text: bname(P.tp[1]) + ' ' + P.tp[2] + ' is one of the passages Christians turn to for ' + TP.name.toLowerCase() + '.', link: 'See more passages for ' + TP.name.toLowerCase(), pick: function () { go({ tab: 'search', srMode: 'topics', topic: TP.id }); window.scrollTo(0, 0); } }); }
+      if (P.j) {
+        var bm = BOOK_MAPS[P.j[0]] || XMAPS[P.j[0]];
+        var narr = MAP_NARR[P.j[0]] || [], joined = narr.some(function (x) { return /^…|…$/.test(x); });
+        cards.push({ kind: 'Follow the journey', color: '#1F5446', title: P.j[2], text: 'The places in ' + bname(P.j[0]) + ', in the order the story visits them.', moreLabel: 'Show the map and the journey',
+          paras: joined ? [narr.join(' ').replace(/\s*…\s*…\s*/g, ', ')] : [], facts: [],
+          map: miniMap(bm ? bm.p.map(function (pp, k) { return placePt(pp[0], k + 1); }) : []),
+          items: bm ? bm.p.map(function (pp, k) { var Pl = PLACES[pp[0]]; return { n: k + 1, bg: '#1F5446', title: (Pl ? Pl[0] : pp[0]) + ' · ' + pp[1], text: joined ? '' : (narr[k] || ''), hasText: !joined && !!narr[k] }; }) : [],
+          link: 'Open ' + bname(P.j[0]) + ' ' + P.j[1] + ' with its interactive map', pick: function () { openChap(P.j[0], P.j[1], 0); } });
+      }
+      if (P.th) { var T = THEMES.filter(function (t) { return t.id === P.th[0]; })[0]; if (T) cards.push({ kind: 'Unifying theme', color: '#7A3B1E', title: T.name + ': ' + T.short, text: P.th[1], moreLabel: 'Trace this theme here',
+          paras: paras(MORE_THEMES[T.id] || ''), facts: [{ label: 'In the Old Testament', text: T.ot }, { label: 'In the New Testament', text: T.nt }], map: { has: false, pins: [] }, items: [],
+          link: 'Open the full theme page', pick: function () { go({ tab: 'themes', theme: T.id }); window.scrollTo(0, 0); } }); }
+      if (P.dx) { var H = HISTORY.filter(function (h) { return h.id === P.dx[0]; })[0]; if (H) { var bs = HX_BASIS[H.basis];
+        cards.push({ kind: 'Where Christians differ · ' + bname(P.dx[2]) + ' ' + P.dx[3], color: '#5B3A74', title: H.name, text: P.dx[1], moreLabel: 'How each tradition sees it',
+          paras: [H.sum], facts: [{ label: 'Basis', text: bs[0] }], hasBox: true, boxLabel: 'Scripture or tradition?', box: H.note, map: { has: false, pins: [] },
+          items: (H.views || []).map(function (v) { return { n: v[1], bg: v[1].length === 1 && TRAD_NAME[v[1]] ? TRAD_NAME[v[1]].color : '#5B3A74', title: v[0], text: v[2], hasText: true }; }),
+          link: 'Open its full history and timeline', pick: function () { go(hxTarget(H.id)); window.scrollTo(0, 0); } }); } }
+      if (P.tp) { var TP = TOPICS.filter(function (t) { return t.id === P.tp[0]; })[0]; if (TP) {
+        var TT = (self._texts || {}).bsb;
+        cards.push({ kind: 'Where to turn', color: '#6B4A12', title: TP.name, text: bname(P.tp[1]) + ' ' + P.tp[2] + ' is one of the passages Christians turn to for ' + TP.name.toLowerCase() + '.', moreLabel: 'Read the passages for ' + TP.name.toLowerCase(),
+          paras: [TP.intro], facts: [], map: { has: false, pins: [] }, items: [],
+          passages: TP.p.map(function (r) { var b = findBook(r[0]), vs = []; if (TT && b && b.chFirst == null) { var ch = (TT[b.idx] || [])[r[1] - 1] || []; for (var v = r[2]; v <= Math.min(r[3], r[2] + 5); v++) if (ch[v - 1]) vs.push({ n: v, t: ch[v - 1] }); }
+            return { label: bname(r[0]).replace(/^Psalms$/, 'Psalm') + ' ' + r[1] + ':' + r[2] + (r[3] !== r[2] ? '–' + r[3] : ''), note: r[4], verses: vs }; }),
+          link: 'Open all passages on Search', pick: function () { go({ tab: 'search', srMode: 'topics', topic: TP.id }); window.scrollTo(0, 0); } }); } }
+      cards.forEach(function (k) { k.passages = k.passages || []; k.hasItems = !!(k.items && k.items.length); k.hasBox = !!k.hasBox; k.paras = k.paras || []; k.facts = (k.facts || []).filter(function (f) { return f.text; }); });
       var months = [];
       for (var m = 0; m < 13; m++) {
         var days = [];
@@ -3231,6 +3270,16 @@ class Component extends DCLogic {
         if (!ol.length && chRow) ol = chRow[0].map(function (e) { return { text: e[0], ref: 'v. ' + e[1], hasRef: true, pick: function () { pJump(Bk.id + c, e[1]); } }; });
         pSums.push({ title: Bk.name + ' ' + c, outline: ol, hasOutline: ol.length > 0, noOutline: !!HN && !ol.length, fallback: 'No chapter outline is available here. The book in brief: ' + Bk.sum });
       })(Bk, c); });
+      var CHD = self._chData, notes = [];
+      if (CHD) P.r.forEach(function (r) { var Bk = findBook(r[0]); if (!Bk) return; for (var c = r[1]; c <= r[2]; c++) {
+        var row = (CHD.books[Bk.id] || [])[c - 1]; if (!row) continue;
+        var evs = (row[0] || []).map(function (e) { return { t: e[0], v: e[1] }; });
+        var ppl = (row[1] || []).slice(0, 8).map(function (x) { return x[0]; });
+        var pls = (row[2] || []).map(function (id) { var q = CHD.places[id]; return q ? { name: q[0], lat: q[1], lon: q[2] } : null; }).filter(Boolean);
+        notes.push({ title: Bk.name + ' ' + c, events: evs, hasEvents: evs.length > 0, people: ppl.join(', '), hasPeople: ppl.length > 0,
+          placesText: pls.map(function (q, k) { return (k + 1) + ' ' + q.name; }).join(' · '), hasPlaces: pls.length > 0,
+          map: miniMap(pls.map(function (q, k) { return { lat: q.lat, lon: q.lon, n: k + 1, label: q.name }; })) });
+      } });
       var setDone = function (on) { var v = self.planLoad(); if (on) v.done[dayN] = 1; else delete v.done[dayN]; self.planSave(v); };
       return {
         started: started, notStarted: !started, startLabel: started ? 'Started ' + fmt(d0(PS.start)) : '',
@@ -3245,6 +3294,7 @@ class Component extends DCLogic {
         readLabel: parts.join('; '), chaps: chaps, readFirst: function () { openChap(P.r[0][0], P.r[0][1], 0); },
         isDone: isDone, doneLabel: isDone ? 'Done' : 'Mark as done', doneBg: isDone ? '#1F5446' : '#FFFDF8', doneFg: isDone ? '#FBF7EF' : '#231E19', doneBorder: isDone ? '#1F5446' : '#D9CDB8',
         toggleDone: function () { setDone(!isDone); },
+        notes: notes, notesLoading: !CHD, chapRange: parts.join('; '),
         cards: cards, hasQ: !!P.q, q: P.q || '', months: months, hub: function () { go({ tab: 'plan', pathId: null, pathStep: null, planDay: null }); window.scrollTo(0, 0); },
         trName: TR_NAMES[ptr], color: (DIVM[(findBook(P.r[0][0]) || {}).div] || { color: '#7A3B1E' }).color,
         trs: ['bsb', 'kjv'].map(function (t) { var on = ptr === t; return { label: t.toUpperCase(), title: TR_NAMES[t], pressed: on, bg: on ? '#231E19' : 'transparent', fg: on ? '#FBF7EF' : '#4A3F35', pick: function () { self.loadText(t); go({ tr: t }); } }; }),
@@ -5820,8 +5870,8 @@ ${(tc.verses || []).map((v, $index) => html`<span id=${v.id} style="border-radiu
 <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-top: -6px"><button type="button" onClick=${V.plan.txtToggle} aria-expanded=${V.plan.txtOpen} aria-controls="plan-text" style="cursor: pointer; display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 6px 14px 6px 10px; border-radius: 999px; border: 1px solid #D9CDB8; background: #F5EFE3; color: #231E19; font-size: 14px; font-weight: 700"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(${V.plan.txtChev}deg); transition: transform 0.2s ease"><path d="M6 9l6 6 6-6"></path></svg>${V.plan.txtLabel}</button><span style="font-size: 13px; color: #6B5F52">${V.plan.txtHint}</span></div>
 <div style="font-size: 12px; color: #6B5F52">${V.plan.trName} · public domain. Words in [brackets] are supplied by the translators.</div>
 ` : null}
-<div style="border: 1px solid #E2D8C6; border-radius: 14px; padding: 14px 16px; display: flex; flex-direction: column; gap: 14px; background: #FFFDF8">
-<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52">Chapter summary</div>
+<details class="be-det" style="border: 1px solid #E2D8C6; border-radius: 14px; padding: 0 16px; background: #FFFDF8"><summary style="display: flex; align-items: center; gap: 10px; min-height: 52px; color: #231E19"><span style="flex: 1 1 auto; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52">Chapter summaries</span><span style="font-size: 13px; color: #6B5F52">${V.plan.chapRange}</span><svg class="be-chev" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex: none; transition: transform 0.2s ease"><path d="M6 9l6 6 6-6"></path></svg></summary>
+<div style="display: flex; flex-direction: column; gap: 14px; padding-bottom: 14px">
 ${(V.plan.sumLoading) ? html`<div style="font-size: 14px; color: #6B5F52">Loading…</div>` : null}
 ${(V.plan.sums || []).map((cs, $index) => html`
 <div>
@@ -5835,10 +5885,24 @@ ${(cs.noOutline) ? html`<p style="margin: 4px 0 0; font-size: 15px; line-height:
 </div>
 `)}
 ${(V.plan.sumHenry) ? html`<div style="font-size: 12px; color: #6B5F52; line-height: 1.45">Outlines from Matthew Henry’s <a href="https://github.com/lyteword/mhenry-concise" target="_blank" rel="noopener" style="color: #7A3B1E">Concise Commentary</a> (1706), a classic Protestant commentary in the public domain${V.plan.sumOwnNote}</div>` : null}
+</div></details>
+<details class="be-det" style="border: 1px solid #E2D8C6; border-radius: 14px; padding: 0 16px; background: #FFFDF8"><summary style="display: flex; align-items: center; gap: 10px; min-height: 52px; color: #231E19"><span style="flex: 1 1 auto; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52">Notes and maps</span><span style="font-size: 13px; color: #6B5F52">${V.plan.chapRange}</span><svg class="be-chev" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex: none; transition: transform 0.2s ease"><path d="M6 9l6 6 6-6"></path></svg></summary><div style="display: flex; flex-direction: column; gap: 18px; padding-bottom: 16px">
+${(V.plan.notesLoading) ? html`<div style="font-size: 14px; color: #6B5F52">Loading…</div>` : null}
+${(V.plan.notes || []).map((nt, $index) => html`<div style="display: flex; flex-direction: column; gap: 8px; border-top: 1px solid #EAE1D0; padding-top: 12px">
+<div style="font-family: Fraunces, Georgia, serif; font-size: 18px; font-weight: 700">${nt.title}</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px 18px; align-items: start">
+<div style="display: flex; flex-direction: column; gap: 6px">
+${(nt.hasEvents) ? html`<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52">What happens</div><ul style="margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 2px">${(nt.events || []).map((ev, $index) => html`<li style="font-size: 15px; line-height: 1.45">${ev.t} <span style="font-size: 12px; color: #6B5F52">v. ${ev.v}</span></li>`)}</ul>` : null}
+${(nt.hasPeople) ? html`<div style="font-size: 14px; line-height: 1.5"><strong>People:</strong> ${nt.people}</div>` : null}
+${(nt.hasPlaces) ? html`<div style="font-size: 14px; line-height: 1.5"><strong>Places:</strong> ${nt.placesText}</div>` : null}
 </div>
+${(nt.map.has) ? html`<div style="position: relative; width: 100%; max-width: 560px; aspect-ratio: 16 / 10; overflow: hidden; border-radius: 10px; border: 1px solid #E2D8C6; background: #C9DCE3"><img src="basemap.svg" alt="" loading="lazy" style="position: absolute; left: ${nt.map.l}%; top: ${nt.map.t}%; width: ${nt.map.w}%; height: ${nt.map.h}%; max-width: none" />${(nt.map.pins || []).map((pn, $index) => html`<div style="position: absolute; left: ${pn.x}%; top: ${pn.y}%; width: 0; height: 0"><span title=${pn.label} style="position: absolute; left: -10px; top: -10px; width: 20px; height: 20px; border-radius: 50%; background: #7A3B1E; color: #FFFFFF; border: 2px solid #FFFDF8; font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.3)">${pn.n}</span></div>`)}</div>` : null}
+</div>
+</div>`)}
+</div></details>
 <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center">
 <button type="button" onClick=${V.plan.toggleDone} aria-pressed=${V.plan.isDone} style="cursor: pointer; border: 1px solid ${V.plan.doneBorder}; background: ${V.plan.doneBg}; color: ${V.plan.doneFg}; border-radius: 999px; padding: 10px 16px; min-height: 44px; font-size: 15px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"></path></svg>${V.plan.doneLabel}</button>
-<span style="font-size: 13px; color: #6B5F52">Notes and maps for each chapter:</span>
+<span style="font-size: 13px; color: #6B5F52">Open in Read:</span>
 ${(V.plan.chaps || []).map((c, $index) => html`<button type="button" onClick=${c.pick} style="cursor: pointer; border: 1px solid #D9CDB8; background: #F5EFE3; color: #231E19; border-radius: 999px; padding: 6px 12px; min-height: 36px; font-size: 14px; font-weight: 600">${c.label}</button>`)}
 </div>
 </div>
@@ -5848,7 +5912,16 @@ ${(V.plan.cards || []).map((k, $index) => html`
 <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: ${k.color}">${k.kind}</div>
 <div style="font-size: 17px; font-weight: 700; color: #231E19">${k.title}</div>
 <p style="margin: 0; font-size: 15px; line-height: 1.55; color: #31291F">${k.text}</p>
+<details class="be-det" style="border-top: 1px solid #EAE1D0; margin-top: 2px"><summary style="display: flex; align-items: center; gap: 8px; min-height: 44px; color: ${k.color}; font-size: 14px; font-weight: 700"><span style="flex: 1 1 auto">${k.moreLabel}</span><svg class="be-chev" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex: none; transition: transform 0.2s ease"><path d="M6 9l6 6 6-6"></path></svg></summary>
+<div style="display: flex; flex-direction: column; gap: 12px; padding: 2px 0 8px">
+${(k.paras || []).map((pa, $index) => html`<p style="margin: 0; font-size: 15px; line-height: 1.6; color: #31291F">${pa}</p>`)}
+${(k.facts || []).map((f, $index) => html`<div style="font-size: 15px; line-height: 1.5"><strong>${f.label}:</strong> ${f.text}</div>`)}
+${(k.hasBox) ? html`<div style="background: #F5EFE3; border-radius: 10px; padding: 10px 12px"><div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52; margin-bottom: 4px">${k.boxLabel}</div><p style="margin: 0; font-size: 15px; line-height: 1.55">${k.box}</p></div>` : null}
+${(k.map.has) ? html`<div style="position: relative; width: 100%; max-width: 560px; aspect-ratio: 16 / 10; overflow: hidden; border-radius: 10px; border: 1px solid #E2D8C6; background: #C9DCE3"><img src="basemap.svg" alt="" loading="lazy" style="position: absolute; left: ${k.map.l}%; top: ${k.map.t}%; width: ${k.map.w}%; height: ${k.map.h}%; max-width: none" />${(k.map.pins || []).map((pn, $index) => html`<div style="position: absolute; left: ${pn.x}%; top: ${pn.y}%; width: 0; height: 0"><span title=${pn.label} style="position: absolute; left: -10px; top: -10px; width: 20px; height: 20px; border-radius: 50%; background: #7A3B1E; color: #FFFFFF; border: 2px solid #FFFDF8; font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.3)">${pn.n}</span></div>`)}</div>` : null}
+${(k.hasItems) ? html`<ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px">${(k.items || []).map((it, $index) => html`<li style="display: flex; gap: 10px; align-items: flex-start"><span style="flex: none; min-width: 22px; height: 22px; padding: 0 5px; border-radius: 11px; background: ${it.bg}; color: #FFFFFF; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; margin-top: 1px">${it.n}</span><div style="min-width: 0"><div style="font-size: 15px; font-weight: 700">${it.title}</div>${(it.hasText) ? html`<div style="font-size: 14px; line-height: 1.55; color: #31291F">${it.text}</div>` : null}</div></li>`)}</ol>` : null}
+${(k.passages || []).map((ps2, $index) => html`<div style="border-left: 3px solid ${k.color}; background: #FBF7EF; border-radius: 0 10px 10px 0; padding: 8px 12px"><div style="font-size: 14px; font-weight: 700">${ps2.label}</div><div style="font-size: 13px; color: #6B5F52; margin-bottom: 4px">${ps2.note}</div><p style="margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: 16px; line-height: 1.6">${(ps2.verses || []).map((v, $index) => html`<sup style="font-family: Inter, system-ui, sans-serif; font-size: 10px; font-weight: 700; color: #7A3B1E; margin: 0 3px 0 4px">${v.n}</sup>${v.t} `)}</p></div>`)}
 <button type="button" onClick=${k.pick} style="align-self: flex-start; cursor: pointer; border: none; background: transparent; color: #7A3B1E; font-size: 14px; font-weight: 700; padding: 4px 0; min-height: 32px; text-align: left">${k.link} →</button>
+</div></details>
 </div>
 `)}
 
