@@ -5499,7 +5499,7 @@ ${(V.plan.months || []).map((mo, $index) => html`
 ` : null}
 
 ${(V.isAbout) ? html`
-<section style="display: flex; flex-direction: column; gap: 22px; max-width: 780px">
+<section style="display: flex; flex-direction: column; gap: 22px">
 <div>
 <div style="font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #7A3B1E">About</div>
 <h1 style="margin: 4px 0 0; font-family: Fraunces, Georgia, serif; font-size: 36px; line-height: 1.1">About Explore Your Bible</h1>
