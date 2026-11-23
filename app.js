@@ -3025,7 +3025,8 @@ class Component extends DCLogic {
         if (P.plan) { go({ tab: 'plan', pathId: 'year', pathStep: null }); window.scrollTo(0, 0); return; }
         go({ tab: 'plan', pathId: P.id, pathStep: info(P).step || 1 }); window.scrollTo(0, 0);
       };
-      var card = function (P) { var i = info(P); return { title: P.title, promise: P.promise, meta: i.meta, pct: i.pct.toFixed(0), btn: i.btn, pick: function () { open(P); } }; };
+      var resetP = function (P) { if (P.plan) { if (window.confirm('Restart the year plan? This clears your start date and the days you have marked done on this device.')) self.planSave({ start: null, done: {} }); return; } var v = self.pathsLoad() || {}; delete v[P.id]; self.pathsSave(v); self.forceUpdate(); };
+      var card = function (P) { var i = info(P); return { title: P.title, promise: P.promise, meta: i.meta, pct: i.pct.toFixed(0), btn: i.btn, started: i.started || i.pct >= 100, reset: function () { resetP(P); }, pick: function () { open(P); } }; };
       var hub = { featured: card(PATHS[0]), others: PATHS.slice(1).map(card),
         goStory: function () { go({ tab: 'story' }); window.scrollTo(0, 0); }, goBooks: function () { go({ tab: 'library' }); window.scrollTo(0, 0); },
         goThemes: function () { go({ tab: 'themes' }); window.scrollTo(0, 0); }, goRead: function () { go({ tab: 'read' }); window.scrollTo(0, 0); } };
@@ -3048,7 +3049,7 @@ class Component extends DCLogic {
         if (s.kind === 'era') return ERAS[s.n - 1].name;
         var t = THEMES.filter(function (x) { return x.id === s.id; })[0]; return t.name;
       };
-      var ps = { pathTitle: P.title, hub: function () { go({ tab: 'plan', pathId: null, pathStep: null }); window.scrollTo(0, 0); },
+      var ps = { restart: function () { var v = self.pathsLoad() || {}; delete v[P.id]; self.pathsSave(v); go({ pathStep: 1 }); window.scrollTo(0, 0); }, pathTitle: P.title, hub: function () { go({ tab: 'plan', pathId: null, pathStep: null }); window.scrollTo(0, 0); },
         counter: i > N ? 'Finished' : 'Step ' + i + ' of ' + N, pct: Math.round(Math.min(i, N) / N * 100), isStep: i <= N, isRecap: i > N };
       if (i <= N) {
         var s = P.steps[i - 1], sections = [], books = [], links = [], reads = [], kicker = '', title = titleOf(s), color = '#7A3B1E', booksLabel = 'Books that tell it';
@@ -3217,10 +3218,16 @@ class Component extends DCLogic {
     };
     if (tab === 'read' || tab === 'search' || tab === 'plan') this.loadText(st.tr === 'kjv' && tab !== 'plan' ? 'kjv' : 'bsb');
     var pathsV = (tab === 'plan' || tab === 'overview') ? pathsVals() : { hub: {}, step: null };
+    var MV_ICON = {'creation': 'M8 12a4 4 0 1 0 8 0a4 4 0 1 0 -8 0M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4', 'fall': 'M12 21s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.6-7 10-7 10zM12 8.4l-1.6 3.1 3.2 2-1.6 3.4', 'covenant': 'M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8L3.5 9.2l5.9-.9z', 'kingdom': 'M3 19h18M4 16L3 7l5 4 4-7 4 7 5-4-1 9z', 'exile': 'M10 4H5v16h5M14 8l4 4-4 4M18 12H9', 'return': 'M3 11l9-7 9 7M5 10v10h14V10M10 20v-5h4v5', 'messiah': 'M12 3v18M7 8h10', 'church': 'M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18', 'newc': 'M3 18h18M7 18a5 5 0 0 1 10 0M12 7v3M5.6 10.6l1.4 1.4M18.4 10.6L17 12M8 21h8'};
     var homeV = (function () {
       if (tab !== 'overview') return {};
       var f = pathsV.hub.featured, rec = (self.pathsLoad() || {}).story || {};
-      return { kicker: rec.max && !rec.finished ? 'Welcome back' : 'New here? Start with the big picture', btn: f.btn + ' →', meta: f.meta,
+      var st1 = PATHS[0].steps, cur = rec.finished ? 0 : (rec.step || 0);
+      var steps = st1.map(function (x, k) { var A0 = ARC.filter(function (a) { return a.id === x.id; })[0]; var done = !!rec.finished || (rec.max || 0) > k + 1 || ((rec.max || 0) === k + 1 && cur > k + 1);
+        return { n: k + 1, label: A0.label, short: A0.title, color: A0.color, icon: MV_ICON[x.id] || '', done: done, opacity: 1, title: A0.label + ': ' + A0.title,
+          aria: 'Step ' + (k + 1) + ', ' + A0.label + ': ' + A0.title + (done ? ' (visited)' : ''), pick: function () { go({ tab: 'plan', pathId: 'story', pathStep: k + 1 }); window.scrollTo(0, 0); } }; });
+      return { kicker: rec.finished ? 'You finished the big picture' : rec.max ? 'Welcome back · step ' + (rec.step || 1) + ' of 9' : 'New here? Start with the big picture', btn: f.btn + ' →', meta: f.meta, steps: steps, started: !!(rec.max || rec.finished),
+        reset: function () { var v = self.pathsLoad() || {}; delete v.story; self.pathsSave(v); self.forceUpdate(); },
         start: function () { var r = (self.pathsLoad() || {}).story || {}; go({ tab: 'plan', pathId: 'story', pathStep: r.finished ? 1 : (r.step || 1) }); window.scrollTo(0, 0); },
         allPaths: function () { go({ tab: 'plan', pathId: null, pathStep: null }); window.scrollTo(0, 0); },
         doors: [
@@ -4634,17 +4641,33 @@ ${(V.hdr.menuOpen) ? html`<div id="hdr-menu" style="padding: 4px 12px 14px; disp
 ${(V.isOverview) ? html`
 <section style="display: flex; flex-direction: column; gap: 24px">
 <div style="display: flex; flex-direction: column; gap: 14px">
-<div style="background: #231E19; color: #FBF7EF; border-radius: 22px; padding: 28px; display: flex; flex-wrap: wrap; align-items: center; gap: 20px 32px">
-<div style="flex: 1 1 380px; min-width: 0">
+<div style="background: #231E19; color: #FBF7EF; border-radius: 22px; padding: 26px 26px 24px; display: flex; flex-direction: column; gap: 18px">
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px">
+<div style="min-width: 0">
 <div style="font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #F6E2A8">${V.home.kicker}</div>
-<h1 style="margin: 6px 0 10px; font-family: Fraunces, Georgia, serif; font-size: 40px; line-height: 1.08; color: #FFFFFF">The Bible in One Story</h1>
-<p style="margin: 0; font-size: 17px; line-height: 1.55; color: #EDE5D6">See how the whole Bible fits together, from creation to new creation, in nine short steps, each with a passage to read yourself.</p>
-<div style="margin-top: 8px; font-size: 13px; color: #CFC4B2">${V.home.meta}</div>
+<h1 style="margin: 6px 0 6px; font-family: Fraunces, Georgia, serif; font-size: 40px; line-height: 1.06; color: #FFFFFF">The Bible in One Story</h1>
+<p style="margin: 0; font-size: 16px; line-height: 1.5; color: #EDE5D6">Nine short steps, from creation to new creation. About 20 minutes.</p>
 </div>
-<div style="display: flex; flex-direction: column; gap: 10px; align-items: flex-start">
-<button type="button" onClick=${V.home.start} style="cursor: pointer; border: none; background: #F6E2A8; color: #231E19; border-radius: 999px; padding: 14px 24px; min-height: 52px; font-size: 17px; font-weight: 800">${V.home.btn}</button>
-<button type="button" onClick=${V.home.allPaths} style="cursor: pointer; border: none; background: transparent; color: #F6E2A8; font-size: 14px; font-weight: 700; text-decoration: underline; padding: 4px 0; min-height: 36px">See all guided paths</button>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px">
+<button type="button" onClick=${V.home.start} style="cursor: pointer; border: none; background: #F6E2A8; color: #231E19; border-radius: 999px; padding: 13px 24px; min-height: 50px; font-size: 17px; font-weight: 800">${V.home.btn}</button>
+${(V.home.started) ? html`<button type="button" onClick=${V.home.reset} style="cursor: pointer; border: none; background: transparent; color: #CFC4B2; font-size: 14px; font-weight: 700; text-decoration: underline; padding: 4px 0; min-height: 36px">Start over</button>` : null}
 </div>
+</div>
+<ol class="be-steps" aria-label="The nine steps" style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 6px">
+${(V.home.steps || []).map((m, $index) => html`<li style="display: flex"><button type="button" onClick=${m.pick} aria-label=${m.aria} title=${m.title} style="cursor: pointer; width: 100%; border: none; border-radius: 14px; padding: 12px 8px 10px; background: ${m.color}; color: #FFFFFF; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; position: relative; opacity: ${m.opacity}">
+<span style="position: absolute; top: 6px; left: 8px; font-size: 11px; font-weight: 800; opacity: 0.8">${m.n}</span>
+${(m.done) ? html`<span aria-hidden="true" style="position: absolute; top: 5px; right: 6px; width: 16px; height: 16px; border-radius: 50%; background: #F6E2A8; color: #231E19; display: flex; align-items: center; justify-content: center"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"></path></svg></span>` : null}
+<svg aria-hidden="true" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin-top: 6px"><path d=${m.icon}></path></svg>
+<span style="font-size: 14px; font-weight: 800; line-height: 1.15">${m.label}</span>
+<span class="be-step-sub" style="font-size: 11.5px; line-height: 1.3; color: rgba(255,255,255,0.85)">${m.short}</span>
+</button></li>`)}
+</ol>
+<div class="be-steps-span" aria-hidden="true" style="display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 6px; margin-top: -10px; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #CFC4B2">
+<div style="grid-column: 1 / span 6; border-top: 2px solid rgba(246,226,168,0.45); padding-top: 4px; text-align: center">Old Testament</div>
+<div style="grid-column: 7 / span 2; border-top: 2px solid rgba(246,226,168,0.45); padding-top: 4px; text-align: center">New Testament</div>
+<div style="grid-column: 9 / span 1; border-top: 2px dashed rgba(246,226,168,0.45); padding-top: 4px; text-align: center">Still to come</div>
+</div>
+<button type="button" onClick=${V.home.allPaths} style="align-self: flex-start; cursor: pointer; border: none; background: transparent; color: #F6E2A8; font-size: 14px; font-weight: 700; text-decoration: underline; padding: 2px 0; min-height: 32px">More guided paths</button>
 </div>
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px">
 ${(V.home.doors || []).map((d, $index) => html`<button type="button" onClick=${d.pick} style="cursor: pointer; text-align: left; border: 1px solid #E2D8C6; background: #FFFDF8; border-radius: 14px; padding: 14px 16px; min-height: 44px; display: flex; flex-direction: column; gap: 4px; color: #231E19"><span style="font-family: Fraunces, Georgia, serif; font-size: 18px; font-weight: 700">${d.title} →</span><span style="font-size: 14px; line-height: 1.45; color: #4A3F35">${d.text}</span></button>`)}
@@ -5595,7 +5618,7 @@ ${(V.isPathsHub) ? html`
 <p style="margin: 0; font-size: 16px; line-height: 1.55; color: #EDE5D6">${V.paths.featured.promise}</p>
 <div style="font-size: 13px; color: #CFC4B2">${V.paths.featured.meta}</div>
 <div aria-hidden="true" style="height: 6px; border-radius: 3px; background: rgba(255,255,255,0.18); overflow: hidden"><div style="height: 100%; width: ${V.paths.featured.pct}%; background: #F6E2A8"></div></div>
-<button type="button" onClick=${V.paths.featured.pick} style="align-self: flex-start; cursor: pointer; border: none; background: #F6E2A8; color: #231E19; border-radius: 999px; padding: 12px 22px; min-height: 48px; font-size: 16px; font-weight: 800">${V.paths.featured.btn}</button>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px"><button type="button" onClick=${V.paths.featured.pick} style="cursor: pointer; border: none; background: #F6E2A8; color: #231E19; border-radius: 999px; padding: 12px 22px; min-height: 48px; font-size: 16px; font-weight: 800">${V.paths.featured.btn}</button>${(V.paths.featured.started) ? html`<button type="button" onClick=${V.paths.featured.reset} style="cursor: pointer; border: none; background: transparent; color: #CFC4B2; font-size: 14px; font-weight: 700; text-decoration: underline; padding: 4px 0; min-height: 36px">Start over</button>` : null}</div>
 </div>
 <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52">More paths</div>
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px">
@@ -5604,7 +5627,7 @@ ${(V.paths.others || []).map((c, $index) => html`<div style="border: 1px solid #
 <p style="margin: 0; font-size: 15px; line-height: 1.55; color: #31291F; flex: 1 1 auto">${c.promise}</p>
 <div style="font-size: 13px; color: #6B5F52">${c.meta}</div>
 <div aria-hidden="true" style="height: 5px; border-radius: 3px; background: #EAE1D0; overflow: hidden"><div style="height: 100%; width: ${c.pct}%; background: #7A3B1E"></div></div>
-<button type="button" onClick=${c.pick} style="align-self: flex-start; cursor: pointer; border: 1px solid #231E19; background: #FFFDF8; color: #231E19; border-radius: 999px; padding: 8px 16px; min-height: 44px; font-size: 14px; font-weight: 700">${c.btn}</button>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px"><button type="button" onClick=${c.pick} style="cursor: pointer; border: 1px solid #231E19; background: #FFFDF8; color: #231E19; border-radius: 999px; padding: 8px 16px; min-height: 44px; font-size: 14px; font-weight: 700">${c.btn}</button>${(c.started) ? html`<button type="button" onClick=${c.reset} style="cursor: pointer; border: none; background: transparent; color: #6B5F52; font-size: 13px; font-weight: 700; text-decoration: underline; padding: 4px 0; min-height: 36px">Start over</button>` : null}</div>
 </div>`)}
 </div>
 <p style="margin: 0; font-size: 14px; color: #6B5F52">Prefer to explore on your own? Everything is still a tap away: the <button type="button" onClick=${V.paths.goStory} style="cursor: pointer; border: none; background: transparent; padding: 0; color: #7A3B1E; font-size: 14px; font-weight: 700; text-decoration: underline">Story</button>, every <button type="button" onClick=${V.paths.goBooks} style="cursor: pointer; border: none; background: transparent; padding: 0; color: #7A3B1E; font-size: 14px; font-weight: 700; text-decoration: underline">book</button>, the <button type="button" onClick=${V.paths.goThemes} style="cursor: pointer; border: none; background: transparent; padding: 0; color: #7A3B1E; font-size: 14px; font-weight: 700; text-decoration: underline">themes</button> and the <button type="button" onClick=${V.paths.goRead} style="cursor: pointer; border: none; background: transparent; padding: 0; color: #7A3B1E; font-size: 14px; font-weight: 700; text-decoration: underline">full Bible</button>.</p>
@@ -5615,7 +5638,7 @@ ${(V.isPathStep) ? html`
 <section style="display: flex; flex-direction: column; gap: 16px">
 <div style="display: flex; flex-direction: column; gap: 6px">
 <button type="button" onClick=${V.ps.hub} style="align-self: flex-start; cursor: pointer; border: none; background: transparent; padding: 4px 0; min-height: 36px; color: #7A3B1E; font-size: 14px; font-weight: 700">← All paths</button>
-<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap"><div style="font-family: Fraunces, Georgia, serif; font-size: 20px; font-weight: 700">${V.ps.pathTitle}</div><div style="font-size: 13px; color: #6B5F52">${V.ps.counter}</div></div>
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap"><div style="font-family: Fraunces, Georgia, serif; font-size: 20px; font-weight: 700">${V.ps.pathTitle}</div><div style="display: flex; align-items: baseline; gap: 12px"><span style="font-size: 13px; color: #6B5F52">${V.ps.counter}</span><button type="button" onClick=${V.ps.restart} style="cursor: pointer; border: none; background: transparent; color: #7A3B1E; font-size: 13px; font-weight: 700; text-decoration: underline; padding: 0; min-height: 32px">Start over</button></div></div>
 <div role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow=${V.ps.pct} aria-label="Progress" style="height: 6px; border-radius: 3px; background: #EAE1D0; overflow: hidden"><div style="height: 100%; width: ${V.ps.pct}%; background: #7A3B1E"></div></div>
 </div>
 ${(V.ps.isStep) ? html`
