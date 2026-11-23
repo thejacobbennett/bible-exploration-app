@@ -4177,7 +4177,7 @@ class Component extends DCLogic {
       sections: regionKeys.filter(function (k) { return (!cReg || k === cReg) && (byRegion[k] || []).length; }).map(function (k) {
         var dots = k.split('').map(function (l) { return { color: cSel[LET.indexOf(l)].color }; });
         var shared = k.length === nSel && nSel > 1;
-        var oSt = (st.cmpOpen || {})[k], open = cReg ? true : oSt != null ? !!oSt : shared;
+        var oSt = (st.cmpOpen || {})[k], open = cReg ? true : oSt != null ? !!oSt : true;
         return { title: regName(k), dots: dots, count: byRegion[k].length, bg: shared ? '#EEF3EC' : k.length > 1 ? '#F5EFE3' : '#FFFDF8',
           open: open, chev: open ? 180 : 0, toggle: function () { var o = {}; Object.keys(st.cmpOpen || {}).forEach(function (x) { o[x] = st.cmpOpen[x]; }); o[k] = !open; go({ cmpOpen: o }); },
           items: byRegion[k].map(function (p) { return { topic: p.topic, hasTopic: !!p.topic, text: p.text }; }) };
