@@ -4146,7 +4146,7 @@ class Component extends DCLogic {
             setIds(ids);
           } };
       }),
-      pickLabel: cTable ? 'Choose as many as you like' : 'Choose up to three',
+      pickLabel: cTable ? 'Pick as many as you want' : 'Pick two or three',
       hint: cTable ? '' : cAll.length > 3 ? 'The Venn diagram shows the first three you picked. Switch to Side by side to see all ' + cAll.length + '.' : nSel < 2 ? 'Pick at least two to compare (up to three in the Venn diagram; any number side by side).' : 'Tap a number in the diagram to see just that overlap, or scroll through all of them below.',
       exportTable: function () {
         var rows = [[cmpMode === 'trad' ? 'Topic' : cmpMode === 'pr' ? 'Practice' : 'Claim'].concat(cSel.map(function (x) { return x.name; }))];
