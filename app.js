@@ -3332,6 +3332,15 @@ class Component extends DCLogic {
     if (tab === 'read' || tab === 'search' || tab === 'plan') this.loadText(st.tr === 'kjv' && tab !== 'plan' ? 'kjv' : 'bsb');
     var pathsV = (tab === 'plan' || tab === 'overview') ? pathsVals() : { hub: {}, step: null };
     var MV_ICON = {'creation': 'M8 12a4 4 0 1 0 8 0a4 4 0 1 0 -8 0M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4', 'fall': 'M12 21s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.6-7 10-7 10zM12 8.4l-1.6 3.1 3.2 2-1.6 3.4', 'covenant': 'M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8L3.5 9.2l5.9-.9z', 'kingdom': 'M3 19h18M4 16L3 7l5 4 4-7 4 7 5-4-1 9z', 'exile': 'M10 4H5v16h5M14 8l4 4-4 4M18 12H9', 'return': 'M3 11l9-7 9 7M5 10v10h14V10M10 20v-5h4v5', 'messiah': 'M12 3v18M7 8h10', 'church': 'M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18', 'newc': 'M3 18h18M7 18a5 5 0 0 1 10 0M12 7v3M5.6 10.6l1.4 1.4M18.4 10.6L17 12M8 21h8'};
+    var homeStats = (function () {
+        var to = function (patch) { return function () { go(patch); window.scrollTo(0, 0); }; };
+        return { p66: to({ tab: 'library', testa: 'all', libCanon: 'protestant' }), c73: to({ tab: 'library', testa: 'all', libCanon: 'catholic' }),
+          ot: to({ tab: 'library', testa: 'OT', libCanon: 'protestant' }), nt: to({ tab: 'library', testa: 'NT', libCanon: 'protestant' }),
+          read: to({ tab: 'read', book: 'gen', chap: 1 }), lib: to({ tab: 'library', testa: 'all', libCanon: 'protestant' }),
+          libParts: to({ tab: 'library', testa: 'all', libCanon: 'protestant' }),
+          libCanon: to({ tab: 'library', testa: 'all', libCanon: canonId }),
+          tl: to({ tab: 'timeline', tlC: -220, tlSpan: 460 }) };
+      })();
     var homeV = (function () {
       if (tab !== 'overview') return {};
       var f = pathsV.hub.featured, rec = (self.pathsLoad() || {}).story || {};
@@ -4672,15 +4681,7 @@ class Component extends DCLogic {
       showPhoneBtn: phoneScreen && !!st.desktopView,
       toDesktop: function () { self.setDesktopView(true); },
       toPhone: function () { self.setDesktopView(false); },
-      home: (function () {
-        var to = function (patch) { return function () { go(patch); window.scrollTo(0, 0); }; };
-        return { p66: to({ tab: 'library', testa: 'all', libCanon: 'protestant' }), c73: to({ tab: 'library', testa: 'all', libCanon: 'catholic' }),
-          ot: to({ tab: 'library', testa: 'OT', libCanon: 'protestant' }), nt: to({ tab: 'library', testa: 'NT', libCanon: 'protestant' }),
-          read: to({ tab: 'read', book: 'gen', chap: 1 }), lib: to({ tab: 'library', testa: 'all', libCanon: 'protestant' }),
-          libParts: to({ tab: 'library', testa: 'all', libCanon: 'protestant' }),
-          libCanon: to({ tab: 'library', testa: 'all', libCanon: canonId }),
-          tl: to({ tab: 'timeline', tlC: -220, tlSpan: 460 }) };
-      })(),
+
       goGap: function () { go({ tab: 'story', era: 9 }); window.scrollTo(0, 0); },
       eraMap: eraMap, bookMap: bookMap,
       tabs: tabs, q: q, trBtns: trBtns, bookOpts: bookOpts, rd: rd, s: s,
@@ -4694,7 +4695,7 @@ class Component extends DCLogic {
       eras: eras, era: era, arc: arc, arcSel: arcSel, future: future, tl: tl, isTimeline: tab === 'timeline', cp: cp, chMap: chMap, listen: listen, player: player, cmp: cmp, isCompare: tab === 'compare', parts: parts, part: part, aside: (function () { var off = !asideOpen; var nar = self._narrow; return { open: !off, closed: off, flex: off ? (nar ? '1 1 100%' : '0 0 52px') : '1 1 340px', toggle: function () { var am = Object.assign({}, asideMap); am[tab] = off; go({ asideOpenMap: am }); }, hideRot: nar ? 90 : 0, showRot: nar ? -90 : 0, railDir: nar ? 'row' : 'column', railPad: nar ? '10px 14px' : '16px 6px', railWrite: nar ? 'horizontal-tb' : 'vertical-rl', railLabel: tab === 'read' ? 'Show chapter notes' : 'Show book details', hideOutside: tab === 'read', hideInside: tab !== 'read' }; })(),
       showAside: true, isAbout: tab === 'about', isPlan: tab === 'plan' && st.pathId === 'year', plan: tab === 'plan' && st.pathId === 'year' ? planVals() : {},
       paths: pathsV.hub, ps: pathsV.step || {}, isPathsHub: tab === 'plan' && pathsV.isHub, isPathStep: tab === 'plan' && pathsV.isStep,
-      home: homeV, foot: { about: function () { go({ tab: 'about' }); window.scrollTo(0, 0); }, search: function () { go({ tab: 'search' }); window.scrollTo(0, 0); } }, pr: pr, isPractice: tab === 'practice', hx: hx, isHistory: tab === 'history',
+      home: Object.assign({}, homeStats, homeV), foot: { about: function () { go({ tab: 'about' }); window.scrollTo(0, 0); }, search: function () { go({ tab: 'search' }); window.scrollTo(0, 0); } }, pr: pr, isPractice: tab === 'practice', hx: hx, isHistory: tab === 'history',
       themeBtns: themeBtns, strip: strip, theme: theme,
       sel: sel
     };
