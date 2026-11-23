@@ -2726,7 +2726,6 @@ class Component extends DCLogic {
     if (['b', 'fw', 'pr'].indexOf(q.get('hxKind')) >= 0) patch.hxKind = q.get('hxKind');
     if (q.get('cmpFam') && FW_FAMILIES.some(function (f) { return f.id === q.get('cmpFam'); })) patch.cmpFam = q.get('cmpFam');
     if (['venn', 'table', 'trads', 'hist'].indexOf(q.get('cmpView')) >= 0) patch.cmpView = q.get('cmpView');
-    if (q.get('tab') === 'history') { var hxT = hxTarget(patch.hxId); Object.keys(hxT).forEach(function (k) { patch[k] = hxT[k]; }); }
     if (['all', 'OT', 'NT', 'AP'].indexOf(q.get('testa')) >= 0) patch.testa = q.get('testa');
     if (q.get('libCanon') && CANONS[q.get('libCanon')]) patch.libCanon = q.get('libCanon');
     if (q.get('srMode') === 'topics') patch.srMode = 'topics';
@@ -3047,7 +3046,7 @@ class Component extends DCLogic {
     };
     var storyViews = seg([['story', 'Storyline', { tab: 'story' }], ['timeline', 'Timeline', { tab: 'timeline' }]], tab);
     var tradView = tab === 'history' ? 'history' : tab === 'practice' || st.cmpMode === 'pr' ? 'practice' : (st.cmpMode === 'fw' ? 'fw' : 'trad');
-    var tradViews = seg([['trad', 'Beliefs', { tab: 'compare', cmpMode: 'trad', cmpReg: null, hxId: null }], ['fw', 'Frameworks', { tab: 'compare', cmpMode: 'fw', cmpReg: null, hxId: null }], ['practice', 'Practice', { tab: 'compare', cmpMode: 'pr', cmpReg: null, hxId: null }]], tradView);
+    var tradViews = seg([['trad', 'Beliefs', { tab: 'compare', cmpMode: 'trad', cmpReg: null, hxId: null }], ['fw', 'Frameworks', { tab: 'compare', cmpMode: 'fw', cmpReg: null, hxId: null }], ['practice', 'Practice', { tab: 'compare', cmpMode: 'pr', cmpReg: null, hxId: null }], ['history', 'History', { tab: 'history' }]], tradView);
 
     var ring = function (b) { return b.id === bookId ? '3px solid ' + INK : '3px solid transparent'; };
     // On phones the book card sits below the content, so bring it into view when a book is picked.
@@ -5002,6 +5001,88 @@ ${(r.hasSrc) ? html`<div style="font-size: 13px">${(r.src || []).map((q, $index)
 </article>
 ` : null}
 <div style="font-size: 12px; color: #6B5F52; max-width: 820px">Summaries are written for this app from each tradition’s catechisms, prayer books and confessions, linked where used. Practice varies by country, parish and family; for guidance, talk with a pastor or priest in your own tradition.</div>
+</section>
+` : null}
+${(V.isHistory) ? html`
+<section style="display: flex; flex-direction: column; gap: 18px">
+<div class="be-seg" role="group" aria-label="Traditions view" style="display: flex; flex-wrap: wrap; gap: 4px; background: #EAE1D0; padding: 4px; border-radius: 999px; align-self: flex-start">${(V.tradViews || []).map((v, $index) => html`<button type="button" onClick=${v.pick} aria-pressed=${v.pressed} style="border: none; cursor: pointer; padding: 8px 18px; min-height: 44px; border-radius: 999px; font-size: 14px; font-weight: 700; background: ${v.bg}; color: ${v.fg}">${v.label}</button>`)}</div>
+<div>
+<div style="font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #7A3B1E">Traditions · History</div>
+<h1 style="margin: 4px 0 8px; font-family: Fraunces, Georgia, serif; font-size: 36px; line-height: 1.1">How it developed</h1>
+<p style="margin: 0; color: #4A3F35; max-width: 800px">Some of what Christians believe and do is spelled out in Scripture; some grew over centuries through councils, teachers and devotion. Pick a belief, framework or practice to see where it started, who shaped it, and the Bible passages behind it.</p>
+</div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px">
+<div class="be-seg" role="group" aria-label="Show" style="display: flex; flex-wrap: wrap; gap: 4px; background: #EAE1D0; padding: 4px; border-radius: 999px">
+${(V.hx.kinds || []).map((m, $index) => html`<button type="button" onClick=${m.pick} aria-pressed=${m.pressed} style="border: none; cursor: pointer; padding: 8px 16px; min-height: 44px; border-radius: 999px; font-size: 14px; font-weight: 700; background: ${m.bg}; color: ${m.fg}">${m.label}</button>`)}
+</div>
+<button type="button" onClick=${V.hx.exportAll} style="cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; border-radius: 999px; padding: 8px 14px; min-height: 40px; font-size: 13px; font-weight: 700"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M5 21h14"></path></svg>Export all timelines (CSV)</button>
+</div>
+<div>
+<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52; margin-bottom: 8px">Topic</div>
+<div role="group" aria-label="Topic" style="display: flex; flex-wrap: wrap; gap: 6px">
+${(V.hx.list || []).map((q, $index) => html`<button type="button" onClick=${q.pick} aria-pressed=${q.pressed} style="cursor: pointer; border: 1px solid #D9CDB8; border-radius: 999px; padding: 6px 12px; min-height: 38px; font-size: 13px; font-weight: 600; background: ${q.bg}; color: ${q.fg}">${q.label}</button>`)}
+</div>
+</div>
+<article id="hx-top" data-focus="card" style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 18px; padding: 22px 24px; display: flex; flex-direction: column; gap: 14px"><button type="button" class="be-fbtn" onClick=${V.focusToggle} aria-label="Focus mode: show this section full screen" title="Focus mode (full screen)"><svg class="be-fi-in" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg><svg class="be-fi-out" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"></path><path d="M15 4v5h5"></path><path d="M9 20v-5H4"></path><path d="M15 20v-5h5"></path></svg></button>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding-right: 80px">
+<span style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52">${V.hx.sel.kindLabel}</span>
+<span style="font-size: 12px; font-weight: 700; border-radius: 999px; padding: 3px 10px; background: ${V.hx.sel.basisBg}; color: ${V.hx.sel.basisFg}">${V.hx.sel.basisLabel}</span>
+</div>
+<h2 style="margin: -4px 0 0; font-family: Fraunces, Georgia, serif; font-size: 30px; line-height: 1.15">${V.hx.sel.name}</h2>
+<p style="margin: 0; font-size: 17px; line-height: 1.6; color: #231E19; max-width: 840px; font-weight: 500">${V.hx.sel.sum}</p>
+${(V.hx.sel.hasMore) ? html`<div style="display: flex; flex-direction: column; gap: 12px; max-width: 840px">${(V.hx.sel.more || []).map((mp, $index) => html`<p style="margin: 0; font-size: 16px; line-height: 1.65; color: #31291F">${mp.text}</p>`)}</div>` : null}
+<div style="background: #F5EFE3; border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px">
+<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52">Scripture or tradition?</div>
+<p style="margin: 0; font-size: 15px; line-height: 1.55; color: #31291F; max-width: 820px">${V.hx.sel.note}</p>
+<div style="display: flex; flex-wrap: wrap; gap: 6px">${(V.hx.sel.refs || []).map((r, $index) => html`<button type="button" onClick=${r.pick} title="Read this passage" style="cursor: pointer; border: 1px solid #D9CDB8; background: #FFFDF8; color: #7A3B1E; border-radius: 999px; padding: 6px 12px; min-height: 36px; font-size: 13px; font-weight: 700">${r.label}</button>`)}</div>
+</div>
+${(V.hx.sel.hasViews) ? html`<div style="display: flex; flex-direction: column; gap: 10px">
+<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52">How the traditions see it</div>
+${(V.hx.sel.views || []).map((v, $index) => html`<div style="border: 1px solid #E2D8C6; border-radius: 12px; padding: 10px 12px; background: #FFFDF8; display: flex; flex-direction: column; gap: 4px; max-width: 840px"><div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap"><span aria-hidden="true" style="display: inline-flex; gap: 3px">${(v.dots || []).map((dt, $index) => html`<span style="width: 10px; height: 10px; border-radius: 50%; background: ${dt.color}"></span>`)}</span><span style="font-size: 14px; font-weight: 700; color: #231E19">${v.label}</span></div><p style="margin: 0; font-size: 15px; line-height: 1.55; color: #31291F">${v.text}</p></div>`)}
+</div>` : null}
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px">
+<span style="font-size: 13px; font-weight: 700; color: #4A3F35; margin-right: 4px">${V.hx.sel.heldLabel}</span>
+${(V.hx.sel.trads || []).map((t, $index) => html`<span style="font-size: 12px; font-weight: 700; border-radius: 999px; padding: 3px 9px; background: ${t.color}; color: #FFFFFF">${t.label}</span>`)}
+</div>
+${(V.hx.sel.hasLink) ? html`<button type="button" onClick=${V.hx.sel.link} style="align-self: flex-start; cursor: pointer; border: 1px solid #231E19; background: #FFFDF8; color: #231E19; border-radius: 999px; padding: 6px 14px; min-height: 38px; font-size: 13px; font-weight: 700">${V.hx.sel.linkLabel}</button>` : null}
+</article>
+<div style="display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: #4A3F35" aria-label="Timeline key">
+${(V.hx.legend || []).map((g, $index) => html`<span style="display: inline-flex; align-items: center; gap: 6px"><span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 50%; background: ${g.color}"></span>${g.label}</span>`)}
+</div>
+<div data-focus="card" style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 18px; padding: 22px 20px 6px"><button type="button" class="be-fbtn" onClick=${V.focusToggle} aria-label="Focus mode: show this section full screen" title="Focus mode (full screen)"><svg class="be-fi-in" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"></path><path d="M20 9V4h-5"></path><path d="M4 15v5h5"></path><path d="M20 15v5h-5"></path></svg><svg class="be-fi-out" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"></path><path d="M15 4v5h5"></path><path d="M9 20v-5H4"></path><path d="M15 20v-5h5"></path></svg></button>
+<h2 style="margin: 0 0 16px; font-family: Fraunces, Georgia, serif; font-size: 22px; padding-right: 80px">Timeline</h2>
+<ol style="list-style: none; margin: 0; padding: 0">
+${(V.hx.sel.steps || []).map((s, $index) => html`
+<li style="display: grid; grid-template-columns: minmax(78px, 132px) 24px minmax(0, 1fr); column-gap: 10px">
+<div style="text-align: right; padding-top: 2px; font-size: 13px; font-weight: 800; line-height: 1.3; color: #231E19">${s.when}</div>
+<div aria-hidden="true" style="position: relative">
+<div style="position: absolute; left: 11px; top: ${s.lineTop}; bottom: 0; width: 2px; background: #E2D8C6"></div>
+<div style="position: relative; margin: 3px 0 0 4px; width: 12px; height: 12px; border-radius: 50%; background: ${s.color}; box-shadow: 0 0 0 3px #FFFDF8, 0 0 0 5px ${s.color}"></div>
+</div>
+<div style="padding: 0 0 22px; display: flex; flex-direction: column; gap: 5px; min-width: 0">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px"><span style="font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52">${s.kindLabel}</span>${(s.hasTrad) ? html`<span style="font-size: 11px; font-weight: 700; border-radius: 999px; padding: 2px 8px; border: 1.5px solid ${s.tradColor}; color: ${s.tradColor}">${s.tradLabel}</span>` : null}</div>
+<h3 style="margin: 0; font-family: Fraunces, Georgia, serif; font-size: 18px; line-height: 1.25">${s.title}</h3>
+<p style="margin: 0; font-size: 15px; line-height: 1.55; color: #31291F; max-width: 760px">${s.text}</p>
+${(s.hasRefs) ? html`<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px">${(s.refs || []).map((r, $index) => html`<button type="button" onClick=${r.pick} title="Read this passage" style="cursor: pointer; border: 1px solid #D9CDB8; background: #F5EFE3; color: #7A3B1E; border-radius: 999px; padding: 4px 10px; min-height: 32px; font-size: 12px; font-weight: 700">${r.label}</button>`)}</div>` : null}
+</div>
+</li>
+`)}
+</ol>
+</div>
+<div>
+<h2 style="margin: 0 0 10px; font-family: Fraunces, Georgia, serif; font-size: 22px">Key people</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px">
+${(V.hx.sel.people || []).map((p, $index) => html`
+<div style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px">
+<div style="font-family: Fraunces, Georgia, serif; font-size: 16px; font-weight: 700; color: #231E19">${p.name}</div>
+<div style="font-size: 13px; color: #6B5F52">${p.dates}</div>
+${(p.hasRole) ? html`<div style="font-size: 14px; line-height: 1.45; color: #31291F">${p.role}</div>` : null}
+</div>
+`)}
+</div>
+</div>
+<div style="font-size: 13px">Read more: ${(V.hx.sel.src || []).map((q, $index) => html`<a href=${q.url} target="_blank" rel="noopener noreferrer" title="Opens in a new tab" style="color: #2E4A8A; font-weight: 600; margin-right: 10px">${q.label} ↗</a>`)}</div>
+<div style="font-size: 12px; color: #6B5F52; max-width: 820px">Dates before about AD 400 are often approximate, and some events (marked “traditional”) are handed down by tradition rather than recorded at the time. Summaries are written for this app; each tradition tells parts of this story in its own way.</div>
 </section>
 ` : null}
 ${(V.isCompare) ? html`
