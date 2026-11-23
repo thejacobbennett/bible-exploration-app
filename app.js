@@ -2174,6 +2174,28 @@ var PATHS = [
   { id: 'year', title: 'The Bible in a Year', minutes: 0, plan: true,
     promise: 'Read the whole Bible in the order things happened, about 15 minutes a day, with the maps, themes and traditions that help each reading make sense.' }
 ];
+var PICON = {
+  clock: 'M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0M12 7v5l3 2',
+  pin: 'M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11zM9.5 10a2.5 2.5 0 1 0 5 0a2.5 2.5 0 1 0 -5 0',
+  people: 'M9 11a4 4 0 1 0 0-8a4 4 0 0 0 0 8M3 21v-1a6 6 0 0 1 12 0v1M16 3.5a4 4 0 0 1 0 7.5M21 21v-1a6 6 0 0 0-4-5.6',
+  book: 'M2 5h7a3 3 0 0 1 3 3v12a2 2 0 0 0-2-2H2zM22 5h-7a3 3 0 0 0-3 3v12a2 2 0 0 1 2-2h8z',
+  bulb: 'M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.8.8 1 1.5 1 2.5h6c0-1 .2-1.7 1-2.5A6 6 0 0 0 12 3z',
+  creation: 'M8 12a4 4 0 1 0 8 0a4 4 0 1 0 -8 0M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4',
+  fall: 'M12 21s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.6-7 10-7 10zM12 8.4l-1.6 3.1 3.2 2-1.6 3.4',
+  covenant: 'M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8L3.5 9.2l5.9-.9z',
+  kingdom: 'M3 19h18M4 16L3 7l5 4 4-7 4 7 5-4-1 9z',
+  exile: 'M10 4H5v16h5M14 8l4 4-4 4M18 12H9',
+  'return': 'M3 11l9-7 9 7M5 10v10h14V10M10 20v-5h4v5',
+  messiah: 'M12 3v18M7 8h10',
+  church: 'M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18',
+  newc: 'M3 18h18M7 18a5 5 0 0 1 10 0M12 7v3M5.6 10.6l1.4 1.4M18.4 10.6L17 12M8 21h8',
+  temple: 'M3 11l9-7 9 7M5 10v10h14V10M10 20v-5h4v5',
+  sacrifice: 'M12 3c2 3 5 5 5 9a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-5 1-8z',
+  nations: 'M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18',
+  loyalty: 'M12 21s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.6-7 10-7 10z',
+  newcreation: 'M3 18h18M7 18a5 5 0 0 1 10 0M12 7v3M5.6 10.6l1.4 1.4M18.4 10.6L17 12M8 21h8'
+};
+PICON.exile2 = PICON.exile;
 // How to read each part of the Bible (shown with the parts on Home and on each book)
 var PART_HOWTO = {
   law: 'Read the stories and the laws together: the laws are the terms of a relationship God has already begun, not a rulebook for earning his favor. When a law seems strange, ask what it taught Israel about holiness, justice or care for the vulnerable, and how the New Testament reads it. It’s fine to read Leviticus and Numbers more quickly the first time.',
@@ -3052,41 +3074,62 @@ class Component extends DCLogic {
       var ps = { restart: function () { var v = self.pathsLoad() || {}; delete v[P.id]; self.pathsSave(v); go({ pathStep: 1 }); window.scrollTo(0, 0); }, pathTitle: P.title, hub: function () { go({ tab: 'plan', pathId: null, pathStep: null }); window.scrollTo(0, 0); },
         counter: i > N ? 'Finished' : 'Step ' + i + ' of ' + N, pct: Math.round(Math.min(i, N) / N * 100), isStep: i <= N, isRecap: i > N };
       if (i <= N) {
-        var s = P.steps[i - 1], sections = [], books = [], links = [], reads = [], kicker = '', title = titleOf(s), color = '#7A3B1E', booksLabel = 'Books that tell it';
+        var s = P.steps[i - 1], facts = [], books = [], links = [], reads = [], kicker = '', title = titleOf(s), color = '#7A3B1E', booksLabel = 'Books that tell it';
+        var icon = PICON.book, what = '', whatLabel = 'What happened', map = '', mapCap = '', mapEra = 0;
+        var trim2 = function (t) { var m = (t || '').match(/[^.!?]+[.!?]+[”’"]?(\s|$)/g); return m ? m.slice(0, 2).join('').trim() : (t || ''); };
+        var placesOf = function (ns) { var out = []; ns.forEach(function (n) { ((ERA_MAPS[String(n)] || {}).p || []).forEach(function (pp) { var pl = PLACES[pp[0]]; var nm = pl ? pl[0].split(' (')[0] : ''; if (nm && out.indexOf(nm) < 0) out.push(nm); }); }); return out; };
         if (s.kind === 'mv') {
           var a = ARC.filter(function (x) { return x.id === s.id; })[0];
-          color = a.color; kicker = 'Movement ' + (ARC.indexOf(a) + 1) + ' of ' + ARC.length + ' · ' + a.span;
+          color = a.color; icon = PICON[a.id] || icon; kicker = 'Step ' + i + ' of ' + N + ' · ' + a.span;
           var eraList = a.eras.map(function (n) { return ERAS[n - 1]; });
-          sections.push({ label: 'What happened', text: a.text });
-          sections.push({ label: 'When', text: eraList.length ? eraList.map(function (e) { return e.name + ' (' + e.dates + ')'; }).join(' · ') : 'Still to come: the Bible’s hope for the future.' });
+          what = a.text;
+          facts.push({ icon: PICON.clock, label: 'When', lines: eraList.length ? eraList.map(function (e) { return e.name + ' · ' + e.dates; }) : ['Still to come'] });
+          var pl = placesOf(a.eras);
+          facts.push({ icon: PICON.pin, label: 'Where', lines: [pl.length ? pl.slice(0, 5).join(', ') : 'A new heaven and a new earth'] });
           var ppl = []; eraList.forEach(function (e) { e.people.split(', ').forEach(function (x) { if (ppl.indexOf(x) < 0) ppl.push(x); }); });
-          if (ppl.length) sections.push({ label: 'Who matters', text: ppl.join(', ') });
-          sections.push({ label: 'Why it matters', text: s.why });
+          if (ppl.length) facts.push({ icon: PICON.people, label: 'Who', lines: [ppl.slice(0, 8).join(', ')] });
+          mapEra = a.eras.filter(function (n) { return ERA_MAPS[String(n)]; })[0] || 0;
           reads.push(readOf(s.read));
-          if (a.eras.length) links.push({ label: 'See ' + (a.eras.length > 1 ? 'these eras' : 'this era') + ' on the map', pick: function () { go({ tab: 'story', era: a.eras[0], pathId: null, pathStep: null }); window.scrollTo(0, 0); } });
           links.push({ label: 'More in the Story', pick: function () { go({ tab: 'story', arc: a.id, pathId: null, pathStep: null }); window.scrollTo(0, 0); } });
         } else if (s.kind === 'era') {
           var e = ERAS[s.n - 1];
-          color = '#2E4A8A'; kicker = 'Era ' + e.n + ' of 11 · ' + e.dates;
-          sections.push({ label: 'What happened', text: e.sum + ' ' + (paras(MORE_ERAS[String(e.n)] || '')[0] || '') });
-          sections.push({ label: 'Who matters', text: e.people });
-          sections.push({ label: 'Why it matters', text: s.why });
+          var aa = ARC.filter(function (x) { return x.eras.indexOf(e.n) >= 0; })[0];
+          color = aa ? aa.color : '#2E4A8A'; icon = aa ? PICON[aa.id] || icon : icon; kicker = 'Step ' + i + ' of ' + N + ' · Era ' + e.n;
+          what = e.sum;
+          facts.push({ icon: PICON.clock, label: 'When', lines: [e.dates] });
+          var pl2 = placesOf([e.n]);
+          if (pl2.length) facts.push({ icon: PICON.pin, label: 'Where', lines: [pl2.slice(0, 5).join(', ')] });
+          facts.push({ icon: PICON.people, label: 'Who', lines: [e.people] });
+          mapEra = ERA_MAPS[String(e.n)] ? e.n : 0;
           BOOKS.forEach(function (b) { if ((b.eras || []).indexOf(e.n) >= 0) books.push({ name: b.name, pick: function () { go({ tab: 'library', book: b.id, pathId: null, pathStep: null, asideOpenMap: Object.assign({}, st.asideOpenMap || {}, { library: true }) }); window.scrollTo(0, 0); } }); });
           booksLabel = 'Books set in this era';
           reads.push(readOf(s.read));
-          links.push({ label: 'See this era on the map', pick: function () { go({ tab: 'story', era: e.n, pathId: null, pathStep: null }); window.scrollTo(0, 0); } });
+          links.push({ label: 'Read more about this era', pick: function () { go({ tab: 'story', era: e.n, pathId: null, pathStep: null }); window.scrollTo(0, 0); } });
         } else {
           var t = THEMES.filter(function (x) { return x.id === s.id; })[0];
-          color = '#1F5446'; kicker = 'Thread ' + i + ' of ' + N + ' · ' + t.short;
-          sections.push({ label: 'What it is', text: paras(MORE_THEMES[t.id] || '')[0] || t.short });
-          sections.push({ label: 'In the Old Testament', text: t.ot });
-          sections.push({ label: 'In the New Testament', text: t.nt });
-          sections.push({ label: 'Why it matters', text: s.why });
+          color = '#1F5446'; icon = PICON[t.id] || PICON.book; kicker = 'Thread ' + i + ' of ' + N;
+          whatLabel = 'What it is'; what = trim2(paras(MORE_THEMES[t.id] || '')[0] || t.short);
+          facts.push({ icon: PICON.book, label: 'In the Old Testament', lines: [t.ot] });
+          facts.push({ icon: PICON.messiah, label: 'In the New Testament', lines: [t.nt] });
           t.books.forEach(function (id) { var b = findBook(id); if (b) books.push({ name: b.name, pick: function () { go({ tab: 'library', book: id, pathId: null, pathStep: null, asideOpenMap: Object.assign({}, st.asideOpenMap || {}, { library: true }) }); window.scrollTo(0, 0); } }); });
           booksLabel = 'Where to see it';
           s.reads.forEach(function (r) { reads.push(readOf(r)); });
           links.push({ label: 'Trace this theme in full', pick: function () { go({ tab: 'themes', theme: t.id, pathId: null, pathStep: null }); window.scrollTo(0, 0); } });
         }
+        if (mapEra) { map = 'maps/era' + mapEra + '.jpg'; mapCap = 'Map: ' + ERAS[mapEra - 1].name + '. Tap to explore it.'; }
+        var tintOf0 = 0;
+        var tintOf = function (hex) { var h = hex.replace('#', ''); var r = parseInt(h.substr(0, 2), 16), g = parseInt(h.substr(2, 2), 16), bb = parseInt(h.substr(4, 2), 16); return 'rgba(' + r + ',' + g + ',' + bb + ',0.10)'; };
+        var rail = P.steps.map(function (x, k) {
+          var on = k + 1 === i, dn = (rec.max || 0) > k + 1 && !on || !!rec.finished && !on;
+          var ic = x.kind === 'mv' ? PICON[x.id] : x.kind === 'era' ? (PICON[(ARC.filter(function (q) { return q.eras.indexOf(x.n) >= 0; })[0] || {}).id] || PICON.book) : (PICON[x.id] || PICON.book);
+          var lb = x.kind === 'mv' ? ARC.filter(function (q) { return q.id === x.id; })[0].label : x.kind === 'era' ? ERAS[x.n - 1].name.split(' & ')[0].replace('Between the testaments', 'Between') : THEMES.filter(function (q) { return q.id === x.id; })[0].name.split(' & ')[0].split(' vs')[0].replace('Creation → new creation', 'New creation').replace('Blessing for all nations', 'Nations').replace('The promised one', 'Messiah');
+          var cc = x.kind === 'mv' ? ARC.filter(function (q) { return q.id === x.id; })[0].color : x.kind === 'era' ? ((ARC.filter(function (q) { return q.eras.indexOf(x.n) >= 0; })[0] || {}).color || '#2E4A8A') : '#1F5446';
+          return { label: lb, icon: ic, done: dn, aria: on ? 'step' : 'false', bg: on ? cc : tintOf(cc).replace('0.10)', '0.16)'), fg: on ? '#FFFFFF' : cc, ring: on ? '0 0 0 3px #FBF7EF, 0 0 0 5px ' + color : 'none', weight: on ? 800 : 600, text: on ? '#231E19' : '#6B5F52',
+            pick: function () { go({ pathStep: k + 1 }); window.scrollTo(0, 0); } };
+        });
+        Object.assign(ps, { icon: icon, facts: facts, what: what, whatLabel: whatLabel, why: s.why, tint: tintOf(color), bulb: PICON.bulb, bookIcon: PICON.book, rail: rail,
+          hasMap: !!map, map: map, mapCap: mapCap, mapAlt: map ? 'Map of ' + ERAS[mapEra - 1].name : '', openMap: function () { go({ tab: 'story', era: mapEra, pathId: null, pathStep: null }); window.scrollTo(0, 0); } });
+        var sections = [];
         Object.assign(ps, { kicker: kicker, title: title, color: color, sections: sections, books: books, hasBooks: books.length > 0, booksLabel: booksLabel, reads: reads, links: links,
           noPrev: i <= 1, prevOpacity: i <= 1 ? 0.45 : 1,
           prev: function () { if (i > 1) { go({ pathStep: i - 1 }); window.scrollTo(0, 0); } },
@@ -4641,16 +4684,16 @@ ${(V.hdr.menuOpen) ? html`<div id="hdr-menu" style="padding: 4px 12px 14px; disp
 ${(V.isOverview) ? html`
 <section style="display: flex; flex-direction: column; gap: 24px">
 <div style="display: flex; flex-direction: column; gap: 14px">
-<div style="background: #4A4541; color: #FBF7EF; border-radius: 22px; padding: 26px 26px 24px; display: flex; flex-direction: column; gap: 18px">
+<div style="background: #ECE8E2; color: #231E19; border-radius: 22px; padding: 26px 26px 24px; display: flex; flex-direction: column; gap: 18px">
 <div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px">
 <div style="min-width: 0">
-<div style="font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #F6E2A8">${V.home.kicker}</div>
-<h1 style="margin: 6px 0 6px; font-family: Fraunces, Georgia, serif; font-size: 40px; line-height: 1.06; color: #FFFFFF">The Bible in One Story</h1>
-<p style="margin: 0; font-size: 16px; line-height: 1.5; color: #EDE5D6">Nine short steps, from creation to new creation. About 20 minutes.</p>
+<div style="font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #7A3B1E">${V.home.kicker}</div>
+<h1 style="margin: 6px 0 6px; font-family: Fraunces, Georgia, serif; font-size: 40px; line-height: 1.06; color: #231E19">The Bible in One Story</h1>
+<p style="margin: 0; font-size: 16px; line-height: 1.5; color: #4A3F35">Nine short steps, from creation to new creation. About 20 minutes.</p>
 </div>
 <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px">
-<button type="button" onClick=${V.home.start} style="cursor: pointer; border: none; background: #F6E2A8; color: #231E19; border-radius: 999px; padding: 13px 24px; min-height: 50px; font-size: 17px; font-weight: 800">${V.home.btn}</button>
-${(V.home.started) ? html`<button type="button" onClick=${V.home.reset} style="cursor: pointer; border: none; background: transparent; color: #CFC4B2; font-size: 14px; font-weight: 700; text-decoration: underline; padding: 4px 0; min-height: 36px">Start over</button>` : null}
+<button type="button" onClick=${V.home.start} style="cursor: pointer; border: none; background: #231E19; color: #FBF7EF; border-radius: 999px; padding: 13px 24px; min-height: 50px; font-size: 17px; font-weight: 800">${V.home.btn}</button>
+${(V.home.started) ? html`<button type="button" onClick=${V.home.reset} style="cursor: pointer; border: none; background: transparent; color: #6B5F52; font-size: 14px; font-weight: 700; text-decoration: underline; padding: 4px 0; min-height: 36px">Start over</button>` : null}
 </div>
 </div>
 <ol class="be-steps" aria-label="The nine steps" style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 6px">
@@ -4662,12 +4705,12 @@ ${(m.done) ? html`<span aria-hidden="true" style="position: absolute; top: 5px; 
 <span class="be-step-sub" style="font-size: 11.5px; line-height: 1.3; color: rgba(255,255,255,0.85)">${m.short}</span>
 </button></li>`)}
 </ol>
-<div class="be-steps-span" aria-hidden="true" style="display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 6px; margin-top: -10px; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #CFC4B2">
-<div style="grid-column: 1 / span 6; border-top: 2px solid rgba(246,226,168,0.45); padding-top: 4px; text-align: center">Old Testament</div>
-<div style="grid-column: 7 / span 2; border-top: 2px solid rgba(246,226,168,0.45); padding-top: 4px; text-align: center">New Testament</div>
-<div style="grid-column: 9 / span 1; border-top: 2px dashed rgba(246,226,168,0.45); padding-top: 4px; text-align: center">Still to come</div>
+<div class="be-steps-span" aria-hidden="true" style="display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 6px; margin-top: -10px; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #6B5F52">
+<div style="grid-column: 1 / span 6; border-top: 2px solid rgba(35,30,25,0.25); padding-top: 4px; text-align: center">Old Testament</div>
+<div style="grid-column: 7 / span 2; border-top: 2px solid rgba(35,30,25,0.25); padding-top: 4px; text-align: center">New Testament</div>
+<div style="grid-column: 9 / span 1; border-top: 2px dashed rgba(35,30,25,0.25); padding-top: 4px; text-align: center">Still to come</div>
 </div>
-<button type="button" onClick=${V.home.allPaths} style="align-self: flex-start; cursor: pointer; border: none; background: transparent; color: #F6E2A8; font-size: 14px; font-weight: 700; text-decoration: underline; padding: 2px 0; min-height: 32px">More guided paths</button>
+<button type="button" onClick=${V.home.allPaths} style="align-self: flex-start; cursor: pointer; border: none; background: transparent; color: #7A3B1E; font-size: 14px; font-weight: 700; text-decoration: underline; padding: 2px 0; min-height: 32px">More guided paths</button>
 </div>
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px">
 ${(V.home.doors || []).map((d, $index) => html`<button type="button" onClick=${d.pick} style="cursor: pointer; text-align: left; border: 1px solid #E2D8C6; background: #FFFDF8; border-radius: 14px; padding: 14px 16px; min-height: 44px; display: flex; flex-direction: column; gap: 4px; color: #231E19"><span style="font-family: Fraunces, Georgia, serif; font-size: 18px; font-weight: 700">${d.title} →</span><span style="font-size: 14px; line-height: 1.45; color: #4A3F35">${d.text}</span></button>`)}
@@ -5612,13 +5655,13 @@ ${(V.isPathsHub) ? html`
 <h1 style="margin: 4px 0 8px; font-family: Fraunces, Georgia, serif; font-size: 40px; line-height: 1.1">Guided paths</h1>
 <p style="margin: 0; font-size: 17px; color: #4A3F35">Step-by-step journeys through the Bible’s big picture, each with passages to read yourself. Your place is saved on this device, so you can stop and pick up again.</p>
 </div>
-<div style="background: #231E19; color: #FBF7EF; border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 10px">
-<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #F6E2A8">Start here</div>
-<h2 style="margin: 0; font-family: Fraunces, Georgia, serif; font-size: 30px; color: #FFFFFF">${V.paths.featured.title}</h2>
-<p style="margin: 0; font-size: 16px; line-height: 1.55; color: #EDE5D6">${V.paths.featured.promise}</p>
-<div style="font-size: 13px; color: #CFC4B2">${V.paths.featured.meta}</div>
-<div aria-hidden="true" style="height: 6px; border-radius: 3px; background: rgba(255,255,255,0.18); overflow: hidden"><div style="height: 100%; width: ${V.paths.featured.pct}%; background: #F6E2A8"></div></div>
-<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px"><button type="button" onClick=${V.paths.featured.pick} style="cursor: pointer; border: none; background: #F6E2A8; color: #231E19; border-radius: 999px; padding: 12px 22px; min-height: 48px; font-size: 16px; font-weight: 800">${V.paths.featured.btn}</button>${(V.paths.featured.started) ? html`<button type="button" onClick=${V.paths.featured.reset} style="cursor: pointer; border: none; background: transparent; color: #CFC4B2; font-size: 14px; font-weight: 700; text-decoration: underline; padding: 4px 0; min-height: 36px">Start over</button>` : null}</div>
+<div style="background: #ECE8E2; color: #231E19; border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 10px">
+<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #7A3B1E">Start here</div>
+<h2 style="margin: 0; font-family: Fraunces, Georgia, serif; font-size: 30px; color: #231E19">${V.paths.featured.title}</h2>
+<p style="margin: 0; font-size: 16px; line-height: 1.55; color: #4A3F35">${V.paths.featured.promise}</p>
+<div style="font-size: 13px; color: #6B5F52">${V.paths.featured.meta}</div>
+<div aria-hidden="true" style="height: 6px; border-radius: 3px; background: rgba(35,30,25,0.12); overflow: hidden"><div style="height: 100%; width: ${V.paths.featured.pct}%; background: #7A3B1E"></div></div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px"><button type="button" onClick=${V.paths.featured.pick} style="cursor: pointer; border: none; background: #231E19; color: #FBF7EF; border-radius: 999px; padding: 12px 22px; min-height: 48px; font-size: 16px; font-weight: 800">${V.paths.featured.btn}</button>${(V.paths.featured.started) ? html`<button type="button" onClick=${V.paths.featured.reset} style="cursor: pointer; border: none; background: transparent; color: #6B5F52; font-size: 14px; font-weight: 700; text-decoration: underline; padding: 4px 0; min-height: 36px">Start over</button>` : null}</div>
 </div>
 <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52">More paths</div>
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px">
@@ -5642,19 +5685,45 @@ ${(V.isPathStep) ? html`
 <div role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow=${V.ps.pct} aria-label="Progress" style="height: 6px; border-radius: 3px; background: #EAE1D0; overflow: hidden"><div style="height: 100%; width: ${V.ps.pct}%; background: #7A3B1E"></div></div>
 </div>
 ${(V.ps.isStep) ? html`
-<article style="background: #FFFDF8; border: 1px solid #E2D8C6; border-top: 6px solid ${V.ps.color}; border-radius: 18px; padding: 22px; display: flex; flex-direction: column; gap: 16px">
-<div>
-<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: ${V.ps.color}">${V.ps.kicker}</div>
-<h1 style="margin: 4px 0 0; font-family: Fraunces, Georgia, serif; font-size: 32px; line-height: 1.12">${V.ps.title}</h1>
+<ol class="be-rail" aria-label="Steps in this path" style="list-style: none; margin: 0; padding: 2px 0 4px; display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none">
+${(V.ps.rail || []).map((r, $index) => html`<li style="flex: 1 0 64px; min-width: 64px"><button type="button" onClick=${r.pick} aria-current=${r.aria} title=${r.label} style="cursor: pointer; width: 100%; border: none; background: transparent; padding: 2px; display: flex; flex-direction: column; align-items: center; gap: 4px">
+<span class="be-rc" style="width: 38px; height: 38px; border-radius: 50%; background: ${r.bg}; color: ${r.fg}; box-shadow: ${r.ring}; display: flex; align-items: center; justify-content: center; position: relative"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d=${r.icon}></path></svg>${(r.done) ? html`<span aria-hidden="true" style="position: absolute; right: -3px; bottom: -3px; width: 15px; height: 15px; border-radius: 50%; background: #1F5446; color: #FFFFFF; display: flex; align-items: center; justify-content: center; border: 2px solid #F5EFE3"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"></path></svg></span>` : null}</span>
+<span class="be-rl" style="font-size: 11px; font-weight: ${r.weight}; line-height: 1.2; color: ${r.text}; text-align: center">${r.label}</span>
+</button></li>`)}
+</ol>
+<article style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 18px; overflow: hidden">
+<div style="background: ${V.ps.color}; color: #FFFFFF; padding: 20px 22px; display: flex; align-items: center; gap: 16px">
+<span aria-hidden="true" style="flex: none; width: 62px; height: 62px; border-radius: 50%; background: rgba(255,255,255,0.16); display: flex; align-items: center; justify-content: center"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d=${V.ps.icon}></path></svg></span>
+<div style="min-width: 0">
+<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.85)">${V.ps.kicker}</div>
+<h1 style="margin: 2px 0 0; font-family: Fraunces, Georgia, serif; font-size: 30px; line-height: 1.1; color: #FFFFFF">${V.ps.title}</h1>
 </div>
-${(V.ps.sections || []).map((x, $index) => html`<div><div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52; margin-bottom: 4px">${x.label}</div><p style="margin: 0; font-size: 16px; line-height: 1.65; color: #231E19">${x.text}</p></div>`)}
+</div>
+<div style="padding: 20px 22px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px 26px; align-items: start">
+<div style="display: flex; flex-direction: column; gap: 12px">
+${(V.ps.facts || []).map((f, $index) => html`<div style="display: flex; gap: 12px; align-items: flex-start">
+<span aria-hidden="true" style="flex: none; width: 36px; height: 36px; border-radius: 10px; background: ${V.ps.tint}; color: ${V.ps.color}; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d=${f.icon}></path></svg></span>
+<div style="min-width: 0"><div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52">${f.label}</div>${(f.lines || []).map((ln, $index) => html`<div style="font-size: 15px; line-height: 1.45; color: #231E19">${ln}</div>`)}</div>
+</div>`)}
+${(V.ps.hasMap) ? html`<figure style="margin: 4px 0 0"><button type="button" onClick=${V.ps.openMap} title="Open this map on the Story page" style="cursor: pointer; display: block; width: 100%; padding: 0; border: 1px solid #E2D8C6; border-radius: 12px; overflow: hidden; background: #EFE6D2"><img src=${V.ps.map} alt=${V.ps.mapAlt} loading="lazy" style="display: block; width: 100%; height: auto" /></button><figcaption style="font-size: 12px; color: #6B5F52; margin-top: 4px">${V.ps.mapCap}</figcaption></figure>` : null}
+</div>
+<div style="display: flex; flex-direction: column; gap: 14px">
+<div><div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52; margin-bottom: 4px">${V.ps.whatLabel}</div><p style="margin: 0; font-size: 17px; line-height: 1.6; color: #231E19">${V.ps.what}</p></div>
+<div style="display: flex; gap: 12px; align-items: flex-start; background: ${V.ps.tint}; border-radius: 14px; padding: 14px 16px">
+<span aria-hidden="true" style="flex: none; color: ${V.ps.color}; margin-top: 2px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d=${V.ps.bulb}></path></svg></span>
+<div><div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: ${V.ps.color}; margin-bottom: 2px">Why it matters</div><p style="margin: 0; font-size: 16px; line-height: 1.55; color: #231E19">${V.ps.why}</p></div>
+</div>
 ${(V.ps.hasBooks) ? html`<div><div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52; margin-bottom: 6px">${V.ps.booksLabel}</div><div style="display: flex; flex-wrap: wrap; gap: 6px">${(V.ps.books || []).map((b, $index) => html`<button type="button" onClick=${b.pick} style="cursor: pointer; border: 1px solid #D9CDB8; background: #F5EFE3; color: #231E19; border-radius: 999px; padding: 6px 12px; min-height: 36px; font-size: 14px; font-weight: 600">${b.name}</button>`)}</div></div>` : null}
+</div>
+</div>
+<div style="padding: 0 22px 22px; display: flex; flex-direction: column; gap: 12px">
 ${(V.ps.reads || []).map((r, $index) => html`<div style="border-left: 4px solid ${V.ps.color}; background: #FBF7EF; border-radius: 0 12px 12px 0; padding: 12px 16px; display: flex; flex-direction: column; gap: 8px">
-<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52">Read it yourself · ${r.label}</div>
+<div style="display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d=${V.ps.bookIcon}></path></svg>Read it yourself · ${r.label}</div>
 <p style="margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: 18px; line-height: 1.7; color: #231E19">${(r.verses || []).map((v, $index) => html`<sup style="font-family: Inter, system-ui, sans-serif; font-size: 11px; font-weight: 700; color: #7A3B1E; margin: 0 3px 0 5px">${v.n}</sup>${v.t} `)}${r.loading}</p>
 <button type="button" onClick=${r.open} style="align-self: flex-start; cursor: pointer; border: none; background: transparent; padding: 4px 0; min-height: 36px; color: #7A3B1E; font-size: 14px; font-weight: 700">${r.openLabel} →</button>
 </div>`)}
 <div style="display: flex; flex-wrap: wrap; gap: 8px">${(V.ps.links || []).map((l, $index) => html`<button type="button" onClick=${l.pick} style="cursor: pointer; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; border-radius: 999px; padding: 8px 14px; min-height: 40px; font-size: 14px; font-weight: 600">${l.label} →</button>`)}</div>
+</div>
 </article>
 <div style="display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap">
 <button type="button" onClick=${V.ps.prev} disabled=${V.ps.noPrev} style="cursor: pointer; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; border-radius: 999px; padding: 10px 18px; min-height: 48px; font-size: 15px; font-weight: 700; opacity: ${V.ps.prevOpacity}">← Back</button>
@@ -5668,11 +5737,11 @@ ${(V.ps.isRecap) ? html`
 <p style="margin: 0; font-size: 17px; line-height: 1.6">${V.ps.recap}</p>
 <ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px">${(V.ps.list || []).map((it, $index) => html`<li><button type="button" onClick=${it.pick} style="cursor: pointer; border: none; background: transparent; padding: 2px 0; text-align: left; color: #231E19; font-size: 15px"><strong>${it.title}</strong></button></li>`)}</ol>
 </article>
-<div style="background: #231E19; color: #FBF7EF; border-radius: 18px; padding: 20px 22px; display: flex; flex-direction: column; gap: 8px">
-<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #F6E2A8">Recommended next</div>
-<h2 style="margin: 0; font-family: Fraunces, Georgia, serif; font-size: 26px; color: #FFFFFF">${V.ps.nextPath.title}</h2>
-<p style="margin: 0; font-size: 15px; line-height: 1.55; color: #EDE5D6">${V.ps.nextPath.promise}</p>
-<button type="button" onClick=${V.ps.nextPath.pick} style="align-self: flex-start; cursor: pointer; border: none; background: #F6E2A8; color: #231E19; border-radius: 999px; padding: 10px 20px; min-height: 46px; font-size: 15px; font-weight: 800">${V.ps.nextPath.btn}</button>
+<div style="background: #ECE8E2; color: #231E19; border-radius: 18px; padding: 20px 22px; display: flex; flex-direction: column; gap: 8px">
+<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #7A3B1E">Recommended next</div>
+<h2 style="margin: 0; font-family: Fraunces, Georgia, serif; font-size: 26px; color: #231E19">${V.ps.nextPath.title}</h2>
+<p style="margin: 0; font-size: 15px; line-height: 1.55; color: #4A3F35">${V.ps.nextPath.promise}</p>
+<button type="button" onClick=${V.ps.nextPath.pick} style="align-self: flex-start; cursor: pointer; border: none; background: #231E19; color: #FBF7EF; border-radius: 999px; padding: 10px 20px; min-height: 46px; font-size: 15px; font-weight: 800">${V.ps.nextPath.btn}</button>
 </div>
 <button type="button" onClick=${V.ps.hub} style="align-self: flex-start; cursor: pointer; border: none; background: transparent; padding: 4px 0; min-height: 36px; color: #7A3B1E; font-size: 14px; font-weight: 700">See all paths</button>
 ` : null}
