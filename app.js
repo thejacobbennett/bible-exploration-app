@@ -3716,7 +3716,7 @@ class Component extends DCLogic {
           { title: 'Read the Bible', text: 'The full text, with chapter notes, maps and read-aloud.', pick: function () { go({ tab: 'read' }); window.scrollTo(0, 0); } }
         ] };
     })();
-    var tabs = [['overview','Home'],['plan','Paths'],['story','Story'],['library','Books'],['themes','Themes'],['compare','Traditions'],['read','Read']].map(function (t) {
+    var tabs = [['overview','Home'],['plan','Paths'],['story','Story'],['library','Books'],['themes','Themes'],['compare','Traditions'],['read','Read'],['about','About']].map(function (t) {
       var grp = TAB_GROUPS[t[0]] || [t[0]];
       var on = grp.indexOf(tab) >= 0;
       return { id: t[0], label: t[1], pressed: on, bg: on ? INK : 'transparent', fg: on ? PAPER : '#4A3F35', pick: function () { go(t[0] === 'compare' ? { tab: 'compare', cmpMode: 'trad', cmpReg: null, hxId: null } : t[0] === 'plan' ? { tab: 'plan', pathId: null, pathStep: null, hxId: null } : { tab: t[0], hxId: null }); window.scrollTo(0, 0); } };
