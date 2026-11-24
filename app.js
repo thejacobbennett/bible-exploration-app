@@ -1936,6 +1936,330 @@ var HISTORY = [
 
   {"id": "covenant", "name": "Covenant theology", "kind": "fw", "basis": "d", "trads": "R", "fw": "cov", "fam": "story", "sum": "A way of reading the whole Bible through God’s covenants, usually a “covenant of works” with Adam and a “covenant of grace” running from the promise in Genesis 3 to Christ. It sees one people of God across both Testaments.", "note": "Scripture is full of covenants: with Noah, Abraham, Israel at Sinai, David, and the new covenant promised by Jeremiah and fulfilled in Christ (Luke 22:20, Hebrews 8). The system that organizes them into overarching covenants of works and grace was developed by Reformed theologians in the 1500s and 1600s.", "more": "Reformers such as Zwingli and Heinrich Bullinger stressed the unity of God’s covenant across the Testaments, partly to defend infant baptism as the new covenant sign parallel to circumcision. In the late 1500s and 1600s Reformed theologians, among them Johannes Cocceius and Herman Witsius, developed full systems, and the Westminster Confession (1646) set out the covenant of works and the covenant of grace.\n\nIn this view, God made a covenant of works with Adam, promising life for obedience; after Adam broke it, God established the covenant of grace, promised in Genesis 3:15 and unfolded through Abraham, Moses and David, until fulfilled in Christ, who kept the covenant of works on behalf of his people. Many also speak of a covenant of redemption between the Father and the Son in eternity.\n\nCovenant theology shapes Presbyterian and Reformed churches and some Reformed Baptists, who hold a modified form. It is usually contrasted with dispensationalism. Since the late 1900s, “progressive covenantalism” or “new covenant theology” has proposed a middle way.", "views": [["Reformed", "R", "The standard framework, set out in the Westminster Confession and taught in Presbyterian and Reformed churches."], ["Baptist", "B", "Reformed Baptists hold a version (1689 Federalism) that sees the new covenant as made only with believers, hence believer’s baptism."], ["Lutheran, Anglican & Methodist", "LAM", "Speak of law and gospel and of God’s covenants without adopting the full system."], ["Dispensationalists", "BP", "Distinguish more sharply between Israel and the church."]], "refs": [["gen", 3, 15, "Genesis 3:15"], ["gen", 17, 7, "Genesis 17:7"], ["jer", 31, 31, "Jeremiah 31:31–34"], ["luk", 22, 20, "Luke 22:20"], ["heb", 8, 6, "Hebrews 8:6–13"]], "people": [["Heinrich Bullinger", "1504–1575", "One eternal covenant"], ["Zacharias Ursinus", "1534–1583", "Early covenant of works"], ["Johannes Cocceius", "1603–1669", "Developed covenant theology"], ["Herman Witsius", "1636–1708", "The Economy of the Covenants"]], "steps": [{"w": "Genesis–Jeremiah", "y": -600, "ap": 1, "k": "b", "t": "Covenants in the Old Testament", "d": "God makes covenants with Noah, Abraham, Israel and David, and promises a new covenant written on the heart.", "r": [["jer", 31, 31, "Jeremiah 31:31"]]}, {"w": "c. 30", "y": 30, "k": "b", "t": "The new covenant in Christ’s blood", "d": "At the Last Supper Jesus speaks of the new covenant in his blood.", "r": [["luk", 22, 20, "Luke 22:20"]]}, {"w": "1534", "y": 1534, "k": "p", "tr": "R", "t": "Bullinger", "d": "Heinrich Bullinger writes on the one and eternal covenant of God."}, {"w": "1648", "y": 1648, "k": "p", "tr": "R", "t": "Cocceius", "d": "Johannes Cocceius publishes a systematic covenant theology."}, {"w": "1646", "y": 1646, "k": "c", "tr": "R", "t": "Westminster Confession", "d": "The confession sets out the covenant of works and the covenant of grace."}, {"w": "1689", "y": 1689, "k": "c", "tr": "B", "t": "Second London Baptist Confession", "d": "Particular Baptists adapt covenant theology to believer’s baptism."}], "src": [["Covenant theology (Wikipedia)", "https://en.wikipedia.org/wiki/Covenant_theology"], ["Covenant (Britannica)", "https://www.britannica.com/topic/covenant-religion"]]}
 ];
+// ===== More traditions (added): PCA / PCUSA, three Baptist bodies, Churches of Christ, Adventist, Nondenominational =====
+(function () {
+  function byId(id) { for (var i = 0; i < TRADS.length; i++) if (TRADS[i].id === id) return i; return -1; }
+  var R0 = TRADS[byId('R')], B0 = TRADS[byId('B')];
+  Object.assign(R0, { name: 'Presbyterian (PCA)', short: 'PCA', origin: 'Calvin’s Geneva and the Scottish Reformation; the PCA formed in 1973',
+    desc: 'Conservative Presbyterian and Reformed churches, such as the Presbyterian Church in America (PCA). They hold the Westminster Confession as their standard, teach God’s sovereignty in salvation (Calvinism) and covenant theology, are governed by elders, and ordain only men as pastors and elders.',
+    docs: 'Westminster Confession and Catechisms (PCA); also the Heidelberg Catechism, Belgic Confession and Canons of Dort in Reformed churches',
+    src: [['Presbyterian Church in America: Beliefs', 'https://www.pcaac.org/resources/wcf/'], ['Calvinism (Britannica)', BR + 'topic/Calvinism']] });
+  Object.assign(B0, { name: 'Southern Baptist', short: 'Southern Baptist', origin: 'Baptists in the American South, Southern Baptist Convention founded 1845',
+    desc: 'The largest Baptist body in the United States. Churches are self-governing but cooperate to fund missions and seminaries. They baptize believers by immersion, hold the Bible to be without error, ordain only men as pastors, and include both Calvinist and non-Calvinist views of salvation.',
+    docs: 'Baptist Faith and Message (2000)', src: [['Baptist Faith and Message 2000', 'https://bfm.sbc.net/bfm2000/'], ['Baptist (Britannica)', BR + 'topic/Baptist/History']] });
+  var NEW = {
+    U: { id: 'U', name: 'Presbyterian (PCUSA)', short: 'PCUSA', color: '#3F8F8A', origin: 'American Presbyterians; the PCUSA formed by a merger in 1983',
+      desc: 'The largest mainline Presbyterian church in the United States. It keeps Presbyterian government by elders and a Book of Confessions that runs from the Nicene Creed to modern statements, ordains women at every level, follows the church year and lectionary, and since 2015 permits same-sex marriage.',
+      docs: 'The Book of Confessions (including the Westminster Confession, Barmen Declaration and Confession of 1967); Book of Order', src: [['PC(USA): The Book of Confessions', 'https://www.pcusa.org/resource/book-confessions/'], ['Presbyterian churches (Britannica)', BR + 'topic/Presbyterian-churches']] },
+    F: { id: 'F', name: 'Reformed Baptist', short: 'Reformed Baptist', color: '#2F5D7A', origin: 'English Particular Baptists, 1640s; 1689 London Baptist Confession',
+      desc: 'Baptists who hold Reformed (Calvinist) theology. They baptize only believers, are led by a plurality of elders in each congregation, keep the Lord’s Day as a Christian Sabbath, and use the 1689 London Baptist Confession, a Baptist adaptation of the Westminster Confession.',
+      docs: 'Second London Baptist Confession (1689)', src: [['1689 London Baptist Confession', 'https://www.the1689confession.com/'], ['Baptist (Britannica)', BR + 'topic/Baptist/History']] },
+    I: { id: 'I', name: 'Independent Baptist', short: 'Independent Baptist', color: '#6B5A4A', origin: 'Fundamentalist Baptists who left the larger conventions, 1920s–1950s',
+      desc: 'Fully independent Baptist churches that belong to no convention. Most are fundamentalist: they stress the Bible’s inerrancy, separation from churches they see as compromising, soul-winning and dispensational teaching about a rapture before the tribulation. Many use only the King James Version.',
+      docs: 'Each church’s own articles of faith (often based on the New Hampshire Confession of 1833)', src: [['Baptist (Britannica)', BR + 'topic/Baptist/History'], ['Fundamentalism (Britannica)', BR + 'topic/fundamentalism']] },
+    H: { id: 'H', name: 'Churches of Christ', short: 'Churches of Christ', color: '#2E7FA0', origin: 'Restoration Movement of Barton Stone and Alexander Campbell, United States, early 1800s',
+      desc: 'Independent congregations that seek to restore the church of the New Testament, using only Bible names and practices. They baptize believers by immersion for the forgiveness of sins, take the Lord’s Supper every Sunday, sing without instruments, and have no creed and no denominational headquarters.',
+      docs: 'The Bible alone; no official creed or confession', src: [['Churches of Christ (Britannica)', BR + 'topic/Churches-of-Christ'], ['Restoration Movement (Britannica)', BR + 'topic/Disciples-of-Christ']] },
+    E: { id: 'E', name: 'Nondenominational / Evangelical', short: 'Nondenominational', color: '#3E8A5E', origin: 'Independent evangelical churches, growing fast since the 1970s',
+      desc: 'Independent Bible churches, community churches and many megachurches with no denominational ties. Most are evangelical: they stress the Bible’s authority, personal conversion, the cross and sharing the faith. Worship is contemporary, baptism is for believers, and each church writes its own statement of faith.',
+      docs: 'Each church’s own statement of faith; many follow the National Association of Evangelicals Statement of Faith', src: [['NAE Statement of Faith', 'https://www.nae.org/statement-of-faith/'], ['Evangelical church (Britannica)', BR + 'topic/evangelical-church-Protestantism']] },
+    V: { id: 'V', name: 'Seventh-day Adventist', short: 'Adventist', color: '#B03A6A', origin: 'Grew from the Millerite movement; organized in Battle Creek, Michigan, 1863',
+      desc: 'A worldwide Protestant church that keeps Saturday, the seventh day, as the Sabbath and stresses Christ’s soon return. It teaches that the dead rest unconscious until the resurrection, encourages a healthy and often vegetarian life, runs many hospitals and schools, and regards Ellen G. White as a prophetic voice whose writings are tested by Scripture.',
+      docs: '28 Fundamental Beliefs', src: [['Seventh-day Adventist Church: Beliefs', 'https://www.adventist.org/beliefs/'], ['Seventh-day Adventist (Britannica)', BR + 'topic/Seventh-day-Adventist']] }
+  };
+  TRADS.splice(byId('R') + 1, 0, NEW.U);
+  TRADS.splice(byId('B') + 1, 0, NEW.F, NEW.I, NEW.H);
+  TRADS.splice(byId('P') + 1, 0, NEW.E);
+  TRADS.push(NEW.V);
+  var SHORT0 = { C: 'Catholic', O: 'Orthodox', L: 'Lutheran', A: 'Anglican', M: 'Methodist', P: 'Pentecostal', N: 'Anabaptist' };
+  TRADS.forEach(function (t) { if (!t.short) t.short = SHORT0[t.id] || t.name; });
+  TRAD_NAME = {}; TRADS.forEach(function (t) { TRAD_NAME[t.id] = t; });
+  var ALLX = TRADS.map(function (t) { return t.id; });
+
+  // 1) Start each split tradition from its parent, then add the new ones where they clearly hold a row
+  function addTo(arr, id) { if (arr.indexOf(id) < 0) arr.push(id); }
+  function rmFrom(arr, id) { var i = arr.indexOf(id); if (i >= 0) arr.splice(i, 1); }
+  var CLONE = [['R', 'U'], ['B', 'F'], ['B', 'I']];
+  [TRAD_POS, PRAC_POS].forEach(function (POS) {
+    POS.forEach(function (row) {
+      var a = row[2] = row[2].slice();
+      if (a.length >= 9 && ['C', 'O', 'L', 'A', 'R', 'M', 'B', 'P', 'N'].every(function (x) { return a.indexOf(x) >= 0; })) { ALLX.forEach(function (x) { addTo(a, x); }); return; }
+      CLONE.forEach(function (c) { if (a.indexOf(c[0]) >= 0) addTo(a, c[1]); });
+    });
+  });
+  function find(POS, text) { for (var i = 0; i < POS.length; i++) if (POS[i][1] === text) return POS[i]; throw new Error('row not found: ' + text); }
+  function edit(POS, text, add, rm) { var r = find(POS, text); (add || '').split('').forEach(function (x) { addTo(r[2], x); }); (rm || '').split('').forEach(function (x) { rmFrom(r[2], x); }); }
+  function insertRow(POS, topic, text, ids) { var at = -1; POS.forEach(function (r, i) { if (r[0] === topic) at = i; }); POS.splice(at < 0 ? POS.length : at + 1, 0, [topic, text, ids.split('')]); }
+  var T = TRAD_POS;
+  edit(T, 'Scripture is the supreme authority; church tradition is subject to it', 'UFIHEV');
+  edit(T, 'Old Testament has the 39 books of the Hebrew Bible', 'UFIHEV');
+  edit(T, 'Often non-creedal (“no creed but the Bible”), while affirming the creeds’ content', 'HEV', 'F');
+  edit(T, 'Detailed Reformation-era confessions serve as doctrinal standards', 'F');
+  edit(T, 'Justification by grace through faith alone (sola fide)', 'EV');
+  edit(T, 'Unconditional election: God chooses whom he will save (Calvinist)', 'F', 'U');
+  edit(T, 'God’s grace goes before and enables a free response that can be resisted (Arminian)', 'HV');
+  edit(T, 'Views range from Calvinist to Arminian within the tradition', 'UEI', 'F');
+  edit(T, 'Baptism and the Lord’s Supper as “ordinances”: acts of obedience and witness', 'HEV');
+  edit(T, 'Christ is truly but spiritually present, received by faith', 'F');
+  edit(T, 'Mainly a memorial of Christ’s death and a declaration of faith', 'HEV', 'F');
+  edit(T, 'The Eucharist is celebrated every Sunday as the center of worship', 'H');
+  edit(T, 'Only believers who profess faith are baptized', 'HEV');
+  edit(T, 'Baptism by immersion is the norm', 'HEVFI');
+  edit(T, 'Each congregation governs itself (congregational)', 'HE');
+  edit(T, 'Priesthood of all believers', 'UFIHEV');
+  edit(T, 'Clergy may marry', 'UFIHEV');
+  edit(T, 'Women are ordained in some churches of this tradition but not others', 'EV', 'RUBFI');
+  edit(T, 'Saints honored as examples; prayer is addressed to God alone', 'UFIHEV');
+  edit(T, 'No purgatory', 'UFIHEV');
+  edit(T, 'Freer, non-liturgical worship', 'HEV');
+  edit(T, 'Separation of church and state; strong defense of religious liberty', 'VI');
+  insertRow(T, 'Authority', 'Restore the New Testament church, using only Bible names and practices (“speak where the Bible speaks”)', 'H');
+  insertRow(T, 'Authority', 'The writings of Ellen G. White are a prophetic gift, tested by and subject to Scripture', 'V');
+  insertRow(T, 'Bible', 'The Bible is inerrant: without error in all that it teaches', 'RBFIEH');
+  insertRow(T, 'Bible', 'Many churches use only the King James Version', 'I');
+  insertRow(T, 'Salvation', 'Faith, repentance, confessing Christ and baptism are all part of being saved (Acts 2:38)', 'H');
+  insertRow(T, 'Grace & free will', 'Believers can never lose their salvation (perseverance of the saints; “once saved, always saved”)', 'RFBI');
+  insertRow(T, 'Grace & free will', 'A believer can fall away and lose salvation', 'MPHV');
+  insertRow(T, 'Lord’s Supper', 'Held about once a quarter, with foot washing beforehand (the “ordinance of humility”)', 'V');
+  insertRow(T, 'Baptism', 'Believers are immersed for the forgiveness of sins; baptism is when one is saved', 'H');
+  insertRow(T, 'Church & leadership', 'Only men serve as pastors and elders', 'RBFIH');
+  insertRow(T, 'Church & leadership', 'Women are ordained as ministers and elders at every level', 'U');
+  insertRow(T, 'Church & leadership', 'Churches cooperate voluntarily to fund missions and seminaries', 'B');
+  insertRow(T, 'Church & leadership', 'Fully independent churches with no denominational ties', 'IE');
+  insertRow(T, 'Church & leadership', 'Governed by elected conferences up to a worldwide General Conference', 'V');
+  insertRow(T, 'Afterlife', 'The dead rest unconscious until the resurrection; the lost are finally destroyed rather than punished forever', 'V');
+  insertRow(T, 'Afterlife', 'A rapture of believers before a seven-year tribulation', 'I');
+  insertRow(T, 'Worship & life', 'Singing without instruments (a cappella)', 'HO');
+  insertRow(T, 'Worship & life', 'The seventh-day Sabbath, Friday sunset to Saturday sunset, kept holy', 'V');
+  insertRow(T, 'Worship & life', 'Health as part of faith: no alcohol or tobacco, often vegetarian', 'V');
+  insertRow(T, 'Worship & life', 'Personal conversion (being “born again”) and evangelism at the center', 'BIPE');
+  insertRow(T, 'Worship & life', 'Contemporary worship led by a band', 'EP');
+  insertRow(T, 'Worship & life', 'The Lord’s Day kept as a Christian Sabbath of worship and rest', 'RF');
+
+  var Q = PRAC_POS;
+  edit(Q, 'Gather on Sunday for Scripture, prayer and singing', '', 'V');
+  edit(Q, 'Sunday as the day of worship, honoring the resurrection', '', 'V');
+  edit(Q, 'Pray mostly in your own words rather than from a book', 'HEV');
+  edit(Q, 'Set Sunday readings from a lectionary that follows the church year', 'U');
+  edit(Q, 'Sermons often preach straight through a book of the Bible', '', 'U');
+  edit(Q, 'The Lord’s Supper is the center of the main Sunday service', 'H');
+  edit(Q, 'The Lord’s Supper is shared monthly or less often', 'EV');
+  edit(Q, 'Footwashing alongside the Lord’s Supper', 'V');
+  edit(Q, 'Formal church discipline, following Matthew 18', 'H', 'U');
+  edit(Q, 'Keep Lent as a season of fasting and repentance', 'U');
+  edit(Q, 'Fasting is voluntary, often for a special need or decision', 'HEV');
+  edit(Q, 'Rest from ordinary work and business on Sunday', 'F', 'U');
+  edit(Q, 'The tithe (10%) taught as the standard', 'VEI', 'F');
+  edit(Q, 'Small groups or Bible studies during the week', 'HE');
+  edit(Q, 'Daily family worship: a Bible reading, prayer and a psalm', 'F', 'U');
+  edit(Q, 'Every honest job is a calling from God (vocation)', 'F');
+  edit(Q, 'Personal evangelism and invitations to faith', 'HEV');
+  insertRow(Q, 'Sunday worship and the Lord’s Supper', 'Singing without instruments', 'HO');
+  insertRow(Q, 'Sunday worship and the Lord’s Supper', 'Worship on Saturday, the seventh-day Sabbath', 'V');
+  insertRow(Q, 'The Lord’s Day and rest', 'Keep the Sabbath from Friday sunset to Saturday sunset, free of work and shopping', 'V');
+  insertRow(Q, 'Faith at home', 'A healthy diet, often vegetarian, with no alcohol or tobacco', 'V');
+  insertRow(Q, 'Sharing the faith', 'Door-to-door visiting and “soul-winning”', 'I');
+
+  // 2) Frameworks: T = typical, S = some
+  Object.keys(FW_TRADS).forEach(function (k) { var f = FW_TRADS[k]; CLONE.forEach(function (c) { ['T', 'S'].forEach(function (x) { if (f[x].indexOf(c[0]) >= 0 && f[x].indexOf(c[1]) < 0) f[x] += c[1]; }); }); });
+  function fw(k, t, s, rm) { var f = FW_TRADS[k]; (rm || '').split('').forEach(function (x) { f.T = f.T.replace(x, ''); f.S = f.S.replace(x, ''); }); (t || '').split('').forEach(function (x) { f.S = f.S.replace(x, ''); if (f.T.indexOf(x) < 0) f.T += x; }); (s || '').split('').forEach(function (x) { if (f.T.indexOf(x) < 0 && f.S.indexOf(x) < 0) f.S += x; }); }
+  fw('sola', 'HEV'); fw('cov', 'F', '', 'B'); fw('cov', '', 'BU'); fw('disp', 'I', 'E', 'F'); fw('prog', '', 'E', 'I');
+  fw('calv', 'F', 'EU', 'BIU'); fw('calv', '', 'B'); fw('arm', 'HV', 'EI', 'F'); fw('mol', '', '', 'FI');
+  fw('amil', '', 'H', 'I'); fw('premil', '', 'EVF', 'I'); fw('dpremil', 'I', 'E', 'F'); fw('postmil', '', '', 'U');
+  fw('spirit', 'F'); fw('memo', 'HEV', '', 'F');
+  fw('psub', 'FIE', 'HV', 'U'); fw('psub', '', 'U'); fw('moral', '', 'U'); fw('cv', '', 'U');
+  fw('regen', '', 'H'); fw('cred', 'HEV'); fw('congr', 'HEFI');
+  fw('cess', 'FI', 'H'); fw('cont', '', 'E', 'FI'); fw('open', '', 'EU');
+  fw('yec', 'VI', 'HERF'); fw('oec', '', 'E', 'IU'); fw('evc', 'U', '', 'RFI');
+  fw('comp', 'RFIBH', 'EV', 'U'); fw('egal', 'U', 'EV', 'RBFI');
+  fw('hist', 'V'); fw('fut', 'I', 'E'); fw('pret', '', '', 'U'); fw('ideal', '', '', 'IF');
+  fw('ecp', 'EFI', 'H', 'U'); fw('ecp', '', 'U'); fw('ann', 'V', 'H');
+  fw('sep', '', '', 'FI'); fw('theon', '', '', 'U');
+  fw('progs', 'F', 'HEV'); fw('class', 'HEF', 'V'); fw('openth', '', '', 'FI');
+  fw('oldp', 'F', 'E'); fw('newp', '', 'U'); fw('libt', '', 'U');
+  fw('sxtrad', 'RHVEFI', '', 'U'); fw('affirm', 'U', '', 'R');
+
+  // 3) Ways of living each practice
+  PRACTICES.forEach(function (p) { if (p.ways.R) p.ways.U = p.ways.R; if (p.ways.B) { p.ways.F = p.ways.B; p.ways.I = p.ways.B; } });
+  var W = {
+    pray: {
+      U: ['Prayer in one’s own words and set prayers from the Book of Common Worship, which includes daily morning and evening prayer. Prayers for the church and the world are part of every service.', 'Use the Book of Common Worship’s evening prayer one night this week.'],
+      F: ['Private prayer in one’s own words and daily family worship: a Bible reading, prayer and often a psalm or hymn, as the 1689 Confession commends.', 'After dinner, read a short passage with your household and pray for each person by name.'],
+      I: ['Spontaneous prayer, a daily “quiet time” with the King James Bible, and a Wednesday-night prayer meeting.', 'Keep a prayer list and bring it to a midweek prayer meeting.'],
+      H: ['Prayer is spoken in your own words, alone and in the assembly, where men lead the public prayers. Set prayer books are generally not used.', 'Pray through the Lord’s Prayer phrase by phrase, putting each line in your own words.'],
+      E: ['A daily “quiet time” of Bible reading and prayer, often guided by a devotional or an app, and spontaneous prayer in small groups.', 'Keep a short prayer list and pray through it each morning for a week.'],
+      V: ['Morning and evening worship at home, prayer in your own words and a midweek prayer meeting. Many families gather at sunset on Friday to begin the Sabbath with prayer.', 'On Friday at sunset, read a psalm and pray with your household to begin a day of rest.'] },
+    beads: {
+      H: ['Not used. Set, repeated prayers and beads are seen as outside New Testament practice (Matthew 6:7).', 'Choose one short prayer from Scripture, such as Psalm 19:14, and pray it at the start of each day.'],
+      E: ['Not generally used, though some use simple prayer beads or short “breath prayers” to focus.', 'Try a breath prayer: breathe in “Lord Jesus Christ,” breathe out “have mercy on me.”'],
+      V: ['Not used. Prayer is spoken freely to God, and the saints are not asked to pray, since the dead are understood to rest until the resurrection.', 'Memorize Psalm 139:23–24 and pray it each evening.'] },
+    word: {
+      U: ['Sunday readings follow the Revised Common Lectionary: an Old Testament reading, a psalm, an epistle and a Gospel. Bible study groups and adult education are common.', 'Read next Sunday’s lectionary passages ahead of time.'],
+      F: ['Expository preaching straight through books of the Bible, personal study, and learning a catechism such as Keach’s Catechism.', 'Learn the first question of Keach’s Catechism and the verses behind it.', ['1689 London Baptist Confession', 'https://www.the1689confession.com/']],
+      I: ['Preaching and Bible memory from the King James Version, Sunday school for every age, and Bible clubs for children.', 'Memorize one verse a week for a month.'],
+      H: ['Sermons and Bible classes for every age, Sunday and midweek, with a strong emphasis on knowing chapter and verse.', 'Read a chapter of Acts each day and note how people became Christians.'],
+      E: ['Personal Bible reading is a daily habit for many, alongside sermon series and small-group studies.', 'Read one Gospel straight through over two weeks, a few chapters a day.'],
+      V: ['Members study a shared Sabbath School lesson each week, discussed in classes before the Sabbath sermon. Daily Bible reading is encouraged.', 'Pick one theme, such as rest, and trace it through Scripture this week.', ['Seventh-day Adventist Church: Beliefs', 'https://www.adventist.org/beliefs/']] },
+    worship: {
+      U: ['Worship follows the Book of Common Worship and the church year. The Lord’s Supper is held at least monthly in many churches, and the table is open to all baptized Christians.', 'Follow the colors and readings of the church year for one season.'],
+      F: ['Lord’s Day worship centers on expository preaching, prayer and congregational singing. The Lord’s Supper, often weekly or monthly, is a spiritual feeding on Christ by faith.', 'Before the Lord’s Supper, examine yourself with 1 Corinthians 11:28.', ['1689 London Baptist Confession', 'https://www.the1689confession.com/']],
+      I: ['Hymn-singing, preaching from the King James Bible and an invitation at the end of the service to receive Christ. The Lord’s Supper is a memorial, usually quarterly.', 'Invite someone to a service and sit with them.'],
+      H: ['Sunday assembly with unaccompanied singing, prayers, a sermon, a collection and the Lord’s Supper every Sunday.', 'Read 1 Corinthians 11:23–26 before the Lord’s Supper this Sunday.'],
+      E: ['Sunday services with a worship band, a sermon and often a time of response. Communion is usually monthly.', 'Look up the Scriptures behind the words of one worship song.'],
+      V: ['Worship is on Saturday: Sabbath School, then a service with hymns and a sermon. Communion comes about once a quarter, with foot washing beforehand.', 'Read John 13:1–17 and do one humble act of service for someone at home.'] },
+    confess: {
+      H: ['Confess sins to God, and before the church when a sin is known to others. Members may come forward at the end of a service to ask for prayer.', 'Read James 5:16 and ask a trusted friend to pray with you about one struggle.'],
+      E: ['Confession to God in personal prayer; accountability partners and small groups offer mutual confession and support.', 'Ask one person you trust to be an accountability partner for a month.'],
+      V: ['Confess directly to God through Christ, who is taught to minister as our High Priest in the heavenly sanctuary.', 'Read Hebrews 4:14–16 and confess one specific sin to God by name.'] },
+    fast: {
+      H: ['Fasting is personal and voluntary, often joined to prayer for a decision or need. There is no calendar of fasts.', 'Skip one meal and use the time to pray for someone in need.'],
+      E: ['Voluntary and personal; many churches call a shared fast at the start of the year or before a major decision.', 'Plan a one-day fast with a friend, agreeing on what you will pray for.'],
+      V: ['Fasting is voluntary. The stronger daily emphasis is temperance: a healthy, often vegetarian diet with no alcohol or tobacco.', 'Choose one day to eat simply and spend the saved time in prayer.'] },
+    rest: {
+      U: ['Sunday is the day of worship and rest, though Sabbath rules are not enforced; the church encourages rhythms of rest as a gift and a matter of justice for workers.', 'Choose one Sunday habit that gives rest to you and to someone else.'],
+      F: ['The 1689 Confession calls the Lord’s Day the Christian Sabbath: a whole day set apart for worship and rest, apart from works of necessity and mercy.', 'Prepare on Saturday so Sunday is free for worship, rest and a visit to someone in need.', ['1689 London Baptist Confession, ch. 22', 'https://www.the1689confession.com/']],
+      I: ['Sunday morning and evening services and Wednesday prayer meeting; many avoid shopping and business on Sunday.', 'Go to an evening service this Sunday as well as the morning one.'],
+      H: ['Sunday, the first day of the week, is the day of assembly (Acts 20:7); Sabbath laws are not seen as binding on Christians.', 'Keep Sunday afternoon free to visit someone who is alone.'],
+      E: ['Sunday worship (often with Saturday-evening services too); rest is encouraged as a healthy rhythm rather than a rule.', 'Plan a weekly afternoon of rest and keep it for a month.'],
+      V: ['The seventh-day Sabbath, Friday sunset to Saturday sunset, is kept holy: no ordinary work or shopping, and time for worship, family, nature and service.', 'Set aside one 24-hour period this week without work, shopping or screens.', ['Seventh-day Adventist Church: Beliefs', 'https://www.adventist.org/beliefs/']] },
+    give: {
+      F: ['Giving is thankful, generous and regular; most do not teach the tithe as a binding law. Deacons care for members in need.', 'Ask your church’s deacons how you can help meet a current need.'],
+      I: ['The tithe is taught as God’s standard, with offerings beyond it, especially for missionaries the church supports directly.', 'Give to one missionary your church supports.'],
+      H: ['A collection is taken every Sunday (1 Corinthians 16:1–2); members give as they have prospered, with no set percentage required.', 'Set aside your giving at the start of the week, before other spending.'],
+      E: ['Tithing is often encouraged as a guide, with giving to missions and much giving done online.', 'Choose one ministry and give to it monthly.'],
+      V: ['Tithing is taught as a duty: 10% of income returned to God through the church, with offerings beyond it.', 'Work out what 10% of this week’s income would be and give it, or a step toward it.'] },
+    mercy: {
+      U: ['Strong social witness: hunger and disaster relief through Presbyterian Disaster Assistance, and advocacy on poverty, racism and justice.', 'Volunteer with a local hunger or housing ministry for one shift.'],
+      F: ['Deacons lead the church’s mercy ministry to members and neighbors, alongside support for missions.', 'Serve with your church’s deacons for one shift.'],
+      I: ['Local benevolence, bus ministries that bring children to church, rescue missions and support for missionaries.', 'Help with a bus or children’s ministry once this month.'],
+      H: ['Benevolence through the local church, children’s homes and disaster relief, run by congregations rather than a denomination.', 'Ask a local shelter what one practical need you could meet this week.'],
+      E: ['Food pantries, mission trips and partnerships with local charities.', 'Join a local service project with your small group.'],
+      V: ['A worldwide network of hospitals, clinics and schools, and relief through ADRA (the Adventist Development and Relief Agency).', 'Volunteer an hour at a health clinic, food bank or hospital this month.'] },
+    together: {
+      I: ['Sunday school, fellowship meals and revival meetings; members are close-knit and attend several services a week.', 'Invite someone new home for Sunday lunch.'],
+      H: ['Close-knit congregations with potlucks, Wednesday-night Bible classes, and visiting the sick and shut-ins.', 'Visit or call someone from church who cannot get out much.'],
+      E: ['Small groups meeting in homes during the week are a core part of church life.', 'Join or host a small group for a six-week study.'],
+      V: ['Fellowship meals after the Sabbath service (often a vegetarian potluck), Pathfinders for young people, and church schools.', 'Invite someone to share a weekend lunch at your home.'] },
+    home: {
+      U: ['Prayer at meals and bedtime, Advent wreaths and other church-year customs at home, and children’s Sunday school.', 'Light an Advent wreath at home and read a short passage each week of Advent.'],
+      F: ['Daily family worship and teaching children a catechism are long Reformed Baptist habits.', 'Teach a child one catechism question and its answer.'],
+      H: ['Family Bible reading and prayer, and teaching children Bible stories and memory verses.', 'Read one Bible story together each night this week.'],
+      E: ['Family devotions, Christian music and children’s ministry resources used at home.', 'Use a short family devotional at dinner for a week.'],
+      V: ['Family worship morning and evening, and preparing the home on Friday to welcome the Sabbath.', 'Finish chores by Friday evening and begin the weekend with a family Bible reading.'] },
+    work: {
+      U: ['Work is a calling to serve God and neighbor; the church also speaks to fair wages and just working conditions.', 'Name one way your work could better serve the common good.'],
+      F: ['Every lawful calling is service to God, done with integrity for his glory (Colossians 3:23).', 'Read Colossians 3:23–24 before work each day this week.'],
+      H: ['Honest work as service to the Lord (Colossians 3:23), with generosity and integrity in business.', 'Read Colossians 3:23–24 before work each day this week.'],
+      E: ['“Faith and work” ministries encourage seeing every job as a place to serve God and witness.', 'Ask God each morning to show you one person at work to encourage.'],
+      V: ['Work is honored six days a week; many members serve in healthcare and education as a calling, and many arrange jobs to keep the Sabbath free.', 'Pray at the start of each workday that your work would serve others.'] },
+    witness: {
+      U: ['Witness through service, justice and hospitality, alongside sharing faith in word; the church supports mission partners worldwide.', 'Tell a friend why your faith matters to you.'],
+      F: ['Clear gospel preaching and personal witness, confident that God draws people to himself; support for missions and church planting.', 'Prepare a two-minute explanation of the gospel in your own words.'],
+      I: ['Soul-winning is central: door-to-door visitation, gospel tracts and personal invitations to receive Christ.', 'Join a church visitation night or invite a neighbor to church.'],
+      H: ['Personal Bible studies with friends and community outreach, aiming to lead people to faith and baptism.', 'Offer to read a Gospel with a friend who is curious.'],
+      E: ['Personal evangelism, inviting friends to church, and supporting missions; a personal decision for Christ is emphasized.', 'Write out your story of coming to faith in under three minutes.'],
+      V: ['Strong worldwide mission: evangelistic meetings, health seminars and literature, sharing the message of Christ’s soon return.', 'Share one thing God has done for you with a friend this week.'] }
+  };
+  Object.keys(W).forEach(function (k) { var p = PRACTICES.filter(function (q) { return q.id === k; })[0]; if (p) Object.assign(p.ways, W[k]); });
+  // Fill any remaining gaps so every tradition has a line for every practice
+  var GAP = { H: 'Churches of Christ', E: 'nondenominational churches', V: 'Adventists' };
+  PRACTICES.forEach(function (p) { ALLX.forEach(function (x) { if (!p.ways[x]) p.ways[x] = [p.shared, 'Pick one of the Scriptures above and put it into practice this week.']; }); });
+
+  // 4) History: who holds each, and how each sees it
+  var ALL9S = 'COLARMBPN';
+  HISTORY.forEach(function (h) {
+    if (h.trads === ALL9S) h.trads = ALLX.join('');
+    else CLONE.forEach(function (c) { if (h.trads.indexOf(c[0]) >= 0 && h.trads.indexOf(c[1]) < 0) h.trads += c[1]; });
+    (h.views || []).forEach(function (v) { CLONE.forEach(function (c) { if (v[1].indexOf(c[0]) >= 0 && v[1].indexOf(c[1]) < 0) v[1] += c[1]; }); if (/^Shared by all/.test(v[0])) v[1] = ALLX.join(''), v[0] = 'Shared by all'; });
+  });
+  var HV = {
+    sola: [['Churches of Christ, Nondenominational & Adventist', 'HEV', 'Scripture alone is the rule of faith. Churches of Christ hold no creed at all; Adventists add that Ellen G. White’s writings are a prophetic gift that must be tested by the Bible.']],
+    trinity: [],
+    bapt: [['Churches of Christ', 'H', 'Believers are immersed “for the forgiveness of sins” (Acts 2:38); baptism is the moment one is saved, joined to faith, repentance and confession of Christ.'], ['Nondenominational & Adventist', 'EV', 'Baptize only believers, by immersion, as a public sign of new life in Christ.']],
+    supper: [['Churches of Christ', 'H', 'A memorial taken every Sunday, following Acts 20:7, as the center of the assembly.'], ['Adventist', 'V', 'A memorial held about once a quarter, preceded by foot washing (John 13).'], ['Nondenominational', 'E', 'Usually a memorial, often monthly.']],
+    lordsday: [['Seventh-day Adventist', 'V', 'Keep the seventh day, Saturday, as the Sabbath of the fourth commandment, from Friday sunset to Saturday sunset; they see Sunday worship as a later change not found in Scripture.'], ['Churches of Christ & Nondenominational', 'HE', 'Gather on Sunday, the first day of the week (Acts 20:7), without binding Sabbath rules.']],
+    music: [['Churches of Christ', 'H', 'Sing a cappella, without instruments, because the New Testament speaks only of singing (Ephesians 5:19).'], ['Nondenominational & Adventist', 'EV', 'Nondenominational churches mostly use contemporary worship bands; Adventists sing hymns, often with piano or organ.']],
+    endtimes: [['Seventh-day Adventist', 'V', 'Christ’s visible return is near; the thousand years are spent with Christ in heaven while the earth lies desolate, after which the lost are destroyed and the earth is made new.'], ['Churches of Christ & Nondenominational', 'HE', 'Churches of Christ are mostly amillennial; nondenominational churches are often premillennial, many expecting a rapture.']],
+    purg: [['Churches of Christ, Nondenominational & Adventist', 'HEV', 'Reject purgatory. Adventists teach that the dead rest unconscious until the resurrection.']],
+    tithe: [['Seventh-day Adventist', 'V', 'Tithing (10%) is taught as a duty, with offerings beyond it.'], ['Churches of Christ & Nondenominational', 'HE', 'Churches of Christ give weekly “as prospered” without a set percentage; many nondenominational churches teach the tithe.']],
+    tongues: [['Churches of Christ', 'H', 'Generally hold that miraculous gifts ended with the apostles (cessationism).'], ['Nondenominational & Adventist', 'EV', 'Nondenominational churches range from cessationist to charismatic; Adventists accept spiritual gifts but not tongues as a sign.']]
+  };
+  HISTORY.forEach(function (h) {
+    if (HV[h.id]) HV[h.id].forEach(function (v) { h.views.push(v); });
+    (h.views || []).forEach(function (v) {
+      if (/Other Protestants|Most other Protestants|Protestants$|& others/.test(v[0])) { ['H', 'E', 'V'].forEach(function (x) { if (!HV[h.id] && v[1].indexOf(x) < 0) v[1] += x; }); }
+    });
+  });
+})();
+
+// ===== Groups outside historic (Nicene) Christianity, shown only when the reader opts in =====
+var ALT_TRADS = [
+  { id: 'Y', alt: true, name: 'Latter-day Saints (Mormon)', short: 'Latter-day Saints', color: '#4F6FA8', origin: 'Joseph Smith, New York, 1830',
+    desc: 'The Church of Jesus Christ of Latter-day Saints teaches that the original church fell away and was restored through Joseph Smith. It adds the Book of Mormon and other scriptures to the Bible, is led by a living prophet and apostles, and teaches that the Father, Son and Holy Spirit are three separate beings, the Father having a glorified body. Temples perform ordinances such as eternal marriage and baptism for the dead.',
+    docs: 'The Bible (KJV), Book of Mormon, Doctrine and Covenants, Pearl of Great Price', src: [['The Church of Jesus Christ of Latter-day Saints: Basic Beliefs', 'https://www.churchofjesuschrist.org/comeuntochrist/believe'], ['Mormon (Britannica)', BR + 'topic/Mormon']] },
+  { id: 'J', alt: true, name: 'Jehovah’s Witnesses', short: 'Jehovah’s Witnesses', color: '#7A5FA0', origin: 'Charles Taze Russell’s Bible Students, Pennsylvania, 1870s',
+    desc: 'Jehovah’s Witnesses worship Jehovah as the one true God and teach that Jesus is God’s Son and first creation, not God Almighty, and that the Holy Spirit is God’s active force. They are led by a Governing Body, use the New World Translation, keep the Memorial of Christ’s death once a year, and expect God’s Kingdom to bring a paradise earth. Every member shares in door-to-door preaching.',
+    docs: 'The New World Translation; publications of the Watch Tower Society', src: [['JW.org: Beliefs', 'https://www.jw.org/en/jehovahs-witnesses/faq/jehovah-witness-beliefs/'], ['Jehovah’s Witness (Britannica)', BR + 'topic/Jehovahs-Witnesses']] },
+  { id: 'W', alt: true, name: 'Oneness Pentecostal', short: 'Oneness Pentecostal', color: '#B8612F', origin: 'Split from early Pentecostalism, 1913–1916; United Pentecostal Church formed 1945',
+    desc: 'Pentecostals who reject the Trinity in favor of “Oneness”: one God who reveals himself as Father, Son and Holy Spirit, with Jesus as the name of God. They baptize “in the name of Jesus” only and teach that repentance, that baptism and receiving the Spirit with speaking in tongues are all part of salvation. Many keep strict holiness standards of dress.',
+    docs: 'Articles of Faith of the United Pentecostal Church International', src: [['UPCI: Our Beliefs', 'https://www.upci.org/about/our-beliefs'], ['Pentecostalism (Britannica)', BR + 'topic/Pentecostalism']] },
+  { id: 'S', alt: true, name: 'Christian Science', short: 'Christian Science', color: '#4F8A78', origin: 'Mary Baker Eddy, Boston, 1879',
+    desc: 'The Church of Christ, Scientist teaches that God is infinite Mind and that matter, sin, sickness and death are not ultimately real. Healing comes through prayer that corrects false thinking, rather than through medicine. There are no clergy: services are read from the Bible and from Mary Baker Eddy’s Science and Health with Key to the Scriptures.',
+    docs: 'The Bible and Science and Health with Key to the Scriptures', src: [['Christian Science (Britannica)', BR + 'topic/Christian-Science']] }
+];
+(function () {
+  ALT_TRADS.forEach(function (t) { TRAD_NAME[t.id] = t; });
+  function find(text) { for (var i = 0; i < TRAD_POS.length; i++) if (TRAD_POS[i][1] === text) return TRAD_POS[i]; throw new Error('row not found: ' + text); }
+  function add(text, ids) { var r = find(text); ids.split('').forEach(function (x) { if (r[2].indexOf(x) < 0) r[2].push(x); }); }
+  function row(topic, text, ids) { var at = -1; TRAD_POS.forEach(function (r, i) { if (r[0] === topic) at = i; }); TRAD_POS.splice(at < 0 ? TRAD_POS.length : at + 1, 0, [topic, text, ids.split('')]); }
+  add('Jesus is fully God and fully human; he died, rose bodily and will return', 'W');
+  add('Salvation is a gift of God’s grace, not earned', 'W');
+  add('Baptism and the Lord’s Supper are commanded by Christ', 'YJW');
+  add('Scripture is the supreme authority; church tradition is subject to it', 'JW');
+  add('Old Testament has the 39 books of the Hebrew Bible', 'YJWS');
+  add('Often non-creedal (“no creed but the Bible”), while affirming the creeds’ content', 'W');
+  add('God’s grace goes before and enables a free response that can be resisted (Arminian)', 'W');
+  add('A believer can fall away and lose salvation', 'YJW');
+  add('Mainly a memorial of Christ’s death and a declaration of faith', 'JW');
+  add('Only believers who profess faith are baptized', 'YJW');
+  add('Baptism by immersion is the norm', 'YJW');
+  add('Only men are ordained as priests', 'Y');
+  add('Clergy may marry', 'YW');
+  add('Saints honored as examples; prayer is addressed to God alone', 'YJW');
+  add('Freer, non-liturgical worship', 'YJW');
+  add('Baptism in the Holy Spirit, speaking in tongues and healing expected today', 'W');
+  add('The dead rest unconscious until the resurrection; the lost are finally destroyed rather than punished forever', 'J');
+  add('Health as part of faith: no alcohol or tobacco, often vegetarian', '');
+  add('The Bible is inerrant: without error in all that it teaches', 'W');
+  row('Core beliefs', 'Rejects the doctrine of the Trinity as defined in the Nicene Creed', 'YJWS');
+  row('Core beliefs', 'Father, Son and Holy Spirit are three separate beings; the Father has a glorified body', 'Y');
+  row('Core beliefs', 'Jesus is God’s Son and first creation (Michael the archangel), not God Almighty; the Spirit is God’s active force', 'J');
+  row('Core beliefs', 'One God revealed as Father, Son and Spirit, not three persons; Jesus is the name of God (Oneness)', 'W');
+  row('Core beliefs', 'God is infinite Mind; matter, sin, sickness and death are not ultimately real', 'S');
+  row('Authority', 'The original church fell away and was restored through a modern prophet', 'Y');
+  row('Authority', 'Further scripture beside the Bible: the Book of Mormon, Doctrine and Covenants and Pearl of Great Price', 'Y');
+  row('Authority', 'Led by a living prophet and twelve apostles who receive continuing revelation', 'Y');
+  row('Authority', 'Teaching set by a Governing Body, published through the Watch Tower Society', 'J');
+  row('Authority', 'Science and Health with Key to the Scriptures read beside the Bible as the church’s “pastor”', 'S');
+  row('Bible', 'Uses its own New World Translation', 'J');
+  row('Salvation', 'Exaltation through faith, repentance, ordinances and keeping covenants; nearly everyone receives some degree of glory', 'Y');
+  row('Salvation', 'Salvation requires repentance, baptism in Jesus’ name and receiving the Spirit with tongues (Acts 2:38)', 'W');
+  row('Lord’s Supper', 'The Memorial is kept once a year at Passover; most members watch but do not partake', 'J');
+  row('Lord’s Supper', 'The sacrament of bread and water is taken every Sunday to renew baptismal covenants', 'Y');
+  row('Baptism', 'Baptism in the name of Jesus only, not “Father, Son and Holy Spirit”', 'W');
+  row('Baptism', 'Baptism and other ordinances performed in temples on behalf of the dead', 'Y');
+  row('Afterlife', 'Only 144,000 reign with Christ in heaven; the faithful majority live forever on a paradise earth', 'J');
+  row('Afterlife', 'Three kingdoms of glory after the judgment; families can be sealed together forever', 'Y');
+  row('Church & leadership', 'No paid clergy: local congregations are led by volunteers or readers', 'YJS');
+  row('Worship & life', 'Temple ordinances, including eternal marriage', 'Y');
+  row('Worship & life', 'Health code: no alcohol, tobacco, coffee or tea (the Word of Wisdom)', 'Y');
+  row('Worship & life', 'No celebration of Christmas, Easter or birthdays; political neutrality and no military service', 'J');
+  row('Worship & life', 'Refuse blood transfusions', 'J');
+  row('Worship & life', 'Door-to-door preaching by all members', 'JY');
+  row('Worship & life', 'Healing through prayer rather than medical treatment', 'S');
+  row('Worship & life', 'Strict holiness standards of dress and appearance', 'W');
+})();
+
 var HX_BY_POS = {}, HX_BY_FW = {};
 HISTORY.forEach(function (h) { (h.pos || []).forEach(function (p) { HX_BY_POS[p] = h; }); if (h.fw) HX_BY_FW[h.fw] = h; });
 HISTORY.forEach(function (h) { if (!h.fam || h.fam === 'auth' || h.fam === 'story') return; FW_FAMILIES.forEach(function (f) { if (f.id === h.fam) f.fws.forEach(function (w) { if (!HX_BY_FW[w.id]) HX_BY_FW[w.id] = h; }); }); });
@@ -4369,7 +4693,7 @@ class Component extends DCLogic {
         hasViews: !!(hxSel.views && hxSel.views.length),
         basisLabel: hxBasis[0], basisBg: hxBasis[1], basisFg: hxBasis[2],
         refs: hxSel.refs.map(hxRef),
-        heldLabel: hxTrads.length === TRADS.length ? 'Shared by all nine traditions:' : hxSel.kind === 'fw' ? 'Mainly held by:' : 'Mainly found in:',
+        heldLabel: hxTrads.length === TRADS.length ? 'Shared by all the traditions here:' : hxSel.kind === 'fw' ? 'Mainly held by:' : 'Mainly found in:',
         trads: hxTrads.map(function (t) { return { label: t.name, color: t.color }; }),
         hasLink: !!(hxSel.fw || hxSel.pr || hxSel.kind === 'b'),
         linkLabel: hxSel.fw ? 'Compare this with other views →' : hxSel.pr ? 'See this practice across traditions →' : 'Compare beliefs across traditions →',
@@ -4458,7 +4782,8 @@ class Component extends DCLogic {
     // Compare traditions and frameworks
     var cmpMode = st.cmpMode === 'fw' ? 'fw' : st.cmpMode === 'pr' ? 'pr' : 'trad';
     var cmpFam = FW_FAMILIES.filter(function (f) { return f.id === st.cmpFam; })[0] || FW_FAMILIES[0];
-    var cItems = cmpMode !== 'fw' ? TRADS : cmpFam.fws;
+    var cAltOn = cmpMode === 'trad' && !!st.cmpAlt;
+    var cItems = cmpMode !== 'fw' ? (cAltOn ? TRADS.concat(ALT_TRADS) : TRADS) : cmpFam.fws;
     var cDefault = cmpMode !== 'fw' ? ['C', 'O', 'L'] : cmpFam.fws.slice(0, 3).map(function (f) { return f.id; });
     var cStored = cmpMode !== 'fw' ? st.cmpSel : (st.cmpFw || {})[cmpFam.id];
     var cIds = (cStored || cDefault).filter(function (id) { return cItems.some(function (x) { return x.id === id; }); });
@@ -4518,7 +4843,7 @@ class Component extends DCLogic {
       chips: cItems.map(function (x) {
         var i = cIds.indexOf(x.id), on = i >= 0;
         var lettered = on && !cTable && i < 3;
-        return { label: x.name, pressed: on, bg: on ? x.color : '#FFFDF8', fg: on ? '#FFFFFF' : INK, border: x.color, letter: lettered ? 'ABC'[i] : '', lettered: lettered,
+        var dash = ALT_TRADS.some(function (a) { return a.id === x.id; }) ? 'dashed' : 'solid'; return { dash: dash, label: x.name, pressed: on, bg: on ? x.color : '#FFFDF8', fg: on ? '#FFFFFF' : INK, border: x.color, letter: lettered ? 'ABC'[i] : '', lettered: lettered,
           pick: function () {
             var ids = cIds.slice();
             if (on) ids.splice(i, 1); else { ids.push(x.id); if (!cTable && ids.length > 3) ids.shift(); }
@@ -4526,6 +4851,7 @@ class Component extends DCLogic {
           } };
       }),
       pickLabel: cTable ? 'Pick as many as you want' : 'Pick two or three',
+      altShow: cmpMode === 'trad', altOn: cAltOn, altToggle: function () { go({ cmpAlt: !cAltOn, cmpReg: null }); },
       hint: cTable ? '' : cAll.length > 3 ? 'The Venn diagram shows the first three you picked. Switch to Side by side to see all ' + cAll.length + '.' : nSel < 2 ? 'Pick at least two to compare (up to three in the Venn diagram; any number side by side).' : 'Tap a number in the diagram to see just that overlap, or scroll through all of them below.',
       exportTable: function () {
         var rows = [[cmpMode === 'trad' ? 'Topic' : cmpMode === 'pr' ? 'Practice' : 'Claim'].concat(cSel.map(function (x) { return x.name; }))];
@@ -5519,10 +5845,11 @@ ${(V.cmp.showPicker) ? html`
 <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52; margin-bottom: 8px">${V.cmp.pickLabel}</div>
 <div style="display: flex; flex-wrap: wrap; gap: 8px">
 ${(V.cmp.chips || []).map((c, $index) => html`
-<button type="button" onClick=${c.pick} aria-pressed=${c.pressed} style="cursor: pointer; border: 2px solid ${c.border}; border-radius: 999px; padding: 6px 14px; min-height: 40px; font-size: 14px; font-weight: 700; background: ${c.bg}; color: ${c.fg}; display: inline-flex; align-items: center; gap: 6px">${(c.lettered) ? html`<span style="font-size: 11px; background: rgba(255,255,255,0.3); border-radius: 50%; width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center">${c.letter}</span>` : null}${c.label}</button>
+<button type="button" onClick=${c.pick} aria-pressed=${c.pressed} style="cursor: pointer; border: 2px ${c.dash} ${c.border}; border-radius: 999px; padding: 6px 14px; min-height: 40px; font-size: 14px; font-weight: 700; background: ${c.bg}; color: ${c.fg}; display: inline-flex; align-items: center; gap: 6px">${(c.lettered) ? html`<span style="font-size: 11px; background: rgba(255,255,255,0.3); border-radius: 50%; width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center">${c.letter}</span>` : null}${c.label}</button>
 `)}
 </div>
 <div style="font-size: 13px; color: #6B5F52; margin-top: 8px">${V.cmp.hint}</div>
+${(V.cmp.altShow) ? html`<label style="display: flex; align-items: flex-start; gap: 10px; margin-top: 12px; padding: 10px 12px; border: 1px dashed #CFC3AE; border-radius: 12px; background: #FFFDF8; cursor: pointer; max-width: 720px"><input type="checkbox" checked=${V.cmp.altOn} onInput=${V.cmp.altToggle} style="width: 18px; height: 18px; margin-top: 2px; accent-color: #7A3B1E; flex: none" /><span style="font-size: 13px; line-height: 1.5; color: #31291F"><b>Also show groups outside historic Christianity</b> (Latter-day Saints, Jehovah’s Witnesses, Oneness Pentecostals, Christian Science). They grew out of Christianity but reject or redefine the Trinity as confessed in the Nicene Creed. Included for understanding and comparison; their chips have dashed borders.</span></label>` : null}
 </div>
 ` : null}
 ${(V.cmp.showVennView) ? html`
@@ -5602,7 +5929,7 @@ ${(c.hasProCon) ? html`<p style="margin: 0; font-size: 14px; color: #31291F"><st
 ${(c.hasFound) ? html`
 <div><div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52; margin-bottom: 6px">Where you'll find it (loosely)</div><div style="display: flex; flex-wrap: wrap; gap: 5px">${(c.found || []).map((t, $index) => html`<span title=${t.tip} style="font-size: 12px; font-weight: 700; border-radius: 999px; padding: 3px 9px; border: 1.5px ${t.style} ${t.color}; background: ${t.bg}; color: ${t.fg}">${t.label}</span>`)}</div><div style="font-size: 11px; color: #6B5F52; margin-top: 4px">Solid: official or majority view. Dashed: found in some churches or among many members.</div></div>
 ` : null}
-${(c.noFound) ? html`<div style="font-size: 12px; color: #6B5F52">Not the official view of any of the nine traditions here; held by individual scholars and churches.</div>` : null}
+${(c.noFound) ? html`<div style="font-size: 12px; color: #6B5F52">Not the official view of any of the traditions here; held by individual scholars and churches.</div>` : null}
 ${(c.hasTypical) ? html`
 <div><div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52; margin-bottom: 6px">Typical frameworks (loosely)</div><ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 3px">${(c.typical || []).map((r, $index) => html`<li style="font-size: 13px; line-height: 1.4"><button type="button" onClick=${r.pick} title="Compare these frameworks" style="cursor: pointer; border: none; background: transparent; padding: 0; color: #2E4A8A; font-weight: 700; font-size: 13px; text-decoration: underline">${r.topic}</button>: ${r.main} <span style="color: #6B5F52">${r.some}</span></li>`)}</ul></div>
 ` : null}
