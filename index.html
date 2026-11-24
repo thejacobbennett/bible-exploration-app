@@ -28,11 +28,40 @@ button:focus-visible,input:focus-visible{outline:3px solid #2E4A8A;outline-offse
 .be-seek::-moz-range-track{height:4px;border-radius:2px;background:linear-gradient(to right,#F6E2A8 var(--fill,0%),#5A4E42 var(--fill,0%))}
 .be-seek::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#FBF7EF;margin-top:-5px;border:none}
 .be-seek::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:#FBF7EF;border:none}
-</style>
+</style><script>
+// Visit counting (GoatCounter: no cookies, no personal data). Each section counts as its own page.
+(function(){
+  var NAMES={overview:'home',plan:'paths',library:'books',compare:'traditions',practice:'traditions/practice'};
+  var last=null, t=null;
+  function pathFor(){
+    var q=new URLSearchParams(location.search), tab=q.get('tab')||'overview', p='/'+(NAMES[tab]||tab);
+    if(tab==='plan'){ if(q.get('pathId')){ p+='/'+q.get('pathId'); if(q.get('pathId')!=='year') p+='/step-'+(q.get('pathStep')||1); } }
+    else if(tab==='compare'){ p+='/'+(q.get('cmpMode')||'trad')+(q.get('cmpView')?'/'+q.get('cmpView'):''); }
+    else if(tab==='practice'){ if(q.get('prId')) p+='/'+q.get('prId'); }
+    else if(tab==='story'){ if(q.get('era')) p+='/era-'+q.get('era'); }
+    else if(tab==='themes'){ if(q.get('theme')) p+='/'+q.get('theme'); }
+    else if(tab==='read'){ if(q.get('book')) p+='/'+q.get('book'); }
+    else if(tab==='library'||tab==='overview'){ if(q.get('book')) p='/books/'+q.get('book'); }
+    return p;
+  }
+  function send(){
+    var p=pathFor(); if(p===last) return;
+    if(!window.goatcounter||!window.goatcounter.count){ setTimeout(send,500); return; }
+    last=p; window.goatcounter.count({path:p, title:document.title});
+  }
+  function later(){ clearTimeout(t); t=setTimeout(send,800); }
+  ['pushState','replaceState'].forEach(function(m){ var o=history[m]; history[m]=function(){ var r=o.apply(this,arguments); later(); return r; }; });
+  addEventListener('popstate',later);
+  window.goatcounter={no_onload:true};
+  later();
+})();
+</script>
+<script data-goatcounter="https://exploreyourbible.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+
 </head>
 <body>
 <div id="app"></div>
 <noscript>Explore Your Bible needs JavaScript to run.</noscript>
-<script type="module" src="app.js?v=1795469468"></script>
+<script type="module" src="app.js?v=1795536472"></script>
 </body>
 </html>
