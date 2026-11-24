@@ -4145,11 +4145,29 @@ class Component extends DCLogic {
         var on = Math.abs(t0 - p[1]) < 2 && Math.abs(t1 - p[2]) < 2;
         return { label: p[0], pressed: on, bg: on ? INK : '#FFFDF8', fg: on ? PAPER : INK, pick: function () { go({ tlSpan: p[2] - p[1], tlC: (p[1] + p[2]) / 2 }); } };
       }),
-      cats: Object.keys(TL_CATS).map(function (k) {
-        var off = !!tlOff[k];
-        return { label: TL_CATS[k][0], color: TL_CATS[k][1], pressed: !off, op: off ? 0.45 : 1, deco: off ? 'line-through' : 'none',
-          pick: function () { var o = Object.assign({}, tlOff); o[k] = !off; go({ tlOff: o }); } };
-      }),
+      cats: (function () {
+        // Click to choose which strands to show. With everything showing, a click shows only that strand;
+        // further clicks add or remove strands. Choosing all of them (or none) goes back to showing everything.
+        var keys = Object.keys(TL_CATS), filtered = keys.some(function (k) { return tlOff[k]; });
+        return keys.map(function (k) {
+          var sel = !tlOff[k], on = filtered && sel;
+          return { label: TL_CATS[k][0], color: TL_CATS[k][1], pressed: on, op: filtered && !sel ? 0.5 : 1, deco: 'none',
+            bg: on ? '#F1E7D6' : 'transparent', bd: on ? TL_CATS[k][1] : 'transparent',
+            pick: function () {
+              var o = {};
+              if (!filtered) keys.forEach(function (j) { if (j !== k) o[j] = true; });
+              else {
+                keys.forEach(function (j) { if (tlOff[j]) o[j] = true; });
+                if (sel) o[k] = true; else delete o[k];
+                var n = keys.filter(function (j) { return !o[j]; }).length;
+                if (n === 0 || n === keys.length) o = {};
+              }
+              go({ tlOff: o });
+            } };
+        });
+      })(),
+      catsFiltered: Object.keys(TL_CATS).some(function (k) { return tlOff[k]; }),
+      catsAll: function () { go({ tlOff: {} }); },
       rs: rs,
       marks: marks, bars: bars, ticks: ticks, bands: bands,
       undated: t0 < TL_UNDATED, undW: pct(Math.max(0, Math.min(100, TX(TL_UNDATED)))),
@@ -5233,10 +5251,11 @@ ${(V.tl.presets || []).map((p, $index) => html`
 <div style="font-family: Fraunces, Georgia, serif; font-size: 18px; font-weight: 700; white-space: nowrap">${V.tl.rangeLabel}</div>
 <div style="font-size: 13px; color: #6B5F52">Drag the handles under the timeline to zoom, or drag the shaded window to move.</div>
 </div>
-<div role="group" aria-label="Show or hide traditions" style="display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center">
+<div role="group" aria-label="Choose which strands to show" style="display: flex; flex-wrap: wrap; gap: 6px 6px; align-items: center">
 ${(V.tl.cats || []).map((c, $index) => html`
-<button type="button" onClick=${c.pick} aria-pressed=${c.pressed} style="cursor: pointer; border: none; background: transparent; padding: 4px 2px; min-height: 32px; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #31291F; opacity: ${c.op}; text-decoration: ${c.deco}"><span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 50%; background: ${c.color}"></span>${c.label}</button>
+<button type="button" onClick=${c.pick} aria-pressed=${c.pressed} style="cursor: pointer; border: 1.5px solid ${c.bd}; background: ${c.bg}; border-radius: 999px; padding: 4px 10px; min-height: 32px; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #31291F; opacity: ${c.op}; text-decoration: ${c.deco}"><span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 50%; background: ${c.color}"></span>${c.label}</button>
 `)}
+${(V.tl.catsFiltered) ? html`<button type="button" onClick=${V.tl.catsAll} style="cursor: pointer; border: none; background: transparent; padding: 4px 6px; min-height: 32px; font-size: 13px; font-weight: 700; color: #7A3B1E; text-decoration: underline">Show all</button>` : null}
 </div>
 </div>
 <div onPointerDown=${V.tl.down} onPointerMove=${V.tl.move} onPointerUp=${V.tl.up} onPointerCancel=${V.tl.up} style="position: relative; height: 240px; overflow: hidden; background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 16px; touch-action: pan-y; user-select: none; cursor: ${V.tl.cursor}"><div style="position: absolute; bottom: 6px; right: 8px; z-index: 8; display: flex; gap: 6px"><button type="button" onClick=${V.tl.zoomOut} disabled=${V.tl.noOut} aria-label="Zoom out on the timeline" style="cursor: pointer; width: 38px; height: 38px; border-radius: 50%; border: 1px solid #D9CDB8; background: rgba(255,253,248,0.95); box-shadow: 0 1px 3px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; padding: 0; color: #231E19"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"></path></svg></button><button type="button" onClick=${V.tl.zoomIn} disabled=${V.tl.noIn} aria-label="Zoom in on the timeline" style="cursor: pointer; width: 38px; height: 38px; border-radius: 50%; border: 1px solid #D9CDB8; background: rgba(255,253,248,0.95); box-shadow: 0 1px 3px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; padding: 0; color: #231E19"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14M12 5v14"></path></svg></button></div><button type="button" onClick=${V.tl.panL} disabled=${V.tl.noL} aria-label="Move earlier in time" style="position: absolute; left: 8px; top: 78px; z-index: 8; cursor: pointer; width: 38px; height: 38px; border-radius: 50%; border: 1px solid #D9CDB8; background: rgba(255,253,248,0.95); box-shadow: 0 1px 3px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; padding: 0; color: ${V.tl.lColor}"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg></button><button type="button" onClick=${V.tl.panR} disabled=${V.tl.noR} aria-label="Move later in time" style="position: absolute; right: 8px; top: 78px; z-index: 8; cursor: pointer; width: 38px; height: 38px; border-radius: 50%; border: 1px solid #D9CDB8; background: rgba(255,253,248,0.95); box-shadow: 0 1px 3px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; padding: 0; color: ${V.tl.rColor}"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></button>
