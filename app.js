@@ -6748,8 +6748,6 @@ ${(V.aside.closed) ? html`
 <span style="font-family: Fraunces, Georgia, serif; font-weight: 700; color: #231E19">Explore Your Bible</span>
 <button type="button" onClick=${V.foot.about} style="cursor: pointer; border: none; background: transparent; padding: 6px 0; min-height: 36px; font-size: 13px; font-weight: 600; color: #4A3F35; text-decoration: underline">About this site</button>
 <button type="button" onClick=${V.foot.search} style="cursor: pointer; border: none; background: transparent; padding: 6px 0; min-height: 36px; font-size: 13px; font-weight: 600; color: #4A3F35; text-decoration: underline">Search</button>
-<span style="flex: 1 1 auto"></span>
-<a href="/classic/" style="font-size: 12px; color: #8C8174; text-decoration: none">Classic version</a>
 </footer>
 ${(V.player.show) ? html`<div aria-hidden="true" style="height: 84px"></div>` : null}
 ${(V.player.show) ? html`
