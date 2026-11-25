@@ -4,554 +4,60 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>The Big Story · Explore Your Bible for Kids</title>
+<title>Explore Your Bible for Kids · Choose an age</title>
 <link rel="icon" href="../favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Lexend:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
-:root{
-  --cream:#FFF8EC; --paper:#FFFFFF; --ink:#2B2340; --soft:#5E5873; --line:#EDE3D2;
-  --sun:#FFC83D; --sky:#4DA8F0; --grass:#46B86A; --coral:#FF7A6B; --grape:#8C6CE0; --berry:#E8578E; --ocean:#2C7FD1; --orange:#FF9A3C; --teal:#2BB3A6; --night:#3B3F8F;
-  --r:22px; --fd:Fredoka,'Arial Rounded MT Bold',Nunito,system-ui,sans-serif;
-}
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--cream);color:var(--ink);font-family:Nunito,system-ui,sans-serif;font-size:18px;line-height:1.55;-webkit-font-smoothing:antialiased}
-h1,h2,h3,.fd{font-family:var(--fd);font-weight:600;line-height:1.15;margin:0}
-button{font:inherit;color:inherit}
-a{color:var(--ocean)}
-.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
-.rainbow{height:8px;background:linear-gradient(90deg,var(--coral),var(--orange),var(--sun),var(--grass),var(--sky),var(--grape))}
-
-/* header */
-header{position:sticky;top:0;z-index:20;background:rgba(255,248,236,.94);backdrop-filter:blur(8px);border-bottom:2px solid var(--line)}
-.hrow{display:flex;align-items:center;gap:14px;padding:10px 0;flex-wrap:wrap}
-.logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
-.logo b{font-family:var(--fd);font-size:22px;font-weight:700}
-.logo small{display:block;font-size:12px;color:var(--soft);font-weight:700;letter-spacing:.04em}
-nav{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
-nav a{font-family:var(--fd);font-weight:600;font-size:16px;text-decoration:none;color:var(--ink);padding:8px 14px;border-radius:999px;min-height:40px;display:inline-flex;align-items:center}
-nav a:hover{background:#FFEFC9}
-nav a.grown{background:var(--ink);color:#fff}
-
-/* hero */
-.hero{padding:44px 0 30px;display:grid;grid-template-columns:1.1fr .9fr;gap:30px;align-items:center}
-.hero h1{font-size:clamp(40px,7vw,68px);font-weight:700}
-.hero h1 span{color:var(--coral)}
-.hero p{font-size:20px;color:var(--soft);margin:14px 0 0;max-width:34ch}
-.cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
-.btn{display:inline-flex;align-items:center;gap:10px;border:none;cursor:pointer;border-radius:999px;padding:14px 24px;font-family:var(--fd);font-weight:600;font-size:19px;min-height:54px;text-decoration:none;box-shadow:0 4px 0 rgba(43,35,64,.18);transition:transform .12s}
-.btn:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(43,35,64,.18)}
-.btn.main{background:var(--coral);color:#fff}
-.btn.alt{background:#fff;color:var(--ink);border:2px solid var(--line)}
-.heroart{background:#fff;border-radius:32px;padding:18px;box-shadow:0 10px 30px rgba(43,35,64,.08);border:2px solid var(--line)}
-.heroart svg{width:100%;height:auto;display:block}
-
-section{padding:34px 0}
-.kicker{font-family:var(--fd);font-weight:600;font-size:15px;letter-spacing:.08em;text-transform:uppercase;color:var(--coral)}
-.sh{font-size:clamp(30px,4.6vw,42px);margin:4px 0 8px}
-.sub{color:var(--soft);font-size:19px;margin:0 0 22px;max-width:60ch}
-
-/* story path */
-.stars{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 18px;font-weight:800;color:var(--soft)}
-.stars .st{font-size:22px;letter-spacing:2px}
-.reset{border:none;background:none;color:var(--soft);text-decoration:underline;cursor:pointer;font-size:14px;font-weight:700}
-.path{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px}
-.chap{position:relative;border:none;cursor:pointer;text-align:left;border-radius:var(--r);padding:16px 16px 18px;color:#fff;min-height:220px;display:flex;flex-direction:column;gap:6px;box-shadow:0 6px 0 rgba(43,35,64,.16);transition:transform .15s}
-.chap:hover{transform:translateY(-3px) rotate(-.5deg)}
-.chap .n{font-family:var(--fd);font-weight:700;font-size:15px;opacity:.9}
-.chap svg{width:92px;height:92px;margin:2px 0 4px;filter:drop-shadow(0 3px 0 rgba(0,0,0,.12))}
-.chap h3{font-size:23px}
-.chap p{margin:0;font-size:15px;font-weight:700;opacity:.95;line-height:1.35}
-.chap .done{position:absolute;top:12px;right:12px;background:#fff;color:var(--orange);border-radius:999px;width:34px;height:34px;display:none;align-items:center;justify-content:center;font-size:20px;box-shadow:0 2px 0 rgba(0,0,0,.12)}
-.chap.is-done .done{display:flex}
-
-/* ideas */
-.ideas{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
-.idea{background:#fff;border-radius:var(--r);padding:20px;border:2px solid var(--line);border-top:10px solid var(--c);display:flex;flex-direction:column;gap:10px}
-.idea h3{font-size:24px;display:flex;align-items:center;gap:10px}
-.idea h3 i{font-style:normal;font-size:30px}
-.idea p{margin:0;color:var(--soft)}
-.verse{background:var(--cream);border-radius:16px;padding:12px 14px;font-weight:700;color:var(--ink)}
-.verse cite{display:block;font-style:normal;font-size:14px;color:var(--soft);margin-top:4px;font-weight:800}
-.when{font-size:16px}
-.when b{color:var(--ink)}
-
-/* people */
-.people{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
-.card{perspective:900px;border:none;background:none;padding:0;cursor:pointer;min-height:250px;text-align:left}
-.card .in{position:relative;width:100%;height:100%;min-height:250px;transition:transform .5s;transform-style:preserve-3d}
-.card.flip .in{transform:rotateY(180deg)}
-.face{position:absolute;inset:0;border-radius:var(--r);padding:18px;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;flex-direction:column}
-.front{background:var(--c);color:#fff;align-items:flex-start;justify-content:space-between;box-shadow:0 6px 0 rgba(43,35,64,.16)}
-.front .em{font-size:58px;line-height:1}
-.front h3{font-size:26px}
-.front small{font-weight:800;opacity:.9}
-.back{background:#fff;border:3px solid var(--c);transform:rotateY(180deg);gap:8px;font-size:16px}
-.back h3{font-size:20px;color:var(--c)}
-.back p{margin:0}
-.back .lesson{font-weight:800}
-.back .ref{margin-top:auto;font-size:14px;color:var(--soft);font-weight:800}
-
-/* library */
-.shelf{background:#fff;border:2px solid var(--line);border-radius:var(--r);padding:20px}
-.books{display:flex;align-items:flex-end;gap:3px;height:150px;border-bottom:10px solid #C99A6B;padding:0 6px;overflow-x:auto}
-.bk{flex:1 0 auto;min-width:9px;border-radius:4px 4px 0 0;cursor:pointer;border:none;padding:0}
-.bk:focus-visible{outline:3px solid var(--ink)}
-.legend{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin-top:18px}
-.lg{display:flex;gap:10px;align-items:flex-start;border:none;background:var(--cream);border-radius:16px;padding:12px;text-align:left;cursor:pointer}
-.lg.on{outline:3px solid var(--c)}
-.lg i{flex:none;width:20px;height:20px;border-radius:6px;background:var(--c);margin-top:3px}
-.lg b{display:block;font-family:var(--fd);font-weight:600;font-size:18px}
-.lg span{font-size:15px;color:var(--soft)}
-
-/* grown-ups */
-.grown-sec{background:#fff;border-top:2px solid var(--line);border-bottom:2px solid var(--line)}
-.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
-.tip{background:var(--cream);border-radius:var(--r);padding:18px}
-.tip h3{font-size:21px;margin-bottom:6px}
-.tip p{margin:0;font-size:16px;color:var(--soft)}
-.tip p b{color:var(--ink)}
-.steps4{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:10px 0 0}
-.s4{border-radius:var(--r);padding:16px;color:#fff}
-.s4 b{font-family:var(--fd);font-size:24px;display:block}
-.s4 span{font-weight:700;font-size:16px}
-details{background:var(--cream);border-radius:18px;padding:0;margin:10px 0}
-summary{cursor:pointer;list-style:none;padding:16px 18px;font-family:var(--fd);font-weight:600;font-size:19px;display:flex;justify-content:space-between;gap:12px}
-summary::-webkit-details-marker{display:none}
-summary:after{content:"+";font-size:26px;line-height:1;color:var(--coral)}
-details[open] summary:after{content:"–"}
-details .a{padding:0 18px 16px;font-size:16px;color:var(--soft)}
-details .a b{color:var(--ink)}
-.note{font-size:15px;color:var(--soft);background:#F4F0FF;border-radius:16px;padding:14px 16px;margin-top:16px}
-
-footer{padding:30px 0 50px;color:var(--soft);font-size:14px}
-
-/* storybook overlay */
-.ov{position:fixed;inset:0;z-index:50;background:var(--cream);overflow-y:auto;display:none}
-.ov.open{display:block}
-.ovtop{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--c);color:#fff}
-.ovtop .t{font-family:var(--fd);font-weight:600;font-size:18px;flex:1}
-.ib{border:none;background:rgba(255,255,255,.22);color:#fff;border-radius:999px;min-width:46px;height:46px;padding:0 14px;cursor:pointer;font-family:var(--fd);font-weight:600;font-size:17px;display:inline-flex;align-items:center;gap:8px;justify-content:center}
-.ib:hover{background:rgba(255,255,255,.34)}
-.book{max-width:820px;margin:0 auto;padding:24px 20px 60px}
-.pic{background:var(--c);border-radius:32px;padding:20px;display:flex;justify-content:center}
-.pic svg{width:min(260px,60vw);height:auto}
-.book h2{font-size:clamp(34px,6vw,50px);margin:22px 0 4px}
-.book .big{font-size:21px;font-weight:700;color:var(--c2)}
-.story{font-size:21px;line-height:1.65;margin:14px 0 0}
-.story p{margin:0 0 14px}
-.box{border-radius:var(--r);padding:18px 18px;margin:16px 0;background:#fff;border:2px solid var(--line)}
-.box h3{font-size:20px;display:flex;align-items:center;gap:8px;margin-bottom:6px;color:var(--c2)}
-.box p{margin:0}
-.box ul{margin:4px 0 0;padding-left:22px}
-.box li{margin:4px 0}
-.box.read{border-color:var(--c);background:#FFFDF7}
-.box.read q{display:block;font-size:22px;font-weight:700;quotes:none;line-height:1.5}
-.box.read cite{display:block;font-style:normal;font-weight:800;color:var(--soft);margin-top:6px;font-size:15px}
-.motion{display:flex;gap:14px;align-items:center}
-.motion .em{font-size:44px}
-.nav2{display:flex;justify-content:space-between;gap:12px;margin-top:22px;flex-wrap:wrap}
-.star-btn{background:var(--sun);color:var(--ink)}
-.cheer{display:none;text-align:center;font-family:var(--fd);font-size:24px;font-weight:600;color:var(--orange);margin-top:10px}
-.cheer.show{display:block;animation:pop .5s}
-@keyframes pop{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
-
-@media (max-width:760px){
-  body{font-size:17px}
-  .hero{grid-template-columns:1fr;padding-top:26px}
-  .heroart{order:-1;max-width:420px}
-  nav{margin-left:0;width:100%;overflow-x:auto;flex-wrap:nowrap}
-  nav a{white-space:nowrap;font-size:15px;padding:8px 12px}
-  .chap{min-height:200px}
-}
-@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+body{margin:0;min-height:100vh;background:#F5EFE2;color:#1B2336;font-family:Lexend,system-ui,sans-serif;display:flex;flex-direction:column}
+main{flex:1;max-width:980px;margin:0 auto;padding:48px 20px;width:100%}
+.k{font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#C9573A}
+h1{font-size:clamp(32px,5vw,48px);margin:6px 0 10px;line-height:1.1}
+p.l{font-size:18px;color:#4F586B;max-width:56ch;margin:0 0 30px}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+a.c{display:flex;flex-direction:column;gap:12px;text-decoration:none;border-radius:24px;padding:26px;min-height:320px;transition:transform .15s}
+a.c:hover{transform:translateY(-4px)}
+.little{background:#FFF8EC;color:#2B2340;border:3px solid #FFC83D;box-shadow:0 8px 0 #FFE08A}
+.little h2{font-family:Fredoka,'Arial Rounded MT Bold',sans-serif;font-size:34px;margin:0}
+.little .age{background:#FF7A6B;color:#fff}
+.exp{background:#1E2A4A;color:#fff;box-shadow:0 8px 0 #0F1730}
+.exp h2{font-size:32px;font-weight:800;margin:0}
+.exp .age{background:#E3A82B;color:#1E2A4A}
+.age{align-self:flex-start;border-radius:999px;padding:5px 14px;font-weight:800;font-size:15px}
+a.c p{margin:0;font-size:16px;line-height:1.55;opacity:.9}
+a.c ul{margin:0;padding-left:20px;font-size:15px;line-height:1.7;opacity:.9}
+.go{margin-top:auto;font-weight:800;font-size:17px}
+svg{width:84px;height:84px}
+footer{text-align:center;font-size:14px;color:#4F586B;padding:20px}
 </style>
 </head>
 <body>
-<div class="rainbow"></div>
-<header>
-  <div class="wrap hrow">
-    <a class="logo" href="#top" aria-label="The Big Story, home">
-      <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><rect x="2" y="6" width="17" height="28" rx="4" fill="#FF7A6B"/><rect x="21" y="6" width="17" height="28" rx="4" fill="#4DA8F0"/><path d="M20 8v26" stroke="#2B2340" stroke-width="2.5" stroke-linecap="round"/><circle cx="10.5" cy="20" r="3.5" fill="#FFC83D"/><path d="M29.5 15l1.2 2.6 2.8.3-2.1 1.9.6 2.8-2.5-1.5-2.5 1.5.6-2.8-2.1-1.9 2.8-.3z" fill="#FFC83D"/></svg>
-      <span><b>The Big Story</b><small>EXPLORE YOUR BIBLE · FOR KIDS</small></span>
+<main>
+  <div class="k">Explore Your Bible for kids</div>
+  <h1>Pick the right story for your child</h1>
+  <p class="l">Two versions of the Bible’s big story, each designed around how children think and learn at that age.</p>
+  <div class="g">
+    <a class="c little" href="little/">
+      <svg viewBox="0 0 120 120" aria-hidden="true"><path d="M10 80 a50 50 0 0 1 100 0" fill="none" stroke="#FF7A6B" stroke-width="10"/><path d="M22 80 a38 38 0 0 1 76 0" fill="none" stroke="#FFC83D" stroke-width="10"/><path d="M34 80 a26 26 0 0 1 52 0" fill="none" stroke="#46B86A" stroke-width="10"/><path d="M46 80 a14 14 0 0 1 28 0" fill="none" stroke="#4DA8F0" stroke-width="10"/></svg>
+      <span class="age">Ages 0–5</span>
+      <h2>My First Big Story</h2>
+      <p>Bright picture stories to read aloud together, about two minutes each.</p>
+      <ul><li>Very short lines and big pictures</li><li>“Say it together” and hand motions</li><li>Tiny prayers and a bedtime rhythm</li></ul>
+      <span class="go">Open →</span>
     </a>
-    <nav aria-label="Sections">
-      <a href="#story">The Story</a>
-      <a href="#ideas">Big Ideas</a>
-      <a href="#people">Bible People</a>
-      <a href="#library">The Bible</a>
-      <a href="#grownups" class="grown">For grown-ups</a>
-    </nav>
+    <a class="c exp" href="explorers/">
+      <svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" fill="none" stroke="#E3A82B" stroke-width="5"/><path d="M60 18 L70 60 L60 102 L50 60Z" fill="#E3A82B"/><path d="M60 60 L70 60 L60 102Z" fill="#C9573A"/><circle cx="60" cy="60" r="6" fill="#1E2A4A"/></svg>
+      <span class="age">Ages 6–10</span>
+      <h2>Bible Explorers</h2>
+      <p>Ten missions through the whole Bible for kids who are starting to read and reason for themselves.</p>
+      <ul><li>Look up real passages in their own Bible</li><li>Quizzes, “Did you know?” facts and badges</li><li>Memory-verse and book-sorting games</li></ul>
+      <span class="go">Start exploring →</span>
+    </a>
   </div>
-</header>
-
-<main id="top">
-  <div class="wrap hero">
-    <div>
-      <div class="kicker">For kids 6 to 10 and the grown-ups who love them</div>
-      <h1>The Bible is one <span>big story</span>.</h1>
-      <p>It’s a true story about God, his world, and how much he loves the people he made. And you’re part of it!</p>
-      <div class="cta">
-        <a class="btn main" href="#story">Start the story <span aria-hidden="true">→</span></a>
-        <a class="btn alt" href="#grownups">Grown-ups, start here</a>
-      </div>
-    </div>
-    <div class="heroart" aria-hidden="true">
-      <svg viewBox="0 0 400 300">
-        <rect width="400" height="300" rx="22" fill="#CFEAFF"/>
-        <circle cx="320" cy="70" r="38" fill="#FFC83D"/>
-        <g stroke="#FFC83D" stroke-width="6" stroke-linecap="round"><path d="M320 14v10M320 116v10M264 70h10M366 70h10M281 31l7 7M352 102l7 7M359 31l-7 7M288 102l-7 7"/></g>
-        <path d="M30 120 a50 50 0 0 1 100 0" fill="none" stroke="#FF7A6B" stroke-width="10"/><path d="M42 120 a38 38 0 0 1 76 0" fill="none" stroke="#FFC83D" stroke-width="10"/><path d="M54 120 a26 26 0 0 1 52 0" fill="none" stroke="#46B86A" stroke-width="10"/>
-        <path d="M0 210 Q100 160 200 205 T400 190 V300 H0Z" fill="#7FD08E"/>
-        <path d="M0 240 Q120 205 240 240 T400 235 V300 H0Z" fill="#46B86A"/>
-        <rect x="88" y="150" width="14" height="70" rx="6" fill="#9A6B45"/><circle cx="95" cy="140" r="34" fill="#2E9E57"/><circle cx="80" cy="132" r="6" fill="#FF7A6B"/><circle cx="108" cy="148" r="6" fill="#FF7A6B"/><circle cx="98" cy="124" r="6" fill="#FF7A6B"/>
-        <g transform="translate(205 180)"><circle cx="0" cy="-34" r="14" fill="#F2B98C"/><rect x="-14" y="-20" width="28" height="40" rx="12" fill="#8C6CE0"/><path d="M-6 20v22M6 20v22" stroke="#2B2340" stroke-width="6" stroke-linecap="round"/></g>
-        <g transform="translate(250 196)"><circle cx="0" cy="-26" r="11" fill="#9C6B4E"/><rect x="-11" y="-15" width="22" height="30" rx="10" fill="#FF9A3C"/><path d="M-5 15v16M5 15v16" stroke="#2B2340" stroke-width="5" stroke-linecap="round"/></g>
-        <path d="M218 168 L240 184" stroke="#F2B98C" stroke-width="6" stroke-linecap="round"/>
-        <g fill="#E8578E"><circle cx="160" cy="250" r="6"/><circle cx="300" cy="258" r="6"/><circle cx="40" cy="262" r="6"/></g>
-      </svg>
-    </div>
-  </div>
-
-  <section id="story">
-    <div class="wrap">
-      <div class="kicker">The Big Story in 10 parts</div>
-      <h2 class="sh">Tap a part to read it together</h2>
-      <p class="sub">One part a night makes a 10-night adventure. Each part has a short story, a Bible verse, questions to wonder about, a hand motion to remember it, and something to do.</p>
-      <div class="stars" aria-live="polite"><span class="st" id="starRow"></span><span id="starText"></span><button class="reset" id="resetStars" type="button">Start over</button></div>
-      <div class="path" id="path"></div>
-    </div>
-  </section>
-
-  <section id="ideas">
-    <div class="wrap">
-      <div class="kicker">Big Ideas</div>
-      <h2 class="sh">Things that are true all through the Bible</h2>
-      <p class="sub">These ideas show up again and again, from the first page to the last. Each one has a short verse to learn by heart and a moment in everyday life to remember it.</p>
-      <div class="ideas" id="ideaList"></div>
-    </div>
-  </section>
-
-  <section id="people">
-    <div class="wrap">
-      <div class="kicker">Bible People</div>
-      <h2 class="sh">Meet some people in the story</h2>
-      <p class="sub">Tap a card to flip it. None of these people were perfect. The real hero of every story is God.</p>
-      <div class="people" id="peopleList"></div>
-    </div>
-  </section>
-
-  <section id="library">
-    <div class="wrap">
-      <div class="kicker">The Bible</div>
-      <h2 class="sh">The Bible is like a library</h2>
-      <p class="sub">It has 66 books, written by many people over a very long time, and God was guiding them all. Some books tell stories, some are songs, some are letters. Tap a color to see which books are which.</p>
-      <div class="shelf">
-        <div class="books" id="books" role="list" aria-label="The 66 books of the Bible"></div>
-        <div class="legend" id="legend"></div>
-      </div>
-    </div>
-  </section>
-
-  <section id="grownups" class="grown-sec">
-    <div class="wrap">
-      <div class="kicker">For grown-ups</div>
-      <h2 class="sh">Sharing the Bible with a 6- to 10-year-old</h2>
-      <p class="sub">You don’t need to be an expert. Children this age mostly need a grown-up who reads with them, listens to their questions and shows what trusting God looks like in ordinary life.</p>
-
-      <h3 class="fd" style="font-size:26px;margin:18px 0 10px">How kids this age think</h3>
-      <div class="cols">
-        <div class="tip"><h3>🧱 Concrete thinkers</h3><p>Children of 6 to 10 understand best through <b>things they can picture, touch and do</b>. “God is with you” lands better tied to a real moment, like the dark bedroom or the first day of school, than as an idea on its own.</p></div>
-        <div class="tip"><h3>📖 Story first</h3><p>They remember <b>stories with people, problems and rescues</b> far better than lists of facts. Tell the Bible as one connected story, and keep coming back to “what does this show us about God?”</p></div>
-        <div class="tip"><h3>⚖️ A strong sense of fair</h3><p>“That’s not fair!” is a big deal at this age. Lean into it: the Bible cares deeply about fairness, and grace is the surprising good news that <b>God gives us better than we deserve</b>.</p></div>
-        <div class="tip"><h3>🤝 Belonging matters</h3><p>Kids are working out who they are and where they fit. Help them hear that they are <b>made on purpose, loved by God and part of his family</b>, before they hear what they should do.</p></div>
-        <div class="tip"><h3>❓ Questions are good</h3><p>Lots of “why?” and “how?” is a sign of a growing faith, not a lack of it. <b>“That’s a great question, let’s find out together”</b> is always a good answer, and so is “I don’t know.”</p></div>
-        <div class="tip"><h3>🌀 Short and moving</h3><p>Attention runs about 10 to 15 minutes. Keep it short, <b>use hand motions and drawing</b>, and repeat favorites. Hearing the same story many times is how children learn it.</p></div>
-      </div>
-
-      <h3 class="fd" style="font-size:26px;margin:28px 0 4px">A simple 10-minute family time</h3>
-      <p style="margin:0;color:var(--soft);font-size:17px">Pick a part of the Big Story and walk through these four steps. Bedtime, breakfast or the car all work.</p>
-      <div class="steps4">
-        <div class="s4" style="background:var(--sky)"><b>1 · Read</b><span>Read the short story out loud, then the Bible verse. Let your child read the verse if they can.</span></div>
-        <div class="s4" style="background:var(--grape)"><b>2 · Wonder</b><span>Ask one “I wonder…” question. Listen more than you talk. There are no wrong answers here.</span></div>
-        <div class="s4" style="background:var(--grass)"><b>3 · Pray</b><span>Say the short prayer together, or let your child pray in their own words.</span></div>
-        <div class="s4" style="background:var(--orange)"><b>4 · Do</b><span>Try the hand motion and the activity. Doing helps remembering.</span></div>
-      </div>
-
-      <h3 class="fd" style="font-size:26px;margin:28px 0 8px">Hard stories and big feelings</h3>
-      <div class="cols">
-        <div class="tip"><h3>Scary parts</h3><p>The Bible is honest about danger, war and death. Preview a passage first, <b>tell it at your child’s level</b>, and always land on what God does: he protects, rescues and keeps his promises. A good children’s Bible helps with this.</p></div>
-        <div class="tip"><h3>When they feel bad about doing wrong</h3><p>Children this age can feel guilt strongly. Pair honesty about sin with the bigger truth: <b>God forgives, and nothing they do makes him stop loving them</b> (Romans 8:39).</p></div>
-        <div class="tip"><h3>When life is hard</h3><p>A move, a loss or a fight at school is a chance to show that God’s story includes sad parts too, and that <b>God is with us in them</b>. The Psalms give words for every feeling.</p></div>
-      </div>
-
-      <h3 class="fd" style="font-size:26px;margin:28px 0 8px">Questions kids ask</h3>
-      <p style="margin:0 0 8px;color:var(--soft);font-size:17px">Simple, honest starting points. Your church may say more about some of these.</p>
-      <div id="faq"></div>
-
-      <div class="note"><b>About this page.</b> This is a gentle introduction to the Bible’s big story for families. It sticks to what Christians across traditions share, and its verses are from the Berean Standard Bible. Different churches teach some things in their own ways, so your church is a great place to keep learning. The full site for grown-ups is at exploreyourbible.com.</div>
-    </div>
-  </section>
 </main>
-
-<footer><div class="wrap">Explore Your Bible · The Big Story for kids. Scripture quotations are from the Berean Standard Bible (public domain).</div></footer>
-
-<div class="ov" id="ov" role="dialog" aria-modal="true" aria-labelledby="ovTitle">
-  <div class="ovtop">
-    <button class="ib" id="ovClose" type="button" aria-label="Close and go back to the story map">✕</button>
-    <div class="t" id="ovBar"></div>
-    <button class="ib" id="ovSpeak" type="button" aria-label="Read the story aloud">🔊 <span>Read to me</span></button>
-  </div>
-  <div class="book" id="ovBody"></div>
-</div>
-
-<script>
-var C = {sun:'#FFC83D', sky:'#4DA8F0', grass:'#46B86A', coral:'#FF7A6B', grape:'#8C6CE0', berry:'#E8578E', ocean:'#2C7FD1', orange:'#FF9A3C', teal:'#2BB3A6', night:'#3B3F8F'};
-
-// ---------- Pictures (simple, friendly SVGs) ----------
-var ART = {
-  creation: '<svg viewBox="0 0 120 120"><circle cx="86" cy="32" r="16" fill="#FFE27A"/><path d="M0 92 Q30 70 60 88 T120 82 V120 H0Z" fill="#B9F0C4"/><rect x="34" y="58" width="7" height="34" rx="3" fill="#9A6B45"/><circle cx="37" cy="52" r="18" fill="#2E9E57"/><circle cx="30" cy="48" r="3.5" fill="#FF7A6B"/><circle cx="44" cy="56" r="3.5" fill="#FF7A6B"/><path d="M70 104c4-8 12-8 16 0" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="96" cy="100" r="5" fill="#fff"/><circle cx="96" cy="100" r="2" fill="#FFC83D"/></svg>',
-  wrong: '<svg viewBox="0 0 120 120"><path d="M60 100 C20 74 14 46 34 34 c12-7 22-1 26 8 c4-9 14-15 26-8 c20 12 14 40 -26 66z" fill="#fff"/><path d="M60 42 l-8 16 12 8 -10 18" stroke="#E8578E" stroke-width="6" fill="none" stroke-linejoin="round" stroke-linecap="round"/></svg>',
-  promise: '<svg viewBox="0 0 120 120"><circle cx="90" cy="28" r="12" fill="#FFF3B0"/><circle cx="95" cy="25" r="10" fill="#3B3F8F"/><g fill="#FFE27A"><path d="M30 24l3 7 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/><circle cx="62" cy="20" r="3"/><circle cx="18" cy="56" r="2.5"/><circle cx="50" cy="48" r="3"/><circle cx="80" cy="58" r="2.5"/><circle cx="104" cy="52" r="3"/><circle cx="70" cy="38" r="2"/><circle cx="38" cy="66" r="2"/></g><path d="M0 98 Q60 80 120 98 V120 H0Z" fill="#2A2D6E"/><g transform="translate(58 86)"><circle cx="0" cy="-12" r="5" fill="#F2B98C"/><path d="M-6 -6h12l3 18h-18z" fill="#FF9A3C"/><path d="M4 -10 l10 -14" stroke="#F2B98C" stroke-width="3" stroke-linecap="round"/></g></svg>',
-  rescue: '<svg viewBox="0 0 120 120"><path d="M0 30 Q12 20 24 30 T48 30 V120 H0Z" fill="#9FD3FF"/><path d="M72 30 Q84 20 96 30 T120 30 V120 H72Z" fill="#9FD3FF"/><path d="M0 50 Q12 40 24 50 T48 50" stroke="#fff" stroke-width="4" fill="none"/><path d="M72 50 Q84 40 96 50 T120 50" stroke="#fff" stroke-width="4" fill="none"/><path d="M48 120 L52 26 H68 L72 120Z" fill="#FFE2A8"/><g fill="#fff"><circle cx="60" cy="92" r="5"/><circle cx="56" cy="70" r="4"/><circle cx="63" cy="52" r="3.5"/><circle cx="59" cy="38" r="3"/></g></svg>',
-  king: '<svg viewBox="0 0 120 120"><path d="M20 82 L14 36 L40 58 L60 26 L80 58 L106 36 L100 82Z" fill="#FFC83D" stroke="#fff" stroke-width="4" stroke-linejoin="round"/><rect x="20" y="82" width="80" height="16" rx="5" fill="#FFE27A" stroke="#fff" stroke-width="4"/><circle cx="60" cy="90" r="5" fill="#E8578E"/><circle cx="38" cy="90" r="4" fill="#4DA8F0"/><circle cx="82" cy="90" r="4" fill="#46B86A"/><circle cx="14" cy="34" r="5" fill="#fff"/><circle cx="60" cy="24" r="5" fill="#fff"/><circle cx="106" cy="34" r="5" fill="#fff"/></svg>',
-  waiting: '<svg viewBox="0 0 120 120"><rect x="46" y="44" width="28" height="56" rx="6" fill="#fff"/><path d="M60 14 C70 28 70 36 60 42 C50 36 50 28 60 14z" fill="#FFC83D"/><path d="M60 24 C64 31 64 35 60 38 C56 35 56 31 60 24z" fill="#FF9A3C"/><rect x="32" y="98" width="56" height="10" rx="5" fill="#fff" opacity=".8"/><g fill="#fff" opacity=".7"><circle cx="20" cy="30" r="3"/><circle cx="100" cy="24" r="3"/><circle cx="96" cy="60" r="2"/><circle cx="24" cy="70" r="2"/></g></svg>',
-  jesus: '<svg viewBox="0 0 120 120"><path d="M60 8l4 10 11 1-8 7 2 11-9-6-9 6 2-11-8-7 11-1z" fill="#FFE27A"/><path d="M60 38 L60 54" stroke="#FFE27A" stroke-width="3" stroke-dasharray="3 4"/><path d="M22 72 L98 72 L86 104 L34 104Z" fill="#C98A52"/><path d="M28 72 l-8 36 M92 72 l8 36" stroke="#9A6B45" stroke-width="6" stroke-linecap="round"/><path d="M24 72 Q60 56 96 72" fill="#FFE2A8"/><ellipse cx="60" cy="66" rx="22" ry="10" fill="#fff"/><circle cx="48" cy="62" r="8" fill="#F2B98C"/></svg>',
-  risen: '<svg viewBox="0 0 120 120"><circle cx="60" cy="58" r="40" fill="#FFE27A"/><g stroke="#FFF3B0" stroke-width="5" stroke-linecap="round"><path d="M60 6v8M14 58h8M98 58h8M27 25l6 6M93 25l-6 6"/></g><path d="M8 110 L8 74 Q8 44 44 44 Q76 44 76 74 L76 110Z" fill="#B49A82"/><path d="M24 110 L24 80 Q24 62 42 62 Q60 62 60 80 L60 110Z" fill="#5C4636"/><circle cx="92" cy="96" r="18" fill="#9C8470"/><path d="M0 110 H120 V120 H0Z" fill="#46B86A"/><path d="M98 108 l4 -10 4 10" stroke="#E8578E" stroke-width="4" fill="none" stroke-linecap="round"/></svg>',
-  family: '<svg viewBox="0 0 120 120"><path d="M60 10 C72 24 70 34 60 40 C50 34 48 24 60 10z" fill="#FF9A3C"/><path d="M60 20 C65 27 64 32 60 35 C56 32 55 27 60 20z" fill="#FFE27A"/><g><circle cx="24" cy="62" r="9" fill="#F2B98C"/><rect x="14" y="72" width="20" height="28" rx="9" fill="#4DA8F0"/></g><g><circle cx="48" cy="58" r="9" fill="#9C6B4E"/><rect x="38" y="68" width="20" height="32" rx="9" fill="#FF7A6B"/></g><g><circle cx="72" cy="58" r="9" fill="#F7D2AE"/><rect x="62" y="68" width="20" height="32" rx="9" fill="#8C6CE0"/></g><g><circle cx="96" cy="62" r="9" fill="#6E4A36"/><rect x="86" y="72" width="20" height="28" rx="9" fill="#FFC83D"/></g><path d="M34 82 L38 82 M58 82 L62 82 M82 82 L86 82" stroke="#fff" stroke-width="6" stroke-linecap="round"/></svg>',
-  allnew: '<svg viewBox="0 0 120 120"><path d="M10 80 a50 50 0 0 1 100 0" fill="none" stroke="#FF7A6B" stroke-width="8"/><path d="M20 80 a40 40 0 0 1 80 0" fill="none" stroke="#FFC83D" stroke-width="8"/><path d="M30 80 a30 30 0 0 1 60 0" fill="none" stroke="#46B86A" stroke-width="8"/><path d="M40 80 a20 20 0 0 1 40 0" fill="none" stroke="#4DA8F0" stroke-width="8"/><path d="M60 112 V88" stroke="#2E9E57" stroke-width="5"/><g fill="#fff"><circle cx="60" cy="80" r="7"/><circle cx="51" cy="88" r="7"/><circle cx="69" cy="88" r="7"/><circle cx="54" cy="98" r="7"/><circle cx="66" cy="98" r="7"/></g><circle cx="60" cy="90" r="6" fill="#FFC83D"/></svg>'
-};
-
-// ---------- The Big Story ----------
-var STORY = [
-  { id:'creation', n:1, title:'God Makes Everything', short:'A good world, made with love', c:C.grass, c2:'#23874A', art:'creation',
-    story:['Before there was anything, there was God. Then God spoke, and light burst out! He made the sky and the sea, mountains and trees, fish and birds, elephants and ladybugs.','Last of all, God made people, a man and a woman, to be his friends, to care for his world and to look like him in special ways. God looked at everything he had made, and it was very, very good.'],
-    verse:['And God looked upon all that He had made, and indeed, it was very good.','Genesis 1:31'], more:'Genesis 1 and 2',
-    big:'God made everything, and he made you on purpose.',
-    wonder:['What is your favorite thing God made? Why?','What do you think it means that people are made to look like God?'],
-    motion:['🙌','Spread your arms wide, as big as the whole world.'],
-    act:'Go on a “very good” walk. Find five things God made and say “very good!” about each one.',
-    pray:'Thank you, God, for making this wonderful world, and for making me.' },
-  { id:'wrong', n:2, title:'Things Go Wrong', short:'People turn away from God', c:C.berry, c2:'#C23C72', art:'wrong',
-    story:['God gave the first people a beautiful garden and everything they needed. But they decided they wanted to be in charge instead of trusting God. They disobeyed him.','Right away, things broke. They felt ashamed and hid. Sadness, hurting and death came into the world. We call this sin: going our own way instead of God’s way.','But God didn’t leave. He came looking for them and called, “Where are you?” And he promised that one day he would make things right.'],
-    verse:['But the LORD God called out to the man, “Where are you?”','Genesis 3:9'], more:'Genesis 3',
-    big:'Everyone does wrong things, but God still comes looking for us.',
-    wonder:['Why do you think Adam and Eve hid?','How does it feel when you’ve done something wrong? What helps?'],
-    motion:['🙈','Cover your eyes like you’re hiding, then peek out: God still finds you.'],
-    act:'Play hide-and-seek. Afterward, talk about how God always comes looking for us because he loves us.',
-    pray:'God, I’m sorry for the times I go my own way. Thank you that you never stop looking for me.' },
-  { id:'promise', n:3, title:'God Makes a Promise', short:'Abraham and the stars', c:C.night, c2:'#3B3F8F', art:'promise',
-    story:['God chose a man named Abraham and said, “Leave your home and go where I show you. I will bless you, and through your family I will bless the whole world.”','Abraham and his wife Sarah were very old and had no children. One night God took Abraham outside and said, “Look up and count the stars, if you can. Your family will be like that!”','Abraham trusted God. And years later, baby Isaac was born. God always keeps his promises.'],
-    verse:['“Now look to the heavens and count the stars, if you are able.”','Genesis 15:5'], more:'Genesis 12, 15 and 21',
-    big:'God always keeps his promises, even when we have to wait.',
-    wonder:['How do you think Abraham felt, looking up at all those stars?','What is a promise someone kept to you?'],
-    motion:['✨','Point up to the sky and wiggle your fingers like twinkling stars.'],
-    act:'Look at the stars tonight (or draw a page full of them) and try to count them. Remember: God keeps every promise.',
-    pray:'Thank you, God, that you always keep your promises. Help me trust you.' },
-  { id:'rescue', n:4, title:'God Rescues His People', short:'Moses and the sea', c:C.ocean, c2:'#1F68B0', art:'rescue',
-    story:['Abraham’s family grew into a big nation called Israel. But in Egypt they became slaves, and the king, Pharaoh, was very cruel.','God heard them crying. He sent Moses to tell Pharaoh, “Let my people go!” Pharaoh said no, again and again, until God showed his power.','When the people were trapped between Pharaoh’s army and the sea, God opened a path right through the water! They walked across on dry ground. God rescued them, and later he gave them good rules for living as his people.'],
-    verse:['The LORD will fight for you; you need only to be still.','Exodus 14:14'], more:'Exodus 3, 14 and 20',
-    big:'God hears us when we cry for help, and he is strong to save.',
-    wonder:['What would it have been like to walk through the sea?','When have you needed help? Who helped you?'],
-    motion:['🌊','Push your hands apart like you’re opening a path through the water.'],
-    act:'Make a sea in a pan of water or with blue blankets, and act out the people crossing on dry ground.',
-    pray:'God, thank you that you hear me and help me. When I’m scared, help me trust you.' },
-  { id:'king', n:5, title:'God Gives a King', short:'David, the shepherd boy', c:C.orange, c2:'#D9741A', art:'king',
-    story:['God’s people wanted a king. God chose a young shepherd boy named David. He wasn’t the oldest or the tallest, but God said, “People look at the outside, but I look at the heart.”','David trusted God. With God’s help he beat the giant Goliath, became king and wrote songs called psalms. David made mistakes too, big ones, and he told God he was sorry.','God promised David that one day a king from his family would rule forever. Everyone waited for that perfect King.'],
-    verse:['For man sees the outward appearance, but the LORD sees the heart.','1 Samuel 16:7'], more:'1 Samuel 16 and 17, Psalm 23',
-    big:'God cares most about our hearts, and he promised a forever King.',
-    wonder:['Why do you think God chose David?','What do you think God sees when he looks at your heart?'],
-    motion:['👑','Put your hands on your head like a crown.'],
-    act:'Read Psalm 23, a song David wrote, and draw a picture of God as a shepherd caring for his sheep.',
-    pray:'God, thank you that you look at my heart. Make my heart good and kind like yours.' },
-  { id:'waiting', n:6, title:'God’s People Wait', short:'Prophets point to a Savior', c:C.grape, c2:'#6E50C4', art:'waiting',
-    story:['After David, many kings didn’t follow God. The people forgot him and did what was wrong. God sent messengers called prophets to say, “Come back to God!”','Many didn’t listen, and enemies took them far from home. It was a sad, hard time. But God didn’t give up on them.','The prophets also brought good news: “A Savior is coming! A child will be born who will bring peace.” So God’s people waited, and waited, and hoped.'],
-    verse:['For unto us a child is born, unto us a son is given … And He will be called Wonderful Counselor, Mighty God, Everlasting Father, Prince of Peace.','Isaiah 9:6'], more:'Isaiah 9 and 40, Daniel 6, Jonah',
-    big:'Even in hard times, God gives us hope.',
-    wonder:['What is the hardest thing you’ve ever had to wait for?','Why do you think God’s people kept hoping?'],
-    motion:['⏳','Tap your wrist like you’re checking a watch: waiting, waiting…'],
-    act:'Light a candle (with a grown-up) and talk about how a little light gives hope in the dark.',
-    pray:'God, when things are hard, help me remember that you are with me and you bring hope.' },
-  { id:'jesus', n:7, title:'Jesus Is Born', short:'The promised King comes', c:C.coral, c2:'#E0503F', art:'jesus',
-    story:['At last, the time came! An angel told a young woman named Mary that she would have a baby, God’s own Son. His name would be Jesus.','Jesus was born in Bethlehem and laid in a manger. Angels sang to shepherds: “Good news of great joy for all the people!”','Jesus grew up and showed everyone what God is like. He healed sick people, welcomed children, forgave people and taught about God’s kingdom. He was the King everyone had been waiting for.'],
-    verse:['“Do not be afraid! For behold, I bring you good news of great joy that will be for all the people.”','Luke 2:10'], more:'Luke 2, Mark 10:13–16',
-    big:'Jesus is God’s Son, who came to show us God’s love.',
-    wonder:['Why do you think the angels were so excited?','Jesus said, “Let the little children come to Me.” How does that make you feel?'],
-    motion:['👶','Rock your arms like you’re holding a baby.'],
-    act:'Look up one story of Jesus helping someone (like Mark 10:13–16). Act it out together.',
-    pray:'Thank you, God, for sending Jesus. Help me know him and love him.' },
-  { id:'risen', n:8, title:'Jesus Dies and Rises', short:'The greatest rescue of all', c:C.sun, c2:'#C99200', art:'risen',
-    story:['Some leaders didn’t like Jesus. They had him put to death on a cross. His friends were so sad. But Jesus had told them this would happen: he was giving his life to take away the wrong things we do, so we could be God’s friends again.','Three days later, some women went to his tomb, and it was empty! An angel said, “He is not here; He has risen!” Jesus was alive!','Jesus beat death. Because of him, God forgives everyone who trusts him. This is the best news in the whole world.'],
-    verse:['“He is not here; He has risen!”','Luke 24:6'], more:'Luke 23 and 24, John 3:16',
-    big:'Jesus died and rose again to forgive us and bring us back to God.',
-    wonder:['How do you think Jesus’ friends felt when they found out he was alive?','Why do you think Jesus was willing to die for us?'],
-    motion:['🌅','Crouch down low, then jump up high: He is risen!'],
-    act:'Make an “empty tomb” from a cup or a box with a rolled-away stone, and tell the story with it.',
-    pray:'Jesus, thank you for loving me so much. Thank you that you are alive!' },
-  { id:'family', n:9, title:'God’s Family Grows', short:'The Holy Spirit and the church', c:C.teal, c2:'#1C8E83', art:'family',
-    story:['After Jesus rose, he told his friends, “I am with you always,” and went back to heaven. Then God sent the Holy Spirit, like wind and fire, to live with his people and give them courage.','Jesus’ friends told everyone the good news. People from all over the world joined God’s family, called the church. They prayed, ate together, shared what they had and cared for each other.','God’s family is still growing today, all around the world. Anyone who trusts Jesus can be part of it, including you!'],
-    verse:['“And surely I am with you always, even to the end of the age.”','Matthew 28:20'], more:'Acts 2',
-    big:'God’s family is for everyone, and Jesus is always with us.',
-    wonder:['Who are some people in God’s family that you know?','How can you help someone in your church or family this week?'],
-    motion:['🤗','Hold hands with someone, or give a big hug: we’re family!'],
-    act:'Make a card or bake something for someone in your church family or neighborhood.',
-    pray:'Thank you, God, for your Holy Spirit and for your family. Help me love others like you love me.' },
-  { id:'allnew', n:10, title:'God Makes All Things New', short:'The happy ending, still to come', c:C.sky, c2:'#2C86CF', art:'allnew',
-    story:['The Bible ends with a promise about the future. One day Jesus will come back, and God will make everything new, like the garden at the beginning, only even better!','There will be no more crying, no more hurting, no more sickness and no more death. God will live right with his people forever.','Until then, God’s people get to share his love and wait with hope for the happiest ending ever.'],
-    verse:['‘He will wipe away every tear from their eyes,’ and there will be no more death or mourning or crying or pain.','Revelation 21:4'], more:'Revelation 21 and 22',
-    big:'God will make everything right and good forever.',
-    wonder:['What do you think God’s new world will be like?','What is something sad that you’re glad God will fix one day?'],
-    motion:['🌸','Start with closed hands like a bud, then open them like a flower.'],
-    act:'Draw what you think God’s new world will look like. Hang it where you can see it.',
-    pray:'God, thank you that one day you will make everything new. Help me share your love until then.' }
-];
-
-// ---------- Big Ideas ----------
-var IDEAS = [
-  { e:'🌍', t:'God made me', c:C.grass, d:'God made everything, and he made you on purpose. You are not an accident. You matter to him.', v:['I praise You, for I am fearfully and wonderfully made.','Psalm 139:14'], w:'When you look in the mirror, say “God made me, and he made me wonderfully.”' },
-  { e:'❤️', t:'God loves me', c:C.berry, d:'God’s love isn’t something you earn by being good. He loves you because he is love, even on your worst day.', v:['We love because He first loved us.','1 John 4:19'], w:'When you feel left out or not good enough, remember: God loved you first.' },
-  { e:'🤝', t:'God is always with me', c:C.sky, d:'You can’t see God, but he is always there: at school, in the dark, at the doctor and everywhere else.', v:['When I am afraid, I put my trust in You.','Psalm 56:3'], w:'When you feel scared, say this verse and take a slow breath.' },
-  { e:'⭐', t:'God keeps his promises', c:C.night, d:'People sometimes break promises. God never does. All through the Bible he did exactly what he said.', v:['They are new every morning; great is Your faithfulness!','Lamentations 3:23'], w:'When you wake up, remember: God’s love is new this morning, too.' },
-  { e:'🕊️', t:'God forgives', c:C.grape, d:'When we do wrong, we can tell God. Because of Jesus, he forgives us and helps us start again.', v:['If we confess our sins, He is faithful and just to forgive us our sins.','1 John 1:9'], w:'When you’ve done something wrong, tell God and say sorry to the person you hurt.' },
-  { e:'🌈', t:'Love one another', c:C.orange, d:'Jesus showed us how to love: being kind, sharing, forgiving and helping, even when it’s hard.', v:['Be kind and tenderhearted to one another, forgiving each other just as in Christ God forgave you.','Ephesians 4:32'], w:'When someone is unkind to you, ask God to help you forgive them.' },
-  { e:'👑', t:'Jesus is King forever', c:C.sun, d:'Jesus rose from the dead and rules over everything. One day he will make the whole world right.', v:['“Behold, I make all things new.”','Revelation 21:5'], w:'When something sad happens, remember that it’s not the end of the story.' }
-];
-
-// ---------- Bible People ----------
-var PEOPLE = [
-  { e:'🛶', n:'Noah', s:'Built a giant boat', c:C.ocean, what:'When the world was full of wrong, Noah listened to God and built a huge ark that kept his family and the animals safe through the flood. Afterward God put a rainbow in the sky as a promise.', learn:'Obey God even when others don’t.', ref:'Genesis 6–9' },
-  { e:'✨', n:'Abraham & Sarah', s:'Trusted God’s promise', c:C.night, what:'They left their home to follow God and waited many years for the baby God promised. When Isaac was born, Sarah laughed for joy.', learn:'God keeps his promises, even when we have to wait.', ref:'Genesis 12–21' },
-  { e:'🧥', n:'Joseph', s:'The coat of many colors', c:C.coral, what:'His brothers were jealous and sold him as a slave. But God was with Joseph, and later he saved his whole family from hunger and forgave his brothers.', learn:'God can bring good out of bad things.', ref:'Genesis 37–50' },
-  { e:'🔥', n:'Moses', s:'Led God’s people out of Egypt', c:C.orange, what:'God spoke to Moses from a burning bush and sent him to free his people. Moses was nervous, but God helped him every step of the way.', learn:'God helps us do hard things.', ref:'Exodus 3–14' },
-  { e:'🌾', n:'Ruth', s:'A loyal friend', c:C.grass, what:'Ruth stayed with her mother-in-law Naomi when life was hard and said, “Your God will be my God.” She became the great-grandmother of King David.', learn:'Be loyal and kind, and God will care for you.', ref:'Ruth 1–4' },
-  { e:'🪨', n:'David', s:'Shepherd, giant-fighter, king', c:C.sun, what:'David trusted God to beat the giant Goliath with just a sling and a stone. As king he wrote many songs to God, and he said sorry when he did wrong.', learn:'God looks at the heart.', ref:'1 Samuel 16–17' },
-  { e:'👸', n:'Esther', s:'A brave queen', c:C.berry, what:'Esther was a queen who risked her life to speak up and save her people. Her cousin told her she was there “for such a time as this.”', learn:'God can use you right where you are.', ref:'Esther 4–8' },
-  { e:'🦁', n:'Daniel', s:'In the lions’ den', c:C.teal, what:'Daniel kept praying to God even when it was against the law. He was thrown to the lions, but God shut their mouths.', learn:'Keep trusting God, even when it’s hard.', ref:'Daniel 6' },
-  { e:'🐋', n:'Jonah', s:'Swallowed by a big fish', c:C.sky, what:'Jonah ran away from what God asked. After a big fish swallowed him and spat him out, he went to Nineveh, and God showed mercy to the whole city.', learn:'God gives second chances, to us and to others.', ref:'Jonah 1–4' },
-  { e:'🌟', n:'Mary', s:'The mother of Jesus', c:C.grape, what:'When an angel told Mary she would be the mother of God’s Son, she said yes to God: “I am the Lord’s servant.”', learn:'Say yes to God.', ref:'Luke 1–2' },
-  { e:'🌳', n:'Zacchaeus', s:'Climbed a tree to see Jesus', c:C.grass, what:'Zacchaeus was a tax collector who had cheated people. Jesus came to his house anyway, and Zacchaeus changed and paid people back.', learn:'Jesus loves us and helps us change.', ref:'Luke 19:1–10' },
-  { e:'🎣', n:'Peter', s:'A fisherman who followed Jesus', c:C.ocean, what:'Peter was one of Jesus’ closest friends. Once he said he didn’t know Jesus, but Jesus forgave him and gave him an important job.', learn:'Jesus forgives and still has plans for us.', ref:'Luke 5, John 21' },
-  { e:'✉️', n:'Paul', s:'Wrote letters to churches', c:C.orange, what:'Paul once hurt Christians, but Jesus met him and changed his heart. He traveled everywhere telling people about Jesus and wrote many letters in the Bible.', learn:'No one is too far from God’s love.', ref:'Acts 9' }
-];
-
-// ---------- The library ----------
-var SHELF = [
-  ['Beginnings and the Law','The first five books: creation, Abraham, Moses and God’s rules for his people.','#46B86A',['Genesis','Exodus','Leviticus','Numbers','Deuteronomy']],
-  ['History','True stories of God’s people: kings, battles, brave women and coming home.','#FF9A3C',['Joshua','Judges','Ruth','1 Samuel','2 Samuel','1 Kings','2 Kings','1 Chronicles','2 Chronicles','Ezra','Nehemiah','Esther']],
-  ['Songs and Wisdom','Prayers, songs and wise sayings, like Psalms and Proverbs.','#E8578E',['Job','Psalms','Proverbs','Ecclesiastes','Song of Songs']],
-  ['Prophets','Messengers who told people to come back to God and that a Savior was coming.','#8C6CE0',['Isaiah','Jeremiah','Lamentations','Ezekiel','Daniel','Hosea','Joel','Amos','Obadiah','Jonah','Micah','Nahum','Habakkuk','Zephaniah','Haggai','Zechariah','Malachi']],
-  ['The Gospels','Four books about Jesus’ life, death and rising again.','#FF7A6B',['Matthew','Mark','Luke','John']],
-  ['Acts','How the good news spread and the church began.','#2BB3A6',['Acts']],
-  ['Letters','Letters to churches and friends about following Jesus.','#4DA8F0',['Romans','1 Corinthians','2 Corinthians','Galatians','Ephesians','Philippians','Colossians','1 Thessalonians','2 Thessalonians','1 Timothy','2 Timothy','Titus','Philemon','Hebrews','James','1 Peter','2 Peter','1 John','2 John','3 John','Jude']],
-  ['Revelation','A vision of Jesus as King and God making all things new.','#FFC83D',['Revelation']]
-];
-
-// ---------- Questions kids ask ----------
-var FAQ = [
-  ['Where is God? Why can’t I see him?','God is spirit, so we can’t see him with our eyes, but he is everywhere, all the time. Like the wind, we can’t see him, but we can see what he does. Jesus came so we could see what God is like (John 14:9).'],
-  ['Does God still love me when I’m bad?','Yes. Nothing you do can make God stop loving you (Romans 8:39). When we do wrong, God wants us to tell him and turn back, and he forgives us because of Jesus.'],
-  ['Why did Jesus have to die?','Sin breaks our friendship with God and spoils his world. Jesus, who never did anything wrong, chose to give his life to take the punishment for our sin, so we can be forgiven and be God’s friends again. Then he rose, beating death (1 Corinthians 15:3–4).'],
-  ['Is the Bible true?','Christians believe the Bible is God’s true word. It has history, poems, songs and letters, and each kind of writing tells the truth in its own way. Most of all, it tells the true story of God and his love.'],
-  ['What happens when someone dies?','It’s okay to feel very sad. The Bible says that people who trust Jesus are with him, and one day God will raise them to new life when he makes everything new, with no more death or crying (Revelation 21:4).'],
-  ['Did God make the dinosaurs?','Yes! God made everything, including dinosaurs. Christians have different ideas about how and when God made the world, but they all agree that God made it, and that it was good.'],
-  ['Why do bad things happen?','Since the first people turned away from God, the world has been broken, and some sad things happen that we don’t understand. God is sad about them too. He is with us in hard times, and he promises to make everything right one day.'],
-  ['How do I pray?','Just talk to God like you would talk to someone who loves you. You can say thank you, say sorry, ask for help or tell him how you feel. You can pray anywhere: out loud, quietly or even in your head. Jesus taught a prayer to help us (Matthew 6:9–13).']
-];
-
-// ---------- Rendering ----------
-var KEY = 'bibleExplorer.kids.stars';
-function getStars(){ try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { return {}; } }
-function setStars(s){ try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {} }
-function esc(s){ return String(s).replace(/[&<>"]/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
-
-function renderPath(){
-  var s = getStars(), done = STORY.filter(function (x) { return s[x.id]; }).length;
-  document.getElementById('starRow').textContent = STORY.map(function (x) { return s[x.id] ? '⭐' : '☆'; }).join('');
-  document.getElementById('starText').textContent = done === STORY.length ? 'You finished the whole Big Story! 🎉' : done + ' of ' + STORY.length + ' parts read';
-  document.getElementById('resetStars').style.display = done ? '' : 'none';
-  document.getElementById('path').innerHTML = STORY.map(function (x, i) {
-    return '<button type="button" class="chap' + (s[x.id] ? ' is-done' : '') + '" style="background:' + x.c + (x.id === 'risen' ? ';color:#2B2340' : '') + '" data-i="' + i + '" aria-label="Part ' + x.n + ': ' + esc(x.title) + (s[x.id] ? ', read' : '') + '">' +
-      '<span class="done" aria-hidden="true">⭐</span><span class="n">Part ' + x.n + '</span>' + ART[x.art] + '<h3>' + esc(x.title) + '</h3><p>' + esc(x.short) + '</p></button>';
-  }).join('');
-}
-document.getElementById('path').addEventListener('click', function (e) { var b = e.target.closest('.chap'); if (b) openChap(+b.dataset.i); });
-document.getElementById('resetStars').addEventListener('click', function () { setStars({}); renderPath(); });
-
-document.getElementById('ideaList').innerHTML = IDEAS.map(function (x) {
-  return '<article class="idea" style="--c:' + x.c + '"><h3><i aria-hidden="true">' + x.e + '</i>' + esc(x.t) + '</h3><p>' + esc(x.d) + '</p><div class="verse">“' + esc(x.v[0]) + '”<cite>' + esc(x.v[1]) + '</cite></div><p class="when"><b>Remember it:</b> ' + esc(x.w) + '</p></article>';
-}).join('');
-
-document.getElementById('peopleList').innerHTML = PEOPLE.map(function (x) {
-  return '<button type="button" class="card" aria-pressed="false" style="--c:' + x.c + '"><div class="in"><div class="face front"><span class="em" aria-hidden="true">' + x.e + '</span><div><h3>' + esc(x.n) + '</h3><small>' + esc(x.s) + '</small></div><small>Tap to flip ↻</small></div>' +
-    '<div class="face back"><h3>' + esc(x.n) + '</h3><p>' + esc(x.what) + '</p><p class="lesson">💡 ' + esc(x.learn) + '</p><p class="ref">Read it: ' + esc(x.ref) + '</p></div></div></button>';
-}).join('');
-document.getElementById('peopleList').addEventListener('click', function (e) { var c = e.target.closest('.card'); if (!c) return; c.classList.toggle('flip'); c.setAttribute('aria-pressed', c.classList.contains('flip')); });
-
-var shelfOn = -1;
-function renderShelf(){
-  var h = [];
-  SHELF.forEach(function (g, gi) { g[3].forEach(function (b) {
-    var ht = 70 + ((b.length * 7) % 60), dim = shelfOn >= 0 && shelfOn !== gi;
-    h.push('<button type="button" class="bk" role="listitem" title="' + esc(b) + '" aria-label="' + esc(b) + ', ' + esc(g[0]) + '" data-g="' + gi + '" style="height:' + ht + 'px;background:' + g[2] + ';opacity:' + (dim ? .22 : 1) + '"></button>');
-  }); });
-  document.getElementById('books').innerHTML = h.join('');
-  document.getElementById('legend').innerHTML = SHELF.map(function (g, gi) {
-    return '<button type="button" class="lg' + (shelfOn === gi ? ' on' : '') + '" style="--c:' + g[2] + '" data-g="' + gi + '" aria-pressed="' + (shelfOn === gi) + '"><i></i><div><b>' + esc(g[0]) + ' · ' + g[3].length + '</b><span>' + esc(g[1]) + (shelfOn === gi ? '<br><b style="font-family:inherit;font-size:14px;color:var(--ink)">' + esc(g[3].join(', ')) + '</b>' : '') + '</span></div></button>';
-  }).join('');
-}
-document.getElementById('library').addEventListener('click', function (e) { var b = e.target.closest('[data-g]'); if (!b) return; var g = +b.dataset.g; shelfOn = shelfOn === g ? -1 : g; renderShelf(); });
-
-document.getElementById('faq').innerHTML = FAQ.map(function (q) { return '<details><summary>' + esc(q[0]) + '</summary><div class="a">' + esc(q[1]) + '</div></details>'; }).join('');
-
-// ---------- Storybook view ----------
-var ov = document.getElementById('ov'), cur = 0, lastFocus = null;
-function openChap(i){
-  stopSpeak(); cur = i; var x = STORY[i];
-  ov.style.setProperty('--c', x.c); ov.style.setProperty('--c2', x.c2);
-  document.getElementById('ovBar').textContent = 'Part ' + x.n + ' of ' + STORY.length;
-  var s = getStars();
-  document.getElementById('ovBody').innerHTML =
-    '<div class="pic" aria-hidden="true">' + ART[x.art] + '</div>' +
-    '<h2 id="ovTitle">' + esc(x.title) + '</h2><div class="big">' + esc(x.big) + '</div>' +
-    '<div class="story" id="storyText">' + x.story.map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('') + '</div>' +
-    '<div class="box read"><h3>📖 Read it together</h3><q>“' + esc(x.verse[0]) + '”</q><cite>' + esc(x.verse[1]) + ' · Read more in ' + esc(x.more) + '</cite></div>' +
-    '<div class="box"><h3>💭 Wonder together</h3><ul>' + x.wonder.map(function (w) { return '<li>' + esc(w) + '</li>'; }).join('') + '</ul></div>' +
-    '<div class="box"><h3>✋ Remember it</h3><div class="motion"><span class="em" aria-hidden="true">' + x.motion[0] + '</span><p>' + esc(x.motion[1]) + '</p></div></div>' +
-    '<div class="box"><h3>🎨 Try this</h3><p>' + esc(x.act) + '</p></div>' +
-    '<div class="box"><h3>🙏 Pray</h3><p>' + esc(x.pray) + '</p></div>' +
-    '<div style="text-align:center;margin-top:18px"><button type="button" class="btn star-btn" id="starBtn">' + (s[x.id] ? '⭐ You earned this star!' : '⭐ We read this part!') + '</button><div class="cheer" id="cheer">Great job! ⭐</div></div>' +
-    '<div class="nav2">' + (i > 0 ? '<button type="button" class="btn alt" id="prevBtn">← ' + esc(STORY[i - 1].title) + '</button>' : '<span></span>') +
-      (i < STORY.length - 1 ? '<button type="button" class="btn main" id="nextBtn" style="background:' + STORY[i + 1].c + (STORY[i + 1].id === 'risen' ? ';color:#2B2340' : '') + '">Next: ' + esc(STORY[i + 1].title) + ' →</button>' : '<button type="button" class="btn main" id="doneBtn">Back to the story map</button>') + '</div>';
-  if (!ov.classList.contains('open')) { lastFocus = document.activeElement; ov.classList.add('open'); document.body.style.overflow = 'hidden'; }
-  ov.scrollTop = 0; document.getElementById('ovClose').focus();
-  try { history.replaceState(null, '', '#part-' + x.n); } catch (e) {}
-  document.getElementById('starBtn').onclick = function () { var st = getStars(); st[x.id] = true; setStars(st); this.textContent = '⭐ You earned this star!'; var ch = document.getElementById('cheer'); ch.classList.remove('show'); void ch.offsetWidth; ch.classList.add('show'); renderPath(); };
-  var p = document.getElementById('prevBtn'), n = document.getElementById('nextBtn'), d = document.getElementById('doneBtn');
-  if (p) p.onclick = function () { openChap(i - 1); };
-  if (n) n.onclick = function () { openChap(i + 1); };
-  if (d) d.onclick = closeChap;
-}
-function closeChap(){ stopSpeak(); ov.classList.remove('open'); document.body.style.overflow = ''; try { history.replaceState(null, '', '#story'); } catch (e) {} if (lastFocus) lastFocus.focus(); }
-document.getElementById('ovClose').onclick = closeChap;
-document.addEventListener('keydown', function (e) { if (!ov.classList.contains('open')) return; if (e.key === 'Escape') closeChap(); if (e.key === 'ArrowRight' && cur < STORY.length - 1) openChap(cur + 1); if (e.key === 'ArrowLeft' && cur > 0) openChap(cur - 1); });
-
-// Read aloud
-var speakBtn = document.getElementById('ovSpeak'), speaking = false;
-if (!('speechSynthesis' in window)) speakBtn.style.display = 'none';
-function stopSpeak(){ if (window.speechSynthesis) speechSynthesis.cancel(); speaking = false; speakBtn.querySelector('span').textContent = 'Read to me'; }
-speakBtn.onclick = function () {
-  if (speaking) { stopSpeak(); return; }
-  var x = STORY[cur], text = x.title + '. ' + x.story.join(' ') + ' The Bible says: ' + x.verse[0].replace(/[“”‘’]/g, '') + ' ' + x.verse[1].replace(':', ', verse ') + '.';
-  var u = new SpeechSynthesisUtterance(text); u.rate = 0.92; u.pitch = 1.05;
-  u.onend = function () { speaking = false; speakBtn.querySelector('span').textContent = 'Read to me'; };
-  speechSynthesis.cancel(); speechSynthesis.speak(u); speaking = true; speakBtn.querySelector('span').textContent = 'Stop';
-};
-
-renderPath(); renderShelf();
-var m = location.hash.match(/^#part-(\d+)$/); if (m && STORY[+m[1] - 1]) openChap(+m[1] - 1);
-</script>
+<footer>Scripture quotations are from the Berean Standard Bible (public domain).</footer>
 <script>window.goatcounter = { path: '/child' };</script>
 <script data-goatcounter="https://exploreyourbible.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
