@@ -13,6 +13,17 @@ body{margin:0}
 a{color:#7A3B1E}a:hover{color:#4F2412}
 button,input{font:inherit}
 button:focus-visible,input:focus-visible{outline:3px solid #2E4A8A;outline-offset:2px}
+.eyb-st{border-radius:4px}
+.eyb-st.has{cursor:help;text-decoration:underline dotted #CDBFA8;text-decoration-thickness:1.5px;text-underline-offset:4px;transition:background .15s}
+.eyb-st.has:hover,.eyb-st.has.open,.eyb-st.has:focus-visible{background:rgba(122,59,30,.10);text-decoration-color:#7A3B1E;outline:none}
+.eyb-tip{display:none;position:absolute;left:0;z-index:40;margin-top:1.55em;width:min(380px,100%);background:#231E19;color:#FBF7EF;border-radius:12px;padding:10px 12px 8px;box-shadow:0 10px 28px rgba(35,30,25,.28);font-size:14px;line-height:1.4;text-decoration:none;cursor:default;font-style:normal;font-weight:400;letter-spacing:0;text-transform:none}
+.eyb-tip::before{content:"";position:absolute;left:0;right:0;top:-12px;height:12px}
+.eyb-st.has:hover .eyb-tip,.eyb-st.has.open .eyb-tip,.eyb-st.has:focus-within .eyb-tip{display:block}
+.eyb-tiph{display:block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#D9B48C;margin-bottom:6px}
+.eyb-refs{display:flex;flex-wrap:wrap;gap:6px}
+.eyb-ref{cursor:pointer;border:1px solid rgba(251,247,239,.25);background:rgba(251,247,239,.08);color:#FBF7EF;border-radius:999px;padding:5px 10px;min-height:32px;font-size:13px;font-weight:600}
+.eyb-ref:hover{background:#FBF7EF;color:#231E19}
+.eyb-sp{position:relative}
 .be-det>summary{list-style:none;cursor:pointer}.be-det>summary::-webkit-details-marker{display:none}.be-det[open]>summary .be-chev{transform:rotate(180deg)}
 @media (max-width:719px){.be-hxd{align-items:flex-end!important}.be-hxd-panel{height:92vh!important;width:100%!important;border-radius:18px 18px 0 0}}
 @media (max-width:719px){.be-steps{grid-template-columns:repeat(3,minmax(0,1fr))!important}.be-steps-span{display:none!important}}
@@ -62,6 +73,6 @@ button:focus-visible,input:focus-visible{outline:3px solid #2E4A8A;outline-offse
 <body>
 <div id="app"></div>
 <noscript>Explore Your Bible needs JavaScript to run.</noscript>
-<script type="module" src="app.js?v=1795555262"></script>
+<script type="module" src="app.js?v=1795830398"></script>
 </body>
 </html>
