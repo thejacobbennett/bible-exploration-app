@@ -520,25 +520,30 @@ function buildQuiz(st, go) {
     return res;
   }
   // results
-  var score = {}, max = 0, answered = 0, picks = [];
+  var score = {}, max = 0, answered = 0, picks = [], breakdown = [];
+  var shortOf = function (id) { var t = TRAD_NAME[id]; return t ? (t.short || t.name) : id; };
   TRADS.forEach(function (t) { score[t.id] = 0; });
   Qs.forEach(function (q) {
-    var k = A[q.id]; if (k === undefined || k < 0) return; var o = q.opts[k]; if (!o) return; answered++;
+    var k = A[q.id]; if (k === undefined || k < 0) { breakdown.push({ n: breakdown.length + 1, q: q.q, a: 'Skipped', hasName: false, name: '', held: '', hasHeld: false, some: '', hasSome: false, skipped: true, op: 0.6 }); return; } var o = q.opts[k]; if (!o) return; answered++;
     if (kind === 'fw') {
       max += 2; var f = FW_TRADS[o.fw] || { T: '', S: '' };
+      var tH = TRADS.filter(function (t) { return f.T.indexOf(t.id) >= 0; }).map(function (t) { return shortOf(t.id); }), sH = TRADS.filter(function (t) { return f.S.indexOf(t.id) >= 0; }).map(function (t) { return shortOf(t.id); });
+      breakdown.push({ n: breakdown.length + 1, q: q.q, a: o.label, hasName: true, name: o.fwName, held: tH.length ? 'Typical in: ' + tH.join(', ') : 'Not the typical view of any tradition here', hasHeld: true, some: sH.length ? 'Also found in some: ' + sH.join(', ') : '', hasSome: sH.length > 0, skipped: false, op: 1 });
       TRADS.forEach(function (t) { if (f.T.indexOf(t.id) >= 0) score[t.id] += 2; else if (f.S.indexOf(t.id) >= 0) score[t.id] += 1; });
       picks.push({ fam: q.famName, name: o.fwName, pick: (function (fid, wid) { return function () { var cf = Object.assign({}, st.cmpFw || {}); var cur2 = (cf[fid] || []).filter(function (x) { return x !== wid; }); cf[fid] = [wid].concat(cur2).slice(0, 3); go({ quiz: null, tab: 'compare', cmpMode: 'fw', cmpFam: fid, cmpFw: cf, cmpView: 'venn' }); window.scrollTo(0, 0); }; })(q.id, o.fw) });
     } else {
       max += 1; var got = {};
       o.specs.forEach(function (sp) { var h = quizHolders(sp); Object.keys(h).forEach(function (x) { got[x] = Math.max(got[x] || 0, h[x]); }); });
       TRADS.forEach(function (t) { score[t.id] += got[t.id] || 0; });
+      var full = TRADS.filter(function (t) { return got[t.id] >= 1; }).map(function (t) { return shortOf(t.id); }), part = TRADS.filter(function (t) { return got[t.id] > 0 && got[t.id] < 1; }).map(function (t) { return shortOf(t.id); });
+      breakdown.push({ n: breakdown.length + 1, q: q.q, a: o.label, hasName: false, name: '', held: full.length ? 'Shared by: ' + full.join(', ') : 'Not the official view of any tradition here', hasHeld: true, some: part.length ? 'Partly: ' + part.join(', ') : '', hasSome: part.length > 0, skipped: false, op: 1 });
     }
   });
   var ranked = TRADS.map(function (t) { var pc = max ? Math.round(score[t.id] / max * 100) : 0; return { id: t.id, name: t.name, color: t.color, pc: pc, pcLabel: pc + '%', w: Math.max(2, pc) + '%' }; })
     .sort(function (a, b) { return b.pc - a.pc; });
   var top = ranked.slice(0, 3);
   Object.assign(res, { answered: answered, none: answered === 0, some: answered > 0, ranked: ranked, topNames: top.map(function (t) { return t.name; }).join(', '),
-    best: top[0] ? top[0].name : '', picks: picks, hasPicks: picks.length > 0,
+    best: top[0] ? top[0].name : '', picks: picks, hasPicks: picks.length > 0, breakdown: breakdown, bdTitle: 'Your answers, question by question (' + answered + ' of ' + N + ' answered)',
     compareTop: function () { go({ quiz: null, tab: 'compare', cmpMode: 'trad', cmpView: 'venn', cmpSel: top.map(function (t) { return t.id; }), cmpReg: null }); window.scrollTo(0, 0); },
     sideTop: function () { go({ quiz: null, tab: 'compare', cmpMode: 'trad', cmpView: 'table', cmpSel: ranked.slice(0, 5).map(function (t) { return t.id; }), cmpReg: null }); window.scrollTo(0, 0); },
     retake: function () { go({ quizA: {}, quizI: 0 }); }, back: function () { go({ quizI: N - 1 }); } });
@@ -5932,7 +5937,8 @@ ${(V.cmp.qz.some) ? html`<div><div style="font-size: 12px; font-weight: 700; let
 ${(V.cmp.qz.hasPicks) ? html`<div style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 14px; padding: 12px 14px"><div style="font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #6B5F52; margin-bottom: 6px">Your frameworks</div>${(V.cmp.qz.picks || []).map((pk, $index) => html`<button type="button" onClick=${pk.pick} style="display: flex; justify-content: space-between; gap: 10px; width: 100%; cursor: pointer; border: none; border-top: 1px solid #EFE7D8; background: transparent; padding: 8px 0; text-align: left; font-size: 14px; color: #231E19"><span style="color: #6B5F52">${pk.fam}</span><b style="text-align: right">${pk.name} →</b></button>`)}</div>` : null}
 <div style="display: flex; flex-direction: column; gap: 6px">${(V.cmp.qz.ranked || []).map((r, $index) => html`<div style="display: grid; grid-template-columns: minmax(120px, 190px) 1fr 44px; gap: 10px; align-items: center; font-size: 14px"><span style="font-weight: 700; color: #231E19">${r.name}</span><div style="height: 12px; border-radius: 99px; background: #EFE7D8; overflow: hidden"><div style="height: 100%; width: ${r.w}; background: ${r.color}; border-radius: 99px"></div></div><span style="text-align: right; font-weight: 700; color: #4A3F35">${r.pcLabel}</span></div>`)}</div>
 <div style="display: flex; flex-wrap: wrap; gap: 8px"><button type="button" onClick=${V.cmp.qz.compareTop} style="cursor: pointer; border: none; background: #231E19; color: #FBF7EF; border-radius: 999px; padding: 10px 18px; min-height: 44px; font-size: 14px; font-weight: 800">Compare my top 3 in a Venn diagram</button><button type="button" onClick=${V.cmp.qz.sideTop} style="cursor: pointer; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; border-radius: 999px; padding: 10px 18px; min-height: 44px; font-size: 14px; font-weight: 700">Top 5 side by side</button></div>` : null}
-<p style="margin: 0; font-size: 13px; color: #6B5F52; line-height: 1.5">This is a starting point for exploring, not a label. Every tradition contains a range of views, and the match only counts the questions you answered.</p>
+${(V.cmp.qz.some) ? html`<details style="background: #FFFDF8; border: 1px solid #E2D8C6; border-radius: 14px"><summary style="cursor: pointer; padding: 12px 14px; font-size: 14px; font-weight: 800; color: #231E19">${V.cmp.qz.bdTitle}</summary><div style="padding: 0 14px 12px; display: flex; flex-direction: column">${(V.cmp.qz.breakdown || []).map((bd, $index) => html`<div style="border-top: 1px solid #EFE7D8; padding: 10px 0; opacity: ${bd.op}"><div style="font-size: 12px; font-weight: 700; color: #6B5F52">${bd.n}. ${bd.q}</div><div style="font-size: 15px; font-weight: 700; color: #231E19; margin-top: 2px">${bd.a}</div>${(bd.hasName) ? html`<div style="font-size: 13px; font-weight: 700; color: #7A3B1E; margin-top: 2px">View: ${bd.name}</div>` : null}${(bd.hasHeld) ? html`<div style="font-size: 13px; color: #4A3F35; margin-top: 3px; line-height: 1.45">${bd.held}</div>` : null}${(bd.hasSome) ? html`<div style="font-size: 13px; color: #6B5F52; line-height: 1.45">${bd.some}</div>` : null}</div>`)}</div></details>
+` : null}<p style="margin: 0; font-size: 13px; color: #6B5F52; line-height: 1.5">This is a starting point for exploring, not a label. Every tradition contains a range of views, and the match only counts the questions you answered.</p>
 <div style="display: flex; justify-content: space-between; gap: 10px"><button type="button" onClick=${V.cmp.qz.back} style="cursor: pointer; border: 1px solid #D9CDB8; background: #FFFDF8; color: #231E19; border-radius: 999px; padding: 8px 16px; min-height: 42px; font-size: 14px; font-weight: 700">← Change answers</button><button type="button" onClick=${V.cmp.qz.retake} style="cursor: pointer; border: none; background: transparent; color: #7A3B1E; padding: 8px 4px; min-height: 42px; font-size: 14px; font-weight: 700; text-decoration: underline">Start over</button></div>
 </div>` : null}
 </div></div>` : null}
