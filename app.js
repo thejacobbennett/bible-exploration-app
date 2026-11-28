@@ -511,12 +511,17 @@ function quizShareText(title, ranked, breakdown, answered, N, full) {
   L.push('', 'Take the quiz at exploreyourbible.com (Traditions page)');
   return L.join('\n');
 }
+function quizKey(kind) { return 'bibleExplorer.quiz.' + kind; }
+function quizLoad(kind) { try { return JSON.parse(localStorage.getItem(quizKey(kind)) || 'null'); } catch (e) { return null; } }
+function quizSave(kind, A, i) { try { localStorage.setItem(quizKey(kind), JSON.stringify({ A: A || {}, i: i || 0 })); } catch (e) {} }
+function quizClear(kind) { try { localStorage.removeItem(quizKey(kind)); } catch (e) {} }
 function buildQuiz(st, go) {
   var kind = st.quiz === 'fw' ? 'fw' : st.quiz === 'trad' ? 'trad' : null;
   var Qs;
   if (kind === 'fw') Qs = QUIZ_FW.map(function (q) { var f = FW_FAMILIES.filter(function (x) { return x.id === q[0]; })[0]; return f ? { id: q[0], q: q[1], help: 'Pick the answer closest to yours. You’ll see the names for each view at the end.', famName: f.name, opts: q[2].map(function (o) { var pr = o[0].split(' ¦ '); var w = f.fws.filter(function (x) { return x.id === o[1]; })[0]; return { label: pr[0], sub: pr[1] || '', fw: o[1], fwName: w ? w.name : o[1] }; }) } : null; }).filter(Boolean);
   else Qs = QUIZ_TRAD.map(function (q) { return { id: q[0], q: q[1], help: q[2], opts: q[3].map(function (o) { var pr = o[0].split(' ¦ '); return { label: pr[0], sub: pr[1] || '', specs: o[1] }; }) }; });
   var A = st.quizA || {}, N = Qs.length, i = Math.max(0, Math.min(st.quizI || 0, N));
+  var g = function (patch) { var A2 = patch.quizA !== undefined ? patch.quizA : A, i2 = patch.quizI !== undefined ? patch.quizI : i; if (kind) quizSave(kind, A2, i2); go(patch); };
   var setA = function (qid, v) { var o = Object.assign({}, A); o[qid] = v; return o; };
   var res = { open: !!kind, isFw: kind === 'fw', title: kind === 'fw' ? 'Find your frameworks' : 'Which tradition fits your beliefs?',
     close: function () { go({ quiz: null }); }, total: N, isQ: i < N, isRes: i >= N };
@@ -524,9 +529,9 @@ function buildQuiz(st, go) {
   if (i < N) {
     var q = Qs[i], cur = A[q.id];
     Object.assign(res, { n: i + 1, pct: Math.round(i / N * 100), q: q.q, help: q.help, hasHelp: !!q.help,
-      opts: q.opts.map(function (o, k) { var on = cur === k; return { label: o.label, sub: o.sub, hasSub: !!o.sub, bg: on ? '#231E19' : '#FFFDF8', fg: on ? '#FBF7EF' : '#231E19', subFg: on ? '#D9CDB8' : '#6B5F52', bd: on ? '#231E19' : '#D9CDB8', pressed: on ? 'true' : 'false', pick: function () { go({ quizA: setA(q.id, k), quizI: i + 1 }); } }; }),
-      notSure: function () { go({ quizA: setA(q.id, -1), quizI: i + 1 }); },
-      back: function () { go({ quizI: Math.max(0, i - 1) }); }, noBack: i === 0, backOp: i === 0 ? 0.4 : 1 });
+      opts: q.opts.map(function (o, k) { var on = cur === k; return { label: o.label, sub: o.sub, hasSub: !!o.sub, bg: on ? '#231E19' : '#FFFDF8', fg: on ? '#FBF7EF' : '#231E19', subFg: on ? '#D9CDB8' : '#6B5F52', bd: on ? '#231E19' : '#D9CDB8', pressed: on ? 'true' : 'false', pick: function () { g({ quizA: setA(q.id, k), quizI: i + 1 }); } }; }),
+      notSure: function () { g({ quizA: setA(q.id, -1), quizI: i + 1 }); },
+      back: function () { g({ quizI: Math.max(0, i - 1) }); }, noBack: i === 0, backOp: i === 0 ? 0.4 : 1 });
     return res;
   }
   // results
@@ -560,7 +565,7 @@ function buildQuiz(st, go) {
     shareMoreLabel: (typeof navigator !== 'undefined' && navigator.share) ? 'More…' : 'Copy', bdTitle: 'Your answers, question by question (' + answered + ' of ' + N + ' answered)',
     compareTop: function () { go({ quiz: null, tab: 'compare', cmpMode: 'trad', cmpView: 'venn', cmpSel: top.map(function (t) { return t.id; }), cmpReg: null }); window.scrollTo(0, 0); },
     sideTop: function () { go({ quiz: null, tab: 'compare', cmpMode: 'trad', cmpView: 'table', cmpSel: ranked.slice(0, 5).map(function (t) { return t.id; }), cmpReg: null }); window.scrollTo(0, 0); },
-    retake: function () { go({ quizA: {}, quizI: 0 }); }, back: function () { go({ quizI: N - 1 }); } });
+    retake: function () { quizClear(kind); g({ quizA: {}, quizI: 0 }); }, back: function () { g({ quizI: N - 1 }); } });
   return res;
 }
 function findBook(id) { for (var i = 0; i < ALLB.length; i++) if (ALLB[i].id === id) return ALLB[i]; return null; }
@@ -5016,7 +5021,8 @@ class Component extends DCLogic {
     };
     cmp.sections.forEach(function (sec) { sec.items.forEach(function (it) { var h = HX_BY_POS[it.text]; it.hasHx = !!h; it.hxPick = function () { if (h) openHx(h.id); }; }); });
     cmp.qz = buildQuiz(st, go);
-    cmp.quizCta = cmpMode === 'fw' ? { t: 'Not sure where you land?', b: 'Find your frameworks', d: '14 quick questions, one per topic, to see which views you hold and which traditions share them.', go: function () { go({ quiz: 'fw', quizI: 0, quizA: {} }); } } : { t: 'Not sure where you fit?', b: 'Take the beliefs quiz', d: '19 quick questions about the Bible, salvation, the sacraments and church life. See which traditions match your answers most closely.', go: function () { go({ quiz: 'trad', quizI: 0, quizA: {} }); } };
+    cmp.quizCta = cmpMode === 'fw' ? { t: 'Not sure where you land?', b: 'Find your frameworks', d: '14 quick questions, one per topic, to see which views you hold and which traditions share them.', go: function () { var sv = quizLoad('fw') || {}; go({ quiz: 'fw', quizI: sv.i || 0, quizA: sv.A || {} }); } } : { t: 'Not sure where you fit?', b: 'Take the beliefs quiz', d: '19 quick questions about the Bible, salvation, the sacraments and church life. See which traditions match your answers most closely.', go: function () { var sv = quizLoad('trad') || {}; go({ quiz: 'trad', quizI: sv.i || 0, quizA: sv.A || {} }); } };
+    (function () { var k = cmpMode === 'fw' ? 'fw' : 'trad', sv = quizLoad(k), N = k === 'fw' ? QUIZ_FW.length : QUIZ_TRAD.length; var n = sv && sv.A ? Object.keys(sv.A).length : 0; cmp.quizCta.hasSaved = n > 0; if (n > 0) { cmp.quizCta.b = (sv.i || 0) >= N ? 'See my results' : 'Continue (' + n + ' of ' + N + ' answered)'; cmp.quizCta.d = 'Your answers are saved on this device. Pick up where you left off, change any answer, or start over.'; } cmp.quizCta.reset = function () { quizClear(k); go({ quizTick: Date.now() }); }; })();
     cmp.quizShow = cmpMode !== 'pr';
     cmp.cards.forEach(function (c, i) { var x = cSel[i]; var h = cmpMode === 'fw' && x ? HX_BY_FW[x.id] : null; c.hasHx = !!h; c.hxPick = function () { if (h) openHx(h.id); }; });
     var showTrads = cmpMode === 'fw' && st.cmpView === 'trads';
@@ -5934,7 +5940,7 @@ ${(V.cmp.fams || []).map((f, $index) => html`<option value=${f.id}>${f.label}</o
 ` : null}
 ${(V.cmp.showPicker) ? html`
 <div>
-${(V.cmp.quizShow) ? html`<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin: 0 0 14px; padding: 12px 16px; background: #F3ECE0; border-radius: 14px"><div style="flex: 1 1 260px"><div style="font-weight: 800; font-size: 15px; color: #231E19">${V.cmp.quizCta.t}</div><div style="font-size: 13px; color: #6B5F52; line-height: 1.45">${V.cmp.quizCta.d}</div></div><button type="button" onClick=${V.cmp.quizCta.go} style="cursor: pointer; border: none; background: #231E19; color: #FBF7EF; border-radius: 999px; padding: 10px 18px; min-height: 44px; font-size: 14px; font-weight: 800">${V.cmp.quizCta.b} →</button></div>` : null}
+${(V.cmp.quizShow) ? html`<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin: 0 0 14px; padding: 12px 16px; background: #F3ECE0; border-radius: 14px"><div style="flex: 1 1 260px"><div style="font-weight: 800; font-size: 15px; color: #231E19">${V.cmp.quizCta.t}</div><div style="font-size: 13px; color: #6B5F52; line-height: 1.45">${V.cmp.quizCta.d}</div></div><button type="button" onClick=${V.cmp.quizCta.go} style="cursor: pointer; border: none; background: #231E19; color: #FBF7EF; border-radius: 999px; padding: 10px 18px; min-height: 44px; font-size: 14px; font-weight: 800">${V.cmp.quizCta.b} →</button>${(V.cmp.quizCta.hasSaved) ? html`<button type="button" onClick=${V.cmp.quizCta.reset} style="cursor: pointer; border: none; background: transparent; color: #7A3B1E; padding: 8px 4px; min-height: 40px; font-size: 13px; font-weight: 700; text-decoration: underline">Clear my answers</button>` : null}</div>` : null}
 ${(V.cmp.qz.open) ? html`<div role="dialog" aria-modal="true" aria-label=${V.cmp.qz.title} style="position: fixed; inset: 0; z-index: 80; background: rgba(35,30,25,.55); display: flex; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 24px 12px">
 <div style="background: #FBF7EF; border-radius: 20px; width: min(720px, 100%); box-shadow: 0 20px 60px rgba(0,0,0,.3); overflow: hidden">
 <div style="display: flex; align-items: center; gap: 12px; padding: 14px 18px; background: #231E19; color: #FBF7EF"><div style="flex: 1; font-family: Fraunces, Georgia, serif; font-weight: 700; font-size: 19px">${V.cmp.qz.title}</div><button type="button" onClick=${V.cmp.qz.close} aria-label="Close the quiz" style="cursor: pointer; border: none; background: rgba(251,247,239,.14); color: #FBF7EF; border-radius: 999px; width: 40px; height: 40px; font-size: 18px">✕</button></div>
